@@ -33,3 +33,4 @@
 /application/config/config.server.php
 /application/third_party/stripe.old
 /application/config/config.local.php
+.vscode

@@ -139,13 +139,24 @@ class Scenario_practice extends Frontend_controller
                     $this->db->group_start();
                     $this->db->like('s.name', $search);
                     $this->db->or_like('s.presentation', $search);
-                    $this->db->or_like('s.patient_information', $search);
+                    // $this->db->or_like('s.patient_information', $search);
                     $this->db->group_end();
                 }
                 $this->db->order_by('sgi.order', 'asc');
                 $topic->topic_items = $this->db->get()->result();
             }
+
+            // Filter out topics with no items
+            $subject->topics = array_filter($subject->topics, function($topic) {
+                return !empty($topic->topic_items);
+            });
         }
+        
+        // Filter out subjects with no topics
+        $scenarioSubjects = array_filter($scenarioSubjects, function($subject) {
+            return !empty($subject->topics);
+        });
+
         return $scenarioSubjects;
     }
 
