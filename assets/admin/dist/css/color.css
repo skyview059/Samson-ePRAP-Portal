@@ -1,0 +1,148 @@
+
+
+
+
+
+/* 
+    Created on : Sep 9, 2020, 7:37:22 PM
+    Author     : LENOVO
+*/
+
+.btn {
+        letter-spacing: .5px;
+}
+.btn-primary {
+    background-color: #4d7092;
+    border-color: #4d7092;
+}
+.btn-primary:hover {
+    color: #FFF;
+    background-color: #198bcc;
+    transition: all,.2s,ease-in-out;    
+}
+
+.btn-primary.active.focus, 
+.btn-primary.active:focus, 
+.btn-primary.active:hover, 
+.btn-primary:active.focus, 
+.btn-primary:active:focus, 
+.btn-primary:active:hover, 
+.open>.dropdown-toggle.btn-primary.focus, 
+.open>.dropdown-toggle.btn-primary:focus, 
+.open>.dropdown-toggle.btn-primary:hover {
+    color: #fff;
+    background-color: #204d74;
+    border-color: #122b40;
+}
+
+a {
+    color: #145885;
+}
+.pagination>.active>a, 
+.pagination>.active>a:focus, 
+.pagination>.active>a:hover, 
+.pagination>.active>span, 
+.pagination>.active>span:focus, 
+.pagination>.active>span:hover {
+    background-color: #6d03a2;
+    border-color: #6d03a2;
+}
+.pagination>.active>a:focus,
+.pagination>.active>a:hover {
+    color: #FFF;
+    background-color: #198bcc;
+    transition: all,.2s,ease-in-out;    
+}
+
+fieldset {
+    border: 1px dashed #bb1616;
+    padding: 15px;
+    margin-bottom: 25px;        
+}
+
+legend {
+    border: 1px dashed #bb1616;
+    padding: 0px 15px;
+    width: inherit;
+    margin-bottom: 5px;
+    margin-left: 50px;
+    color: #145885;
+    font-weight: bold;
+    font-size: 14pt;
+}
+
+fieldset, legend {
+    background-color: #FFF;
+}
+
+.name2img {
+    font-size: 20pt;
+    background: #f1f1f1;
+    height: 60px;
+    width: 60px;
+    padding-top: 6px;
+    margin: 0 auto;
+    text-align: center;
+    border: 5px solid #dedede;
+    border-radius: 50%;
+    -moz-border-radius: 50%;
+    -webkit-border-radius: 50%;
+    font-weight: bold;
+    color: #ababab;
+}
+.img-cercle {
+    border: 3px solid #dedede;
+    background: #f1f1f1;
+    border-radius: 50%;
+    -moz-border-radius: 50%;
+    -webkit-border-radius: 50%;
+}
+
+.name2img-v3 {    
+    height: 60px;
+    width: 60px;
+    padding-top: 6px;
+    margin: 0 auto;
+    text-align: center;
+    border: 5px solid #dedede;
+    border-radius: 50%;
+    -moz-border-radius: 50%;
+    -webkit-border-radius: 50%;
+    font-weight: bold;
+    color: #ababab;
+    background-image: url('../img/female.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    position: relative;
+}
+.name2img-male-v3 {
+    background-image: url('../img/male.png');
+}
+
+.name2img-v3>span {
+    position: absolute;
+    bottom: 5px;
+    background: #3c8dbc;
+    font-size: 12pt;
+    padding: 5px 10px;
+    margin-left: 55px;
+    color: #FFF;
+    border-radius: 5px;
+}
+
+.skin-blue-light .main-header .logo {
+    background-color: #fff !important;
+    color: #6d03a2 !important;
+}
+.skin-blue-light .main-header .navbar .sidebar-toggle:hover {
+    background-color: #198bcc;
+}
+
+.skin-blue-light .main-header .logo,
+.skin-blue-light .main-header .navbar {
+    background-color: #6d03a2;
+}
+
+.skin-blue-light .main-header li.user-header {
+    background-color: #6d03a2;
+}

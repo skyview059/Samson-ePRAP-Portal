@@ -1,0 +1,1 @@
+ALTER TABLE `student_logs` ADD FOREIGN KEY (`student_id`) REFERENCES `students`(`id`) ON DELETE CASCADE ON UPDATE NO ACTION;

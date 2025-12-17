@@ -1,0 +1,1 @@
+<?php load_module_asset('course', 'js', 'script.common.js.php' ); ?>

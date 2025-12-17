@@ -1,0 +1,23 @@
+<div style="background-color: #F9F9F9; padding: 50px 0;">
+    <div style="width: 90%; border: 1px solid #EEE; background: #fff; margin: 0 auto;">
+        <div style="background-color:#009adf; height:80px; padding:15px;">
+            <div style="float:left">
+                <img src="https://www.eprap.com/portal/assets/theme/images/logo.png" />
+            </div>
+
+            <div style="float:right; text-align:right; color:#FFF;  font-size:12pt;">
+                Cell: +44(0) 8000 096 888<br />                
+            </div>
+        </div>
+
+        <div class="mail_body" style="min-height: 120px; padding:20px; font-size:11pt; font-family:Arial, Helvetica, sans-serif;">
+            %MailBody%
+        </div>
+
+        <div style="background-color:#CCC;">
+            <p style="color:#222; text-align:center; padding:10px 0; margin: 0">
+                Copyright &copy; <?= date('Y')?> ePRAP. All rights reserved.
+            </p>
+        </div>
+    </div>
+</div>
