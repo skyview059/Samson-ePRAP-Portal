@@ -17,6 +17,9 @@ $route['admin/scenario/save_assign_scenario'] = 'scenario/save_assign_scenario';
 $route['admin/scenario/ajax_del_action']   = 'scenario/ajax_del_action';
 $route['admin/scenario/ajax_batch_delete'] = 'scenario/ajax_batch_delete';
 
+$route['admin/scenario/set_display_mode']      = 'scenario/set_display_mode';
+$route['admin/scenario/ajax_set_display_mode'] = 'scenario/ajax_set_display_mode';
+
 
 $route['admin/scenario/practice']                                = 'scenario/practice';
 $route['admin/scenario/practice/view/(:num)']                    = 'scenario/practice/practice_view/$1';

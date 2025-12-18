@@ -293,6 +293,42 @@ class Scenario extends Admin_controller
         echo ajaxRespond('OK', '<p class="ajax_success">Selected Scenario Deleted Successfully</p>');
     }
 
+    public function set_display_mode()
+    {
+        $exam_id = (int)$this->input->get('exam_id');
+        $mode = $this->input->get('mode');
+
+        if (!in_array($mode, ['Presentation', 'Diagnosis'])) {
+            $this->session->set_flashdata('msge', 'Invalid Mode');
+            redirect(site_url(Backend_URL . "scenario?id={$exam_id}"));
+        }
+
+        if ($exam_id > 0) {
+            $this->db->where('exam_id', $exam_id);
+        }
+        $this->db->update('scenarios', ['display_mode' => $mode]);
+
+        $this->session->set_flashdata('msgs', "All scenarios set to display {$mode}");
+        redirect(site_url(Backend_URL . "scenario?id={$exam_id}"));
+    }
+
+    public function ajax_set_display_mode()
+    {
+        ajaxAuthorized();
+        $id = (int)$this->input->post('id');
+        $mode = $this->input->post('mode');
+
+        if (!in_array($mode, ['Presentation', 'Diagnosis'])) {
+            echo ajaxRespond('Fail', 'Invalid Mode');
+            exit;
+        }
+
+        $this->db->where('id', $id);
+        $this->db->update('scenarios', ['display_mode' => $mode]);
+
+        echo ajaxRespond('OK', 'Updated');
+    }
+
 
     public function _menu()
     {

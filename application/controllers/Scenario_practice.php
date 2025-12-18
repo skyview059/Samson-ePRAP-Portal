@@ -128,7 +128,9 @@ class Scenario_practice extends Frontend_controller
                 $this->db->order_by('stis.id', 'desc');
                 $practice_id = $this->db->get_compiled_select('scenario_topics_items_students as stis');
 
-                $this->db->select('sgi.id, sgi.scenario_id, s.name as scenario_name, s.presentation');
+                // $this->db->select('sgi.id, sgi.scenario_id, s.name as scenario_name, s.presentation, s.display_mode');
+                $this->db->select('sgi.id, sgi.scenario_id');
+                $this->db->select("IF(s.display_mode = 'Presentation', s.presentation, s.name) as display_title");
                 $this->db->select("IFNULL(({$status}), 'Incomplete') as status");
                 $this->db->select("IFNULL(({$practice_id}), 0) as practice_id");
                 $this->db->from('scenario_topics_items as sgi');

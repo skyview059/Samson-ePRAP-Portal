@@ -17,7 +17,11 @@
 <section class="content">
     <div class="box">
         <div class="box-header with-border">
-            <div class="col-md-3 col-md-offset-9 text-right">
+            <div class="col-md-8">
+                <a href="<?= site_url(Backend_URL . "scenario/set_display_mode?exam_id={$id}&mode=Presentation") ?>" class="btn btn-info" onclick="return confirm('Are you sure you want to set ALL scenarios to Presentation mode?')"><i class="fa fa-list"></i> Set All to Presentation</a>
+                <a href="<?= site_url(Backend_URL . "scenario/set_display_mode?exam_id={$id}&mode=Diagnosis") ?>" class="btn btn-warning" onclick="return confirm('Are you sure you want to set ALL scenarios to Diagnosis mode?')"><i class="fa fa-stethoscope"></i> Set All to Diagnosis</a>
+            </div>
+            <div class="col-md-4 text-right">
                 <form action="<?php echo site_url(Backend_URL . 'scenario'); ?>" class="form-inline" method="get">
                     <input type="hidden" name="id" value="<?= $id; ?>"/>
                     <div class="input-group">
@@ -50,6 +54,7 @@
                         <th width="100">Scenario No</th>
                         <th>Presentation</th>
                         <th>Diagnosis</th>
+                        <th>Display Mode</th>
                         <th width="150">Created on</th>
                         <th width="150">Updated on</th>
                         <th width="180" class="text-center">Action</th>
@@ -72,6 +77,12 @@
                             <td><?php echo sprintf('%03d',$scenario->reference_number); ?></td>                            
                             <td><?php echo $scenario->presentation; ?></td>
                             <td><?php echo $scenario->name; ?></td>
+                            <td>
+                                <select class="form-control input-sm display-mode-toggle" data-id="<?= $scenario->id ?>">
+                                    <option value="Presentation" <?= ($scenario->display_mode == 'Presentation') ? 'selected' : '' ?>>Presentation</option>
+                                    <option value="Diagnosis" <?= ($scenario->display_mode == 'Diagnosis') ? 'selected' : '' ?>>Diagnosis</option>
+                                </select>
+                            </td>
                             <td><?php echo globalDateTimeFormat($scenario->created_at); ?></td>
                             <td><?php echo globalDateTimeFormat($scenario->updated_at); ?></td>
                             <td class="text-center">
@@ -113,3 +124,24 @@
     </div>
 </section>
 <?php load_module_asset('scenario','js'); ?>
+<script>
+    $(document).ready(function() {
+        $('.display-mode-toggle').change(function() {
+            var id = $(this).data('id');
+            var mode = $(this).val();
+            $.ajax({
+                url: '<?= site_url(Backend_URL . 'scenario/ajax_set_display_mode') ?>',
+                type: 'POST',
+                data: {id: id, mode: mode},
+                success: function(response) {
+                    var res = JSON.parse(response);
+                    if(res.Status == 'OK') {
+                        toastr.success('Display mode updated successfully');
+                    } else {
+                        toastr.error('Failed to update display mode');
+                    }
+                }
+            });
+        });
+    });
+</script>

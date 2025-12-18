@@ -40,7 +40,7 @@ class Scenario_model extends Fm_model
         // $this->db->select("{$sr_qty} as examed");
 
 
-        $this->db->select('s.id, s.reference_number, s.presentation, s.name, s.created_at, s.updated_at');
+        $this->db->select('s.id, s.reference_number, s.presentation, s.name, s.display_mode, s.created_at, s.updated_at');
         $this->db->from('scenarios as s');
 
         /* Code Off for Long Loading Time */

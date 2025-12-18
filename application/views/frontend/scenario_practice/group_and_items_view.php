@@ -132,7 +132,7 @@ if ($scenarioItems):
                                                 <a class="custom_title"
                                                    href="<?= site_url('scenario-practice/exam/' . $exam->id . '/item/' . $item->id); ?>">
                                                     <?php
-                                                    $displayName = $item->scenario_name;
+                                                    $displayName = $item->display_title;
                                                     if (isset($search) && $search !== '') {
                                                         $displayName = preg_replace('/(' . preg_quote($search, '/') . ')/i', '<span style="background-color: yellow; font-weight: bold;">$1</span>', $displayName);
                                                     }
