@@ -50,7 +50,9 @@ class Scenario_practice extends Frontend_controller
 
     public function examExplore($exam_id)
     {
-        $purchaseStatus = scenarioPracticePurchaseStatus($this->student_id, $exam_id);
+        // $purchaseStatus = scenarioPracticePurchaseStatus($this->student_id, $exam_id);
+        // $purchaseStatus = true; // Free for all now
+        $purchaseStatus = (object)['scenario_type' => 'Both']; // Free for all now
 
         $this->db->select('count(*)');
         $this->db->where('exam_id', 'exams.id', false);
@@ -94,7 +96,9 @@ class Scenario_practice extends Frontend_controller
 
     private function getScenarioGroupsAndGroupItems($exam_id, $search = '')
     {
-        $purchaseStatus = scenarioPracticePurchaseStatus($this->student_id, $exam_id);
+        // $purchaseStatus = scenarioPracticePurchaseStatus($this->student_id, $exam_id);
+        // $purchaseStatus = true; // Free for all now
+        $purchaseStatus = (object)['scenario_type' => 'Both']; // Free for all now
 
         $this->db->select('id as subject_id, name as subject_name, type as subject_type');
         $this->db->from('scenario_subjects');
@@ -564,6 +568,7 @@ class Scenario_practice extends Frontend_controller
 
     private function checkPurchaseStatus($exam_id)
     {
+        /*
         $purchaseStatus = scenarioPracticePurchaseStatus($this->student_id, $exam_id);
         if ($purchaseStatus) {
             return $purchaseStatus;
@@ -571,6 +576,8 @@ class Scenario_practice extends Frontend_controller
             $this->session->set_flashdata('msge', 'Please purchase this exam to view it');
             redirect(site_url('scenario-practice'));
         }
+        */
+        return true;
     }
 
 }
