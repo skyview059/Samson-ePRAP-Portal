@@ -34,3 +34,4 @@
 /application/third_party/stripe.old
 /application/config/config.local.php
 .vscode
+/samson_prap_live.sql.zip

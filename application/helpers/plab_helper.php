@@ -7,8 +7,8 @@ function sidebar_links($tab = '')
     $menus = [
         ''                          => '<i class="fa fa-dashboard"></i> Dashboard',
         'booking'                   => '<i class="fa fa-check-square-o"></i> Booking',
-//        'whatsapp-group'            => '<i class="fa fa-whatsapp"></i> Whatsapp Group',
-        'scenario-practice'         => '<i class="fa fa-users"></i> PLAB Part 2 Scenarios <span class="label label-success">NEW</span>',
+//        'whatsapp-group'          => '<i class="fa fa-whatsapp"></i> Whatsapp Group',
+        'scenario-practice'         => '<i class="fa fa-users"></i> Course Materials <span class="label label-success">NEW</span>',
         'study-plan'                => '<i class="fa fa-bookmark"></i> Study Plan <span class="label label-success">NEW</span>',
         'mock'                      => '<i class="fa fa-list"></i> Online Mock <span class="label label-success">NEW</span>',
         'practices'                 => '<i class="fa fa-book"></i> Practice Booking',
@@ -23,8 +23,8 @@ function sidebar_links($tab = '')
         'exams'                     => '<i class="fa fa-book"></i> Mock Exam <i class="fa fa-clock-o"></i>',
         'results'                   => '<i class="fa fa-wpforms"></i> Results',
         'understand'                => '<i class="fa fa-graduation-cap"></i> Understanding Your Results',
-//        'messages'                  => '<i class="fa fa-comments-o"></i> Admin Messages',
-        'student-messages'                  => '<i class="fa fa-comments-o"></i> Student Messages',
+//        'messages'                => '<i class="fa fa-comments-o"></i> Admin Messages',
+        'student-messages'          => '<i class="fa fa-comments-o"></i> Student Messages',
         'change-password'           => '<i class="fa fa-lock"></i> Change Password',
         'contact-us'                => '<i class="fa fa-envelope"></i> Contact us'
     ];
