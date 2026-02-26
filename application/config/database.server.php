@@ -8,17 +8,17 @@ $query_builder = TRUE;
 $db['default'] = array(
     'dsn' => '',
 
-    'hostname' => 'localhost',
-    'username' => 'eprapcom_prap_db',
-    'password' => '+KUMZO0-UxX$',
-    'database' => 'eprapcom_prap_db',
+    'hostname' => '127.0.0.1',
+    'username' => 'eprap_portal',
+    'password' => 'v:0sKiZy}gfl',
+    'database' => 'eprap_portal-323034fd81',
 
     'dbdriver' => 'mysqli',
     'dbprefix' => '',
     'pconnect' => FALSE,
     'db_debug' => (ENVIRONMENT !== 'production'),
     'cache_on' => FALSE,
-    'cachedir' => '',
+    'cachedir' => FCPATH . 'temp/db_cache/',
     'char_set' => 'utf8',
     'dbcollat' => 'utf8_general_ci',
     'swap_pre' => '',
@@ -31,6 +31,6 @@ $db['default'] = array(
 
 /* For only Keeping DB Backup Logs */
 $db['sqlite'] = array(
-    'dsn'      => 'sqlite:DB/backup_logs.sqlite',   // path/to/database
+    'dsn'      => 'sqlite:'. FCPATH .'/DB/backup_logs.sqlite',   // path/to/database
     'dbdriver' => 'pdo'
 );
