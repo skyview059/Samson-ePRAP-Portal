@@ -238,7 +238,7 @@
                                 <div class="mb-15">
                                     <label for="country_id"> Country </label>
                                     <select class="form-control select2" name="country_id" id="country_id">
-                                        <?php echo getDropDownCountries('', 'Select country of origin'); ?>
+                                        <?php echo getDropDownCountries('', 'Select country'); ?>
                                     </select>
                                 </div>
                             </div>

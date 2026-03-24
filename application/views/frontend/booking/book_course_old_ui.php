@@ -56,7 +56,7 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <select name="country_id" class="form-control select2" id="country_id">
-                                    <?php echo getDropDownCountries('', 'Select Country of Origin'); ?>
+                                    <?php echo getDropDownCountries('', 'Select Country'); ?>
                                 </select>
                             </div>
                         </div>
