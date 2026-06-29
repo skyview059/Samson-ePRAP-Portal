@@ -113,7 +113,7 @@
 
 <div class="row" style="padding-bottom: 15px">
     <div class="col-md-5">
-        <h2 style="margin-top: 0;"><?= $exam->name; ?> /UKMLA OSCE Practice</h2>
+        <h2 style="margin-top: 0;"><?= $exam->name; ?></h2>
         <p>Total scenarios: 
             <span id="total_scenarios_count" class="label label-info"></span>
             <span style="font-size: 11pt;color: #c70000; padding-left:50px;">Please select scenario to start practising</span>    
