@@ -101,10 +101,46 @@ class Scenario_model extends Fm_model
     }
     
     function relation($id)
-    {        
+    {
         $this->db->where('scenario_id', $id );
         return $this->db->count_all_results('scenario_relations');
-        
+
+    }
+
+    // Subjects of an exam, each with their topics nested (for the assign modal JS preload)
+    function get_subjects_with_topics($exam_id)
+    {
+        $subjects = $this->db->select('id, name')
+            ->where('exam_id', $exam_id)
+            ->order_by('order', 'ASC')
+            ->get('scenario_subjects')->result();
+
+        foreach ($subjects as $subject) {
+            $subject->topics = $this->db->select('id, name')
+                ->where('exam_id', $exam_id)
+                ->where('subject_id', $subject->id)
+                ->order_by('order', 'ASC')
+                ->get('scenario_topics')->result();
+        }
+        return $subjects;
+    }
+
+    // Current single assignment per scenario, keyed by scenario_id
+    function get_scenario_assignments($exam_id)
+    {
+        $this->db->select('sti.scenario_id, sti.subject_id, sti.scenario_topic_id');
+        $this->db->select('ss.name as subject_name, st.name as topic_name');
+        $this->db->from('scenario_topics_items as sti');
+        $this->db->join('scenario_subjects as ss', 'ss.id = sti.subject_id', 'LEFT');
+        $this->db->join('scenario_topics as st', 'st.id = sti.scenario_topic_id', 'LEFT');
+        $this->db->where('sti.exam_id', $exam_id);
+        $rows = $this->db->get()->result();
+
+        $map = [];
+        foreach ($rows as $row) {
+            $map[$row->scenario_id] = $row; // single assignment: last row wins
+        }
+        return $map;
     }
 
 }

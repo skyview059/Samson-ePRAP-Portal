@@ -20,6 +20,8 @@ $route['admin/scenario/ajax_batch_delete'] = 'scenario/ajax_batch_delete';
 $route['admin/scenario/set_display_mode']      = 'scenario/set_display_mode';
 $route['admin/scenario/ajax_set_display_mode'] = 'scenario/ajax_set_display_mode';
 
+$route['admin/scenario/ajax_assign_topic'] = 'scenario/ajax_assign_topic';
+
 
 $route['admin/scenario/practice']                                = 'scenario/practice';
 $route['admin/scenario/practice/view/(:num)']                    = 'scenario/practice/practice_view/$1';

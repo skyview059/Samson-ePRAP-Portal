@@ -33,12 +33,14 @@ class Scenario extends Admin_controller
 
 
         $data = array(
-            'scenarios'  => $scenarios,
-            'q'          => $q,
-            'pagination' => getPaginator($total_rows, $page, $target, $limit),
-            'total_rows' => $total_rows,
-            'start'      => $start,
-            'id'         => $id,
+            'scenarios'     => $scenarios,
+            'q'             => $q,
+            'pagination'    => getPaginator($total_rows, $page, $target, $limit),
+            'total_rows'    => $total_rows,
+            'start'         => $start,
+            'id'            => $id,
+            'subjects_tree' => $this->Scenario_model->get_subjects_with_topics($id),
+            'assignments'   => $this->Scenario_model->get_scenario_assignments($id),
         );
         $this->viewAdminContent('scenario/scenario/index', $data);
     }
@@ -329,6 +331,60 @@ class Scenario extends Admin_controller
         echo ajaxRespond('OK', 'Updated');
     }
 
+
+    // Assign a scenario to a single Subject + Topic (saved into scenario_topics_items).
+    // Single assignment: any existing assignment for this scenario is replaced.
+    public function ajax_assign_topic()
+    {
+        ajaxAuthorized();
+
+        $exam_id     = (int)$this->input->post('exam_id');
+        $scenario_id = (int)$this->input->post('scenario_id');
+        $subject_id  = (int)$this->input->post('subject_id');
+        $topic_id    = (int)$this->input->post('scenario_topic_id');
+
+        if (!$scenario_id || !$exam_id) {
+            echo json_encode(['Status' => 'Fail', 'Msg' => 'Invalid scenario']);
+            return;
+        }
+
+        // Clear the previous assignment for this scenario (single assignment per scenario)
+        $this->db->where('scenario_id', $scenario_id)
+            ->where('exam_id', $exam_id)
+            ->delete('scenario_topics_items');
+
+        if (!$subject_id || !$topic_id) {
+            echo json_encode([
+                'Status'       => 'OK',
+                'Msg'          => 'Scenario assignment cleared',
+                'subject_id'   => 0,
+                'topic_id'     => 0,
+                'subject_name' => '',
+                'topic_name'   => '',
+            ]);
+            return;
+        }
+
+        $this->db->insert('scenario_topics_items', [
+            'exam_id'           => $exam_id,
+            'subject_id'        => $subject_id,
+            'scenario_topic_id' => $topic_id,
+            'scenario_id'       => $scenario_id,
+            'order'             => 9999,
+        ]);
+
+        $subject = $this->db->select('name')->get_where('scenario_subjects', ['id' => $subject_id])->row();
+        $topic   = $this->db->select('name')->get_where('scenario_topics', ['id' => $topic_id])->row();
+
+        echo json_encode([
+            'Status'       => 'OK',
+            'Msg'          => 'Scenario assigned successfully',
+            'subject_id'   => $subject_id,
+            'topic_id'     => $topic_id,
+            'subject_name' => $subject ? $subject->name : '',
+            'topic_name'   => $topic ? $topic->name : '',
+        ]);
+    }
 
     public function _menu()
     {
