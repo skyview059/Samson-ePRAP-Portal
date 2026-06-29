@@ -130,7 +130,8 @@ if ($scenarioItems):
                                             <div>
                                                 <span><?php echo ++$sl; ?>.</span>
                                                 <a class="custom_title"
-                                                   href="<?= site_url('scenario-practice/exam/' . $exam->id . '/item/' . $item->id); ?>">
+                                                   href="<?= site_url('scenario-practice/exam/' . $exam->id . '/item/' . $item->id); ?>"
+                                                   onclick="return openScenarioPopup(this.href);">
                                                     <?php
                                                     $displayName = $item->display_title;
                                                     if (isset($search) && $search !== '') {
@@ -173,6 +174,25 @@ if ($scenarioItems):
         // count li.diagnosis_title by accordion item
         countItems();
     });
+
+    // open scenario item in a centered popup window so the visitor can close it
+    // without leaving this listing page
+    function openScenarioPopup(url) {
+        const width  = Math.round(window.screen.availWidth * 0.8);
+        const height = Math.round(window.screen.availHeight * 0.8);
+        const left   = (window.screen.availWidth - width) / 2;
+        const top    = (window.screen.availHeight - height) / 2;
+
+        const features = 'popup=yes,scrollbars=yes,resizable=yes' +
+            ',width=' + width + ',height=' + height + ',left=' + left + ',top=' + top;
+
+        const popup = window.open(url, 'scenarioPracticeItem', features);
+        if (popup) {
+            popup.focus();
+            return false; // prevent default navigation
+        }
+        return true; // popup blocked, fall back to normal navigation
+    }
 
     function countItems() {
         const accordionItems = document.querySelectorAll('.panel-collapse');

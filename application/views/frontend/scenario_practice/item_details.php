@@ -124,12 +124,12 @@
 
 <div class="container-fluid" id="scenarioPracticeContent">
     <div class="row">
-        <div class="col-md-8">
+        <div class="col-md-7">
             <div style="padding: 50px 0">
                 <h2><?php echo $practice->presentation; ?></h2>
             </div>
         </div>
-        <div class="col-md-4 text-right">
+        <div class="col-md-5 text-right">
             <div style="padding-top: 60px">
                 <h4 style="text-align: right; font-weight: 700; margin-bottom: 15px;">Student ID
                     No: <?= showStudentID(); ?></h4>
@@ -269,6 +269,15 @@
         </div>
 
     </div>
+
+    <!-- Close button for popup window (hidden unless opened as a popup) -->
+    <div class="row" id="closePopupRow" style="display: none;">
+        <div class="col-md-12 text-center" style="padding: 30px 0;">
+            <button type="button" class="btn btn-danger" onclick="closeScenarioPopup()">
+                <i class="fa fa-times"></i> Close Window
+            </button>
+        </div>
+    </div>
 </div>
 
 <!-- Modal -->
@@ -363,6 +372,18 @@
 <?php $this->load->view('frontend/scenario_practice/start_practice_modal'); ?>
 
 <script type="application/javascript">
+    // Show the close button only when this page was opened as a popup window,
+    // then let the visitor close it with the JS button (browser X icon also works).
+    document.addEventListener('DOMContentLoaded', function () {
+        if (window.opener && !window.opener.closed) {
+            document.getElementById('closePopupRow').style.display = 'block';
+        }
+    });
+
+    function closeScenarioPopup() {
+        window.close();
+    }
+
     function copyURL() {
         const url = window.location.href;
         navigator.clipboard.writeText(url).then(function () {
@@ -389,5 +410,5 @@
         if (event.ctrlKey && event.shiftKey && (event.keyCode === 73 || event.keyCode === 74)) {
             return false; // Ctrl+Shift+I (DevTools) and Ctrl+Shift+J (Console)
         }
-    };
+    };    
 </script>

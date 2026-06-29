@@ -563,7 +563,8 @@ class Scenario_practice extends Frontend_controller
             'practice_id'  => 0,
             'exam_id'      => $exam_id,
         ];
-        $this->viewFrontContent('frontend/scenario_practice/item_details', $data_array);
+        // $this->viewFrontContent('frontend/scenario_practice/item_details', $data_array);
+        $this->viewReadingMode('frontend/scenario_practice/item_details', $data_array);
     }
 
     private function checkPurchaseStatus($exam_id)

@@ -39,6 +39,11 @@ class Frontend_controller extends MX_Controller {
         $this->load->view($view, $data);
         $this->load->view('frontend/footer');
     }
+    public function viewReadingMode($view, $data = []) {
+        $this->load->view('frontend/header-min', $data);
+        $this->load->view($view, $data);
+        $this->load->view('frontend/footer');
+    }
     
     protected function viewMemberContent($view, $data = [])
     {
