@@ -161,15 +161,16 @@
                                                       data-item_id="<?= $item->id; ?>"
                                                       data-exam_id="<?= $exam->id; ?>"
                                                       data-practice_id="<?= $item->practice_id; ?>">
-                                                    <?= $item->presentation; ?>
+                                                    <?php // $item->presentation; ?>
+                                                    <?= $item->display_title; ?>
                                                 </span>
                                             </div>
                                             <div class="pull-right">
-                                                <!--                                                <button class="viewDiagnosisBtn btn btn-link"-->
-                                                <!--                                                        data-id="-->
+                                                <!-- <button class="viewDiagnosisBtn btn btn-link"-->
+                                                <!-- data-id="-->
                                                 <?php //= $item->id
                                                 ?><!--">View Diagnosis-->
-                                                <!--                                                </button>-->
+                                                <!-- </button>-->
                                                 <span id="status_<?php echo $item->id; ?>">
                                                     <?php echo scenarioStatus($item->id, $item->status, $item->practice_id); ?>
                                                 </span>

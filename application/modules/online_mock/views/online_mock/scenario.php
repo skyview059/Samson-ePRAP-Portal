@@ -234,7 +234,7 @@
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <form method="POST" id="assessor">
-                <input type="hidden" name="scenario_rel_id" id="scenario_rel_id" value="0"/>
+                <input type="hidden" name="scenario_rel_id" id="assessor_scenario_rel_id" value="0"/>
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
                                 aria-hidden="true">&times;</span></button>
@@ -323,7 +323,7 @@
             show    : 'false',
             backdrop: 'static'
         });
-        $('#scenario_rel_id').val(id);
+        $('#assessor_scenario_rel_id').val(id);
 
         $.ajax({
             url       : "admin/online_mock/get_assessor?id=" + id,
