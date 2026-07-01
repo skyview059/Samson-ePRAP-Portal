@@ -652,10 +652,22 @@ class Online_mock extends Admin_controller
     {
         ajaxAuthorized();
         $id = $this->input->post('id');
-        $this->db->set('reading_time', $this->input->post('reading_time'))
-            ->set('practice_time', $this->input->post('practice_time'))
+        $reading_time = $this->input->post('reading_time');
+        $practice_time = $this->input->post('practice_time');
+
+        $this->db->set('reading_time', $reading_time)
+            ->set('practice_time', $practice_time)
             ->where('id', $id)
             ->update('exam_schedules');
+
+        $force_reset = (int) $this->input->post('force_reset');
+        if($force_reset == 1 ){
+            $this->db->set('reading_time', $reading_time )
+                ->set('practice_time', $practice_time )
+                ->where('exam_schedule_id', $id)
+                ->update('scenario_relations');
+        }
+            
         echo ajaxRespond('OK', 'Time Save Successfully');
     }
 

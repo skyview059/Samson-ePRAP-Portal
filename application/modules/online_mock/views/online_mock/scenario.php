@@ -135,6 +135,17 @@
                             <div class="input-group-addon">minutes</div>
                         </div>
                     </div>
+                    <div class="form-group">
+                        <label for="practice_time">Set Existing Scenario Time.</label>
+                        <div>
+                            <label class="radio-inline">
+                                <input type="radio" name="force_reset" value="0" checked> No
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="force_reset" value="1"> Yes
+                            </label>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer" style="text-align:center;">
                     <button type="button" class="btn btn-default" id="close_scenario_time_modal" data-dismiss="modal">
@@ -307,9 +318,9 @@
             beforeSend: function () {
                 toastr.info('Please wait...');
             },
-            success   : function (msg) {
+            success   : function (respond) {
                 toastr.clear();
-                toastr.success(msg.msg);
+                toastr.success(respond.Msg);
                 $('#scenario_time_popup').modal('hide');
                 location.reload();
             }

@@ -145,17 +145,17 @@
                         <div class="tabbable-line">
                             <ul class="nav nav-tabs">
                                 <li class="active">
-                                    <a href="#examiner_information" data-toggle="tab">Examiner</a>
-                                </li>
-                                <li>
                                     <a href="#candidate_instructions" data-toggle="tab">Candidate</a>
                                 </li>
+                                <li>
+                                    <a href="#examiner_information" data-toggle="tab">Examiner</a>
+                                </li>                                
                                 <li>
                                     <a href="#patient_information" data-toggle="tab">Patient</a>
                                 </li>
                             </ul>
                             <div class="tab-content">
-                                <div class="tab-pane" id="candidate_instructions">
+                                <div class="tab-pane active" id="candidate_instructions">
                                     <?= $scenario->candidate_instructions; ?>
                                 </div>
 
@@ -210,7 +210,7 @@
                                     <?php endif; ?>
                                 </div>
 
-                                <div class="tab-pane active" id="examiner_information">
+                                <div class="tab-pane" id="examiner_information">
                                     <?php if ($scenario->candidate_instructions): ?>
                                         <h3 class="title">Candidate Information:</h3>
                                         <?= $scenario->candidate_instructions; ?>
