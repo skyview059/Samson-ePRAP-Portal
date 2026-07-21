@@ -36,6 +36,8 @@
                     </div>
                 </form>
             </div>
+
+            <?php pp( $_sql_ ); ?>
         </div>
 
         <?php if($scenarios) { ?>
@@ -179,9 +181,69 @@
     </div>
 </div>
 
+<div class="modal fade" id="scenario_rel_modal">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">Scenario Usage</h4>
+            </div>
+            <div class="modal-body">
+                <p>Scenario: <strong id="rel_scenario_name"></strong></p>
+                <table class="table table-bordered" style="margin-bottom: 0;">
+                    <tbody>
+                    <tr>
+                        <td>Exam Results</td>
+                        <td width="70" class="text-center"><span class="label label-primary" id="rel_result">...</span></td>
+                    </tr>
+                    <tr>
+                        <td>Scenario Relations</td>
+                        <td class="text-center"><span class="label label-primary" id="rel_sce_rel">...</span></td>
+                    </tr>
+                    <tr>
+                        <td>Practice Topic Items</td>
+                        <td class="text-center"><span class="label label-primary" id="rel_topis">...</span></td>
+                    </tr>
+                    </tbody>
+                </table>
+                <p class="text-danger" id="rel_error" style="display: none; margin-top: 10px;">Could not load usage data.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <?php load_module_asset('scenario','js'); ?>
 <script>
     var subjectsTree = <?php echo json_encode($subjects_tree); ?>;
+
+    function viewRel(ScenarioId) {
+        var $row = $('#row_' + ScenarioId);
+        $('#rel_scenario_name').text($row.length ? $.trim($row.find('td').eq(3).text()) : ('#' + ScenarioId));
+        $('#rel_result, #rel_sce_rel, #rel_topis').text('...');
+        $('#rel_error').hide();
+        $('#scenario_rel_modal').modal('show');
+
+        $.ajax({
+            url     : '<?= site_url(Backend_URL . 'scenario/get_rel/') ?>' + ScenarioId,
+            type    : 'GET',
+            dataType: 'json',
+            success : function (res) {
+                $('#rel_result').text(res.result);
+                $('#rel_sce_rel').text(res.sce_rel);
+                $('#rel_topis').text(res.topis);
+            },
+            error   : function () {
+                $('#rel_result, #rel_sce_rel, #rel_topis').text('-');
+                $('#rel_error').show();
+            }
+        });
+        return false;
+    }
 
     function populateAssignTopics(subjectId, selectedTopicId) {
         var $topic = $('#assign_topic_id');

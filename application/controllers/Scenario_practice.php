@@ -9,6 +9,7 @@ class Scenario_practice extends Frontend_controller
         parent::__construct();
         $this->load->library('form_validation');
         $this->load->helper('scenario/scenario');
+        $this->load->helper('exam/exam');
         if (empty($this->student_id)) {
             redirect(site_url('login'));
         }

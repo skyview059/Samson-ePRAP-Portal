@@ -22,11 +22,13 @@ function scenarioTabs($id, $active_tab)
 
 function scenarioDelBtn($id, $used)
 {
+    $btn = '<span onclick="return viewRel(' . $id . ');" class="btn btn-xs btn-primary"> &nbsp;<i class="fa fa-bars"></i>&nbsp; </span>';
     if ($used) {
-        return '<span class="btn btn-xs btn-danger disabled"> &nbsp;<i class="fa fa-lock"></i> &nbsp;</span>';
+        $btn .= '<span class="btn btn-xs btn-danger disabled"> &nbsp;<i class="fa fa-lock"></i> &nbsp;</span>';
     } else {
-        return '<span onclick="return delScen(' . $id . ');" class="btn btn-xs btn-danger"> &nbsp;<i class="fa fa-times"></i>&nbsp; </span>';
+        $btn .= '<span onclick="return delScen(' . $id . ');" class="btn btn-xs btn-danger"> &nbsp;<i class="fa fa-times"></i>&nbsp; </span>';
     }
+    return $btn;
 }
 
 function getScenarioGroupName($id)

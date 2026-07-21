@@ -29,11 +29,12 @@ class Scenario extends Admin_controller
         $total_rows = $this->Scenario_model->total_rows($id, $q);
         $scenarios  = $this->Scenario_model->get_limit_data($limit, $start, $id, $q);
 
-//        echo $this->db->last_query();
+    
 
 
         $data = array(
             'scenarios'     => $scenarios,
+            '_sql_'         => $this->db->last_query(),
             'q'             => $q,
             'pagination'    => getPaginator($total_rows, $page, $target, $limit),
             'total_rows'    => $total_rows,
@@ -72,6 +73,26 @@ class Scenario extends Admin_controller
             $this->session->set_flashdata('msge', 'Scenario Not Found');
             redirect(site_url(Backend_URL . 'scenario'));
         }
+    }
+
+    public function get_rel($id)
+    {
+        $id = intval($id);
+        $_sql_1 = "SELECT count(scenario_id) FROM `result_details` WHERE `scenario_id` = '{$id}'";
+        $_sql_2 = "SELECT count(scenario_id) FROM `scenario_relations` WHERE `scenario_id` = '{$id}'";
+        $_sql_3 = "SELECT count(scenario_id) FROM `scenario_topics_items` WHERE `scenario_id` = '{$id}'";
+
+        $used_in = $this->db
+                    ->select("({$_sql_1}) AS result", false )
+                    ->select("({$_sql_2}) as sce_rel", false )
+                    ->select("({$_sql_3}) as topis", false )
+                    ->get()->row();
+
+        echo json_encode([
+            'result' => $used_in->result,
+            'sce_rel' => $used_in->sce_rel,
+            'topis' => $used_in->topis,
+        ]);
     }
 
     public function single_print($id)

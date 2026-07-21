@@ -477,16 +477,19 @@ function scenarioPracticePurchaseStatus($student_id, $course_id)
 //    return $ci->db->count_all_results();
 }
 
-function getPackageScenarioTypeName($type)
+function getPackageScenarioTypeName($type, $exam_id = 0)
 {
+
+    $exam_name = ($exam_id) ? getExamName($exam_id) : 'PLAB 2';
+
     // "PLAB" refers to Professional and Linguistic Assessments Board
     switch ($type) {
         case 'New':
-            return 'PLAB 2 new scenario';
+            return "{$exam_name} New Scenario";
         case 'Old':
-            return 'PLAB 2 scenario bank';
+            return "{$exam_name} Scenario Bank";
         case 'Both':
-            return 'Complete PLAB2 scenario bank';
+            return "Complete {$exam_name} Scenario Bank";
         default:
             return 'N/A';
     }

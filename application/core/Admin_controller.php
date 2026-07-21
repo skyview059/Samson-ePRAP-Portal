@@ -32,7 +32,7 @@ class Admin_controller extends MX_Controller {
         }
         $this->set_admin_prefix( $this->uri->uri_string() );
         
-//         $this->output->enable_profiler(TRUE);
+        // $this->output->enable_profiler(TRUE);
     }
 
     private function isActiveAccount(){

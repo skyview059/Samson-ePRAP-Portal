@@ -9,6 +9,7 @@ $route['admin/scenario/delete/(:num)']        = 'scenario/delete/$1';
 $route['admin/scenario/create_action']        = 'scenario/create_action';
 $route['admin/scenario/update_action']        = 'scenario/update_action';
 $route['admin/scenario/delete_action/(:num)'] = 'scenario/delete_action/$1';
+$route['admin/scenario/get_rel/(:num)']       = 'scenario/get_rel/$1';
 
 $route['admin/scenario/get']                  = 'scenario/get';
 $route['admin/scenario/save']                 = 'scenario/save';

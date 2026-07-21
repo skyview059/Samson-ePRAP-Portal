@@ -149,8 +149,8 @@ class Frontend extends Frontend_controller
             'gender'                  => set_value('gender', 'Male'),
             'math'                    => $math,
 
-            'exam_id'        => set_value('exam_id'),
-            'exam_date'      => set_value('exam_date'),
+            'exam_id'           => set_value('exam_id'),
+            'exam_date'         => set_value('exam_date'),
 
             'answer'            => set_value('answer'),
             'secret_question_1' => set_value('secret_question_1'),
@@ -174,28 +174,28 @@ class Frontend extends Frontend_controller
             $gmc_number     = (int)$this->input->post('gmc_number', TRUE);
 
             $data = array(
-                'number_type'             => $this->input->post('number_type', TRUE),
-                'gmc_number'              => ($gmc_number) ?: null,
-                'title'                   => $this->input->post('title', TRUE),
+                'number_type'             => null,
+                'gmc_number'              => null,
+                'title'                   => null,
                 'fname'                   => $this->input->post('fname', TRUE),
-                'mname'                   => $this->input->post('mname', TRUE),
+                'mname'                   => null,
                 'lname'                   => $this->input->post('lname', TRUE),
                 'email'                   => $this->input->post('email', TRUE),
-                'phone_code'              => $phone['code'],
-                'phone'                   => $phone['number'],
+                'phone_code'              => null,
+                'phone'                   => null,
                 'whatsapp_code'           => $whatsapp['code'],
                 'whatsapp'                => $whatsapp['number'],
-                'occupation'              => $this->input->post('occupation', TRUE),
-                'purpose_of_registration' => getExamName(intval($this->input->post('exam_id', TRUE))),
+                'occupation'              => null,
+                'purpose_of_registration' => null,
                 'password'                => password_encription($this->input->post('password')),
                 'tmp_ip_addr'             => $this->input->ip_address(),
-                'gender'                  => $this->input->post('gender', TRUE),
+                'gender'                  => null,
 
-                'exam_id'        => intval($this->input->post('exam_id', TRUE)),
+                'exam_id'        => null,
                 'exam_date'      => $this->input->post('exam_date', TRUE),
 
-                'secret_question_1' => $this->input->post('secret_question_1', TRUE),
-                'answer_1'          => $this->input->post('answer_1', TRUE),
+                'secret_question_1' => null,
+                'answer_1'          => null,
                 'contact_by_rm'     => ($this->input->post('contact_by_rm')) ? 'Yes' : 'No',
                 'created_at'        => date('Y-m-d H:i:s'),
                 'updated_at'        => date('Y-m-d H:i:s')
@@ -233,26 +233,26 @@ class Frontend extends Frontend_controller
     {
         $this->form_validation->CI =& $this;
 
-        $this->form_validation->set_rules('gmc_number', 'GMC number', 'trim|min_length[7]|max_length[7]|callback_unique_student_number');
+        // $this->form_validation->set_rules('gmc_number', 'GMC number', 'trim|min_length[7]|max_length[7]|callback_unique_student_number');
 
         $this->form_validation->set_rules('email', 'email', 'trim|required|max_length[100]|valid_email|callback_unique_email');
         $this->form_validation->set_rules('fname', 'first name', 'trim|required|max_length[50]');
-        $this->form_validation->set_rules('mname', 'middle name', 'trim|max_length[50]');
+        // $this->form_validation->set_rules('mname', 'middle name', 'trim|max_length[50]');
         $this->form_validation->set_rules('lname', 'last name', 'trim|required|max_length[50]');
-        $this->form_validation->set_rules('phone[number]', 'phone', 'trim|required|max_length[20]');
-        $this->form_validation->set_rules('occupation', 'Occupation', 'trim|required');
-        $this->form_validation->set_rules('gender', 'gender', 'trim|required');
+        // $this->form_validation->set_rules('phone[number]', 'phone', 'trim|required|max_length[20]');
+        // $this->form_validation->set_rules('occupation', 'Occupation', 'trim|required');
+        // $this->form_validation->set_rules('gender', 'gender', 'trim|required');
         $this->form_validation->set_rules('password', 'password', 'trim|required|min_length[6]|max_length[13]|callback_valid_password');
         $this->form_validation->set_rules('passconf', 'Confirm Password', 'trim|required|min_length[6]|max_length[13]|matches[password]');
 
-        $this->form_validation->set_rules('exam_id', 'purpose of registration', 'trim|required|is_natural_no_zero', [
-            'is_natural_no_zero' => 'Please select a purpose of registration'
-        ]);
-        $this->form_validation->set_rules('exam_date', 'Exam date', 'trim|required');
+        // $this->form_validation->set_rules('exam_id', 'purpose of registration', 'trim|required|is_natural_no_zero', [
+        //     'is_natural_no_zero' => 'Please select a purpose of registration'
+        // ]);
+        $this->form_validation->set_rules('exam_date', 'Exam date', 'trim');
 
         $this->form_validation->set_rules('answer', 'Answer', 'trim|required|callback_check_captcha_answer');
-        $this->form_validation->set_rules('secret_question_1', 'Secret Question 1', 'trim|required');
-        $this->form_validation->set_rules('answer_1', 'Answer 1', 'trim|required');
+        // $this->form_validation->set_rules('secret_question_1', 'Secret Question 1', 'trim|required');
+        // $this->form_validation->set_rules('answer_1', 'Answer 1', 'trim|required');
 
         $this->form_validation->set_error_delimiters('<p class="error">', '</p>');
     }

@@ -64,7 +64,8 @@
                             <div class="panel-heading"><?php echo $package->title; ?></div>
                             <div class="panel-body">
                                 <p><?php echo $package->duration; ?></p>
-                                <p><?php echo getPackageScenarioTypeName($package->scenario_type); ?></p>
+                                <p><?php echo getPackageScenarioTypeName($package->scenario_type, $package->exam_id); ?></p>
+                                <!-- <p><?php // echo getExamName($package->exam_id); ?></p> -->
                                 <form id="purchasePracticeForm" method="post"
                                       action="<?php echo site_url('purchase-practice-action'); ?>">
                                     <input type="hidden" id="practice_id" name="practice_id" value="<?php echo $exam->id; ?>">

@@ -30,19 +30,69 @@
                         <div class="form-group">
                             <label for="first_name" class="col-sm-4 control-label">Full Name <sup>*</sup></label>
                             <div class="col-sm-8">
-                                <div class="row">                                    
-                                    <div class="col-md-6">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <select name="title" class="form-control">
+                                            <?php echo getNameTitle($title); ?>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
                                         <input type="text" class="form-control" name="fname" id="fname"
                                                placeholder="First Name" value="<?php echo $fname; ?>"/>
                                         <?php echo form_error('fname') ?>
-                                    </div>                                    
-                                    <div class="col-md-6">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <input type="text" class="form-control" name="mname" id="mname"
+                                               placeholder="Middle (Optional)" value="<?php echo $mname; ?>"/>
+                                        <?php echo form_error('mname') ?>
+                                    </div>
+                                    <div class="col-md-3">
                                         <input type="text" class="form-control" name="lname" id="lname"
                                                placeholder="Last Name" value="<?php echo $lname; ?>"/>
                                         <?php echo form_error('lname') ?>
                                     </div>
                                 </div>
 
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="gender" class="col-sm-4 control-label">Gender <sup>*</sup></label>
+                            <div class="col-sm-8" style="padding-top:8px;">
+                                <?php echo htmlRadio('gender', $gender); ?>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="occupation" class="col-sm-4 control-label">Occupation <sup>*</sup></label>
+                            <div class="col-sm-8">
+                                <select name="occupation" class="form-control" id="occupation">
+                                    <option value="">--Select Occupation--</option>
+                                    <?php echo getDropDownOccuptions($occupation); ?>
+                                </select>
+                                <?php echo form_error('occupation'); ?>
+                            </div>
+                        </div>
+
+                        <div class="form-group" id="show_gmc_number">
+                            <label for="gmc_number" class="col-sm-4 control-label">GMC/GDC/NMC Number<sup>*</sup></label>
+                            <div class="col-sm-8">
+
+                                <div class="input-group">
+                            <span class="input-group-btn">
+                                <select name="number_type" id="number_type" class="form-control" style="width: 150px">
+                                    <option value="0">--Select--</option>
+                                    <?php echo getNumberType($number_type); ?>
+                                </select>
+                            </span>
+
+                                    <input type="text" class="form-control" name="gmc_number" id="gmc_number"
+                                           placeholder="Enter Number (Optional)" minlength="7" maxlength="7"
+                                           value="<?php echo $gmc_number; ?>"/>
+                                </div>
+                                <p id="help-block" class="help-block" style="font-size:11pt;"><em>If you put number, then it
+                                        must be valid & 7 digit number</em></p>
+                                <?php echo form_error('number_type') ?>
+                                <?php echo form_error('gmc_number') ?>
                             </div>
                         </div>
 
@@ -53,6 +103,28 @@
                                        placeholder="Email Address"
                                        value="<?php echo $email; ?>"/>
                                 <?php echo form_error('email') ?>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="phone" class="col-sm-4 control-label">Phone Number<sup>*</sup></label>
+                            <div class="col-sm-8">
+
+                                <div class="input-group">
+                            <span class="input-group-btn">
+                                <select name="phone[code]" class="form-control" style="width: 190px">
+                                    <?php echo getPhoneCode($phone_code); ?>
+                                </select>
+                            </span>
+
+                                    <input type="text" class="form-control" name="phone[number]"
+                                           id="phone" placeholder="77xxxxxx"
+                                           minlength="11" maxlength="11"
+                                           onkeypress="return DigitOnly(event);"
+                                           value="<?php echo $phone; ?>"/>
+                                </div>
+                                <?php echo form_error('phone[code]') ?>
+                                <?php echo form_error('phone[number]') ?>
                             </div>
                         </div>
 
@@ -74,9 +146,17 @@
                                 <?php echo form_error('whatsapp[number]'); ?>
                             </div>
                         </div>
-                        
                         <div class="form-group">
-                            <label for="exam_date" class="col-sm-4 control-label">Exam Date</label>
+                            <label for="exam_id" class="col-sm-4 control-label">Purpose of Registration <sup>*</sup></label>
+                            <div class="col-sm-8">
+                                <select name="exam_id" class="form-control" id="exam_id">
+                                    <?php echo getExamNameDropDownForFrontend($exam_id, 'Select'); ?>
+                                </select>
+                                <?php echo form_error('exam_id') ?>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="exam_date" class="col-sm-4 control-label">Exam Date <sup>*</sup></label>
                             <div class="col-sm-8">
                                 <div class="input-group">
                                 <span class="input-group-addon">
@@ -89,8 +169,11 @@
                                 <?php echo form_error('exam_date'); ?>
                             </div>
                         </div>
-
-                        
+                    </div>
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-heading">Security Details</div>
+                    <div class="panel-body">
                         <div class="form-group">
                             <label for="password" class="col-sm-4 control-label">Password <sup>*</sup></label>
                             <div class="col-sm-8">
@@ -112,6 +195,25 @@
                                     </div>
                                 </div>
 
+                            </div>
+                        </div>
+
+
+                        <div class="form-group">
+                            <label for="secret_question_1" class="col-sm-4 control-label">Question 1 <sup>*</sup></label>
+                            <div class="col-sm-8">
+                                <select name="secret_question_1" class="form-control" id="secret_question_1">
+                                    <?php echo getSecretQuestions($secret_question_1); ?>
+                                </select>
+                                <?php echo form_error('secret_question_1') ?>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="answer_1" class="col-sm-4 control-label">Answer <sup>*</sup></label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control" name="answer_1"
+                                       id="answer_1" value="<?php echo $answer_1; ?>"/>
+                                <?php echo form_error('answer_1') ?>
                             </div>
                         </div>
 
@@ -159,20 +261,12 @@
                                 <div id="agree_respond"></div>
                             </div>
                         </div>
-
-                        <div class="text-center" style="margin-bottom: 50px">
-                            <a href="<?php echo site_url(); ?>" class="btn btn-lg btn-default" style="background-color: #888888;">
-                                <i class="fa fa-arrow-left"></i> 
-                                Back to Sign in
-                            </a>
-                            <button type="button" class="btn btn-lg btn-primary" onclick="sign_up();">
-                                Sign Up
-                                <i class="fa fa-sign-in"></i>
-                            </button>
-                        </div>
                     </div>
                 </div>
-                
+                <div class="text-center" style="margin-bottom: 50px">
+                    <a href="<?php echo site_url(); ?>" class="btn btn-lg btn-default">Back to Sign in</a>
+                    <button type="button" class="btn btn-lg btn-primary" onclick="sign_up();">Sign Up</button>
+                </div>
             </form>
 
         </div>
@@ -215,6 +309,56 @@
             $("#your_email_error").empty();
         }
 
+        const number_type = $('#number_type').val();
+        if (number_type === '0') {
+            $('#number_type').addClass('required');
+            error = 1;
+        } else {
+            $('#number_type').removeClass('required');
+        }
+
+        const gmc_number = $('#gmc_number').val();
+        if (gmc_number && gmc_number.length !== 7) {
+            $('#gmc_number').addClass('required');
+            $('.help-block').addClass('error');
+            error = 1;
+        } else {
+            $('#gmc_number').removeClass('required').addClass('require_pass');
+            $('#help-block').removeClass('error');
+        }
+
+        const exam_id = $('#exam_id').val();
+        if (!exam_id) {
+            $('#exam_id').addClass('required');
+            error = 1;
+        } else {
+            $('#exam_id').removeClass('required');
+        }
+
+        const exam_date = $('#exam_date').val();
+        if (!exam_date) {
+            $('#exam_date').addClass('required');
+            error = 1;
+        } else {
+            $('#exam_date').removeClass('required');
+        }
+
+        const phone = $('#phone').val();
+        if (!phone) {
+            $('#phone').addClass('required');
+            error = 1;
+        } else {
+            $('#phone').removeClass('required');
+        }
+
+        const occupation = $('#occupation').val();
+        if (!occupation) {
+            $('#occupation').addClass('required');
+            error = 1;
+        } else {
+            $('#occupation').removeClass('required');
+        }
+
         const whatsapp = $('#whatsapp').val();
         if (!whatsapp) {
             $('#whatsapp').addClass('required');
@@ -249,6 +393,22 @@
         if (password !== passconf) {
             $('#sign_up_respond2').html('<span class="error">Confirm password not match...</span>');
             error = 1;
+        }
+
+        const secret_question_1 = $('#secret_question_1').val();
+        if (!secret_question_1) {
+            $('#secret_question_1').addClass('required');
+            error = 1;
+        } else {
+            $('#secret_question_1').removeClass('required');
+        }
+
+        const answer_1 = $('#answer_1').val();
+        if (!answer_1) {
+            $('#answer_1').addClass('required');
+            error = 1;
+        } else {
+            $('#answer_1').removeClass('required');
         }
 
         const answer = $('#answer').val();
