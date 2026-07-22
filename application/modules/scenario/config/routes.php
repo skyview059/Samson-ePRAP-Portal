@@ -22,6 +22,7 @@ $route['admin/scenario/set_display_mode']      = 'scenario/set_display_mode';
 $route['admin/scenario/ajax_set_display_mode'] = 'scenario/ajax_set_display_mode';
 
 $route['admin/scenario/ajax_assign_topic'] = 'scenario/ajax_assign_topic';
+$route['admin/scenario/ajax_unassign_topic'] = 'scenario/ajax_unassign_topic';
 
 
 $route['admin/scenario/practice']                                = 'scenario/practice';

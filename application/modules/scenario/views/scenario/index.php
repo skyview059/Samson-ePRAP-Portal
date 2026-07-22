@@ -36,8 +36,7 @@
                     </div>
                 </form>
             </div>
-
-            <?php pp( $_sql_ ); ?>
+            
         </div>
 
         <?php if($scenarios) { ?>
@@ -100,6 +99,12 @@
                                         data-subject-id="<?= $asg ? $asg->subject_id : ''; ?>"
                                         data-topic-id="<?= $asg ? $asg->scenario_topic_id : ''; ?>">
                                     <i class="fa fa-link"></i> Assign
+                                </button>
+                                <button type="button" class="btn btn-xs btn-danger unassign_btn"
+                                        data-id="<?= $scenario->id; ?>"
+                                        data-name="<?= html_escape($scenario->name); ?>"
+                                        <?= $asg ? '' : 'style="display: none;"'; ?>>
+                                    <i class="fa fa-unlink"></i> Unassign
                                 </button>
                             </td>
 
@@ -277,6 +282,51 @@
         $('#assign_topic_modal').modal('show');
     });
 
+    $(document).on('click', '.unassign_btn', function () {
+        var $btn = $(this);
+        var id   = $btn.data('id');
+        var name = $btn.data('name');
+
+        if (!confirm('Remove the practice assignment of "' + name + '"?')) {
+            return false;
+        }
+
+        $.ajax({
+            url       : '<?= site_url(Backend_URL . 'scenario/ajax_unassign_topic') ?>',
+            type      : 'POST',
+            dataType  : 'json',
+            data      : {
+                scenario_id: id,
+                exam_id    : '<?= $id; ?>'
+            },
+            beforeSend: function () {
+                $btn.prop('disabled', true);
+                toastr.warning('Removing...');
+            },
+            success   : function (res) {
+                toastr.clear();
+                if (res.Status === 'OK') {
+                    toastr.success(res.Msg);
+                    var $cell = $('#linking_' + id);
+                    $cell.find('.assign-label').html('<span class="label label-default">Unassigned</span>');
+                    $cell.find('.assign_btn')
+                        .data('subject-id', '')
+                        .data('topic-id', '');
+                    $btn.hide();
+                } else {
+                    toastr.error(res.Msg || 'Could not remove assignment');
+                }
+                $btn.prop('disabled', false);
+            },
+            error     : function () {
+                toastr.clear();
+                toastr.error('Request failed');
+                $btn.prop('disabled', false);
+            }
+        });
+        return false;
+    });
+
     $(document).on('change', '#assign_subject_id', function () {
         populateAssignTopics($(this).val(), null);
     });
@@ -322,6 +372,7 @@
                     $cell.find('.assign_btn')
                         .data('subject-id', res.subject_id)
                         .data('topic-id', res.topic_id);
+                    $cell.find('.unassign_btn').toggle(!!res.subject_id);
                     $('#assign_topic_modal').modal('hide');
                 } else {
                     toastr.error(res.Msg || 'Could not save assignment');

@@ -34,7 +34,7 @@ class Scenario extends Admin_controller
 
         $data = array(
             'scenarios'     => $scenarios,
-            '_sql_'         => $this->db->last_query(),
+            // '_sql_'         => pp($this->db->last_query()),
             'q'             => $q,
             'pagination'    => getPaginator($total_rows, $page, $target, $limit),
             'total_rows'    => $total_rows,
@@ -404,6 +404,29 @@ class Scenario extends Admin_controller
             'topic_id'     => $topic_id,
             'subject_name' => $subject ? $subject->name : '',
             'topic_name'   => $topic ? $topic->name : '',
+        ]);
+    }
+
+    // Remove the existing Subject + Topic assignment of a scenario.
+    public function ajax_unassign_topic()
+    {
+        ajaxAuthorized();
+
+        $exam_id     = (int)$this->input->post('exam_id');
+        $scenario_id = (int)$this->input->post('scenario_id');
+
+        if (!$scenario_id || !$exam_id) {
+            echo json_encode(['Status' => 'Fail', 'Msg' => 'Invalid scenario']);
+            return;
+        }
+
+        $this->db->where('scenario_id', $scenario_id)
+            ->where('exam_id', $exam_id)
+            ->delete('scenario_topics_items');
+
+        echo json_encode([
+            'Status' => 'OK',
+            'Msg'    => 'Scenario assignment removed',
         ]);
     }
 
