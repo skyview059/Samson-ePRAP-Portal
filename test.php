@@ -75,3 +75,12 @@
 //
 //
 //echo getLocalCurrencyRate(599.99, $Scr='NGN', $Dist='GBP');
+
+
+
+
+
+
+print_r( strtotime('2024-07-01 01:00:00 GMT+6' ));
+echo "\r\n";
+print_r( strtotime('2024-07-01 06:30:00 GMT+6') );
