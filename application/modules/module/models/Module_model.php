@@ -14,14 +14,14 @@ class Module_model extends Fm_model
     }
     // get total rows
     function total_rows() {
-	$this->db->from($this->table);
+	    $this->db->from($this->table);
         return $this->db->count_all_results();
     }
 
     // get data with limit and search
     function get_limit_data($limit, $start = 0) {
         $this->db->order_by($this->id, $this->order);
-	$this->db->limit($limit, $start);
+	    $this->db->limit($limit, $start);
         return $this->db->get($this->table)->result();
     }
 }

@@ -16,9 +16,9 @@ class Acl_model extends Fm_model {
 		$this->db->select('acls.*, m.name');
 		$this->db->from( $this->table );
 		$this->db->join('modules as m', 'acls.module_id = m.id');		
-                $this->db->order_by('module_id', 'ASC');
+        $this->db->order_by('module_id', 'ASC');
 		$this->db->order_by($this->id, $this->order);
-                $this->db->order_by('order_id', 'ASC');
+        $this->db->order_by('order_id', 'ASC');
 		return $this->db->get()->result();
     }
 
@@ -33,11 +33,15 @@ class Acl_model extends Fm_model {
      * this function wrote 2 times more in app/helpers/acl_helper.php
      */
     function checkPermission($access_key,$role_id){
-        return $this->db->from('role_permissions')
+
+        $this->db->cache_on();
+        $count = $this->db->from('role_permissions')
                 ->join('acls', 'acls.id = role_permissions.acl_id', 'left')
-                ->where('role_id',$role_id)
+                ->where('role_id', (int) $role_id)
                 ->where('permission_key',$access_key)			
-                ->count_all_results();        
+                ->count_all_results();  
+        $this->db->cache_off();
+        return $count;    
     }        
     
     // get total rows
@@ -46,7 +50,7 @@ class Acl_model extends Fm_model {
             $this->db->like('permission_name', $q);
             $this->db->or_like('permission_key', $q);            
         }
-	$this->db->from($this->table);
+	    $this->db->from($this->table);
         return $this->db->count_all_results();
     }
 
@@ -57,7 +61,7 @@ class Acl_model extends Fm_model {
             $this->db->like('permission_name', $q);
             $this->db->or_like('permission_key', $q);            
         }
-	$this->db->limit($limit, $start);
+	    $this->db->limit($limit, $start);
         return $this->db->get($this->table)->result();
     }
 }

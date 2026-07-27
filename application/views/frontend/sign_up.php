@@ -74,21 +74,6 @@
                                 <?php echo form_error('whatsapp[number]'); ?>
                             </div>
                         </div>
-                        
-                        <div class="form-group">
-                            <label for="exam_date" class="col-sm-4 control-label">Exam Date</label>
-                            <div class="col-sm-8">
-                                <div class="input-group">
-                                <span class="input-group-addon">
-                                    <i class="fa fa-calendar"></i>
-                                </span>
-                                    <input type="text" class="form-control js_datepicker" name="exam_date"
-                                           autocomplete="off" id="exam_date" placeholder="Exam Date"
-                                           value="<?php echo $exam_date; ?>"/>
-                                </div>
-                                <?php echo form_error('exam_date'); ?>
-                            </div>
-                        </div>
 
                         
                         <div class="form-group">

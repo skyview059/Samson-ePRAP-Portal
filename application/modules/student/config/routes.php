@@ -42,3 +42,4 @@ $route['admin/student/login_history']                 = 'student/login_history';
 $route['admin/student/login_history/graph']           = 'student/login_history/graph';
 $route['admin/student/login_history/delete']          = 'student/login_history/delete';
 $route['admin/student/login_history/bulk_action']     = 'student/login_history/bulk_action';
+$route['admin/student/ai/search']     = 'student/ai/search';

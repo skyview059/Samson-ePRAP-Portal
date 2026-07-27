@@ -225,8 +225,7 @@
                                 <div class="row">
                                     <div class="mb-15 col-md-6">
                                         <select name="phone_code" class="form-control select2" aria-label="phone_code">
-                                            <?php $phone_code = '';
-                                            echo getPhoneCode($phone_code); ?>
+                                            <?php echo getPhoneCode(''); ?>
                                         </select>
                                     </div>
 
@@ -274,7 +273,7 @@
 
                 <div class="card courses">
                     <div class="card-header">
-                        Courses
+                        Live Courses
                     </div>
 
                     <div class="card-body">
@@ -336,6 +335,50 @@
                                         </td>
                                     </tr>
                                 <?php } }?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card courses">
+                    <div class="card-header">
+                        Subscription
+                    </div>
+                    <div class="card body">
+                        <table class="table table-bordered table-striped table-condensed course_table">
+                            <thead>
+                            <tr>
+                                <th width="40"> Select</th>
+                                <th width="450"> Name</th>                                
+                                <th width="100" class="text-center"> Price</th>
+                                <th class="text-center"> Duration</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <?php foreach ($practices as $practice) { ?>
+                                <tr class="active">
+                                    <td colspan="4">&nbsp;&nbsp;<strong><?= $practice['exam']; ?></strong></td>
+                                </tr>
+                                <?php foreach ($practice['packages'] as $p) { ?>
+                                    <tr>
+                                        <td>
+                                            <input name="practice_package_id[<?= $p['id']; ?>]"
+                                                    class="practice2buy form-control"
+                                                    type="checkbox"
+                                                    value="<?= $p['id']; ?>"
+                                                    data-price="<?= $p['price']; ?>" />
+                                        </td>
+                                        <td>
+                                            <?= $p['name']; ?>
+                                            <?php if (!empty($p['description'])) { ?>
+                                                <br><small class="text-muted"><?= $p['description']; ?></small>
+                                            <?php } ?>
+                                        </td>                                        
+                                        <td class="text-center"><?= GBP($p['price']); ?></td>
+                                        <td class="text-center"><?= $p['duration']; ?></td>
+                                    </tr>
+                                <?php } ?>
+                            <?php } ?>
                             </tbody>
                         </table>
                     </div>

@@ -13,7 +13,7 @@ class Frontend_controller extends MX_Controller {
         if($this->isAccountCheck() == false && $this->student_id){
             redirect( site_url('logout'));   
         }
-//        $this->output->enable_profiler(TRUE);
+    //    $this->output->enable_profiler(TRUE);
     }
 
     public function index() {

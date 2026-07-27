@@ -75,8 +75,32 @@ class Frontend extends Frontend_controller
             ];
         }
 
+
+        $this->db->select('e.id as exam_id, e.name as exam');
+        $this->db->select('pp.id as package_id, pp.title, pp.description, pp.price, pp.duration');
+        $this->db->from('exams as e');
+        $this->db->join('practice_packages as pp', 'pp.exam_id = e.id', 'INNER');
+        $this->db->where('e.status', 'Active');
+        $this->db->where('pp.status', 'Active');
+        $this->db->order_by('e.id', 'ASC');
+        $this->db->order_by('pp.id', 'ASC');
+        $practiceRows = $this->db->get()->result();
+
+        $practices = [];
+        foreach ($practiceRows as $p) {
+            $practices[$p->exam_id]['exam']       = $p->exam;
+            $practices[$p->exam_id]['packages'][] = [
+                'id'          => $p->package_id,
+                'name'        => $p->title,
+                'description' => $p->description,
+                'price'       => $p->price,
+                'duration'    => $p->duration,
+            ];
+        }
+
         $view_data = [
             'course_plans'      => $data,
+            'practices'         => $practices,
             'course_payment_id' => $course_payment_id,
             'payment_info'      => $paymentInfo
         ];

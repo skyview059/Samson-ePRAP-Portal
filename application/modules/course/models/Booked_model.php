@@ -38,6 +38,42 @@ class Booked_model extends Fm_model {
         $today = date('Y-m-d');
         $this->db->select("DATEDIFF(cd.start_date, '{$today}') as days_left");
         
+        // $this->db->from('course_booked as cb');        
+        $this->db->from('course_payments as cp');        
+        $this->db->join('course_booked as cb', 'cp.id=cb.course_payment_id', 'LEFT');        
+        $this->db->join('course_dates as cd', 'cd.id=cb.course_date_id', 'LEFT');
+        $this->db->join('courses as c', 'c.id=cb.course_id', 'LEFT');
+        
+        // $this->db->select('cc.name as category');
+        // $this->db->join('course_categories as cc', 'c.category_id=cc.id', 'LEFT');
+        
+        // $this->db->join('course_payments as cp', 'cp.id=cb.course_payment_id', 'LEFT');
+        $this->db->join('students as s', 's.id=cp.student_id', 'LEFT');
+        
+        $this->__sql($category_id, $course_id, $status, $course_dates_id);
+        
+        $this->db->order_by('cb.id', $this->order);       
+        $this->db->limit($limit, $start);
+        return $this->db->get()->result();        
+    }
+
+    function get_limit_data__xxx($limit, $start, $category_id, $course_id, $status, $course_dates_id)
+    {
+        $this->db->select('cb.*');
+        $this->db->select('c.name as course, c.price,c.booking_limit');
+        
+        $this->db->select('cp.id as payment_id, cp.total_pay as paid, cp.gateway as gateway');
+        $this->db->select('DATE_FORMAT(cp.purchased_at, "%d-%b-%Y") as booked_on'); 
+        
+        $this->db->select("s.number_type, s.gmc_number as gmc, CONCAT(s.fname, ' ', IF(s.mname IS NULL or s.mname = '', '', CONCAT(s.mname, ' ')), s.lname) as full_name");
+        $this->db->select('s.email,s.phone_code,s.phone');
+        $this->db->select('DATE_FORMAT(cd.start_date, "%d/%m/%Y %h:%i %p") as start_date');
+        $this->db->select('DATE_FORMAT(cd.end_date, "%d/%b/%Y %h:%i %p") as end_date');
+        
+        $today = date('Y-m-d');
+        $this->db->select("DATEDIFF(cd.start_date, '{$today}') as days_left");
+
+        $this->db->from('course_booked as cb');        
         $this->db->join('course_dates as cd', 'cd.id=cb.course_date_id', 'LEFT');
         $this->db->join('courses as c', 'c.id=cb.course_id', 'LEFT');
         
@@ -51,7 +87,7 @@ class Booked_model extends Fm_model {
         
         $this->db->order_by('cb.id', $this->order);       
         $this->db->limit($limit, $start);
-        return $this->db->get('course_booked as cb')->result();        
+        return $this->db->get()->result();        
     }
     
     function __sql($category_id, $course_id, $status, $course_dates_id){
@@ -59,7 +95,7 @@ class Booked_model extends Fm_model {
         if($course_id){ $this->db->where('cb.course_id', $course_id ); }
         if($status){ $this->db->where('cb.status', $status ); }        
         if($course_dates_id){ $this->db->where('cb.course_date_id', $course_dates_id ); }
-        $this->db->where('cb.type', 'course');
+        // $this->db->where('cb.type', 'course');
     }
     
     function getReschedule($booking_id){
@@ -72,7 +108,41 @@ class Booked_model extends Fm_model {
         return $this->db->get()->row();
     }
     
-    function getStudentEmail($booking_id){        
+    /* Preview: get the course_payments header (with student) for a given booking id */
+    function getPaymentByBooking($booking_id){
+        $this->db->select('cp.*');
+        $this->db->select("s.number_type, s.gmc_number as gmc, CONCAT(s.fname, ' ', IF(s.mname IS NULL or s.mname = '', '', CONCAT(s.mname, ' ')), s.lname) as full_name");
+        $this->db->select('s.email, s.phone_code, s.phone');
+        $this->db->select('DATE_FORMAT(cp.purchased_at, "%d-%b-%Y %h:%i %p") as purchased_on');
+        $this->db->from('course_booked as cb');
+        $this->db->join('course_payments as cp', 'cp.id=cb.course_payment_id', 'LEFT');
+        $this->db->join('students as s', 's.id=cp.student_id', 'LEFT');
+        $this->db->where('cb.id', $booking_id);
+        return $this->db->get()->row();
+    }
+
+    /* Preview: get ALL bookings under a course_payments id (1 -> many).
+       Supports both course (courses) and practice (exams + practice_packages) types. */
+    function getBookingsByPayment($payment_id){
+        $this->db->select('cb.*');
+        $this->db->select('c.duration');
+        // Resolve display name & category by booking type
+        $this->db->select("CASE WHEN cb.type = 'practice' THEN e.name ELSE c.name END as course", FALSE);
+        $this->db->select("CASE WHEN cb.type = 'practice' THEN pp.title ELSE cc.name END as category", FALSE);
+        $this->db->select('DATE_FORMAT(cd.start_date, "%d/%m/%Y %h:%i %p") as start_date');
+        $this->db->select('DATE_FORMAT(cd.end_date, "%d/%b/%Y %h:%i %p") as end_date');
+        $this->db->from('course_booked as cb');
+        $this->db->join('courses as c', 'c.id=cb.course_id', 'LEFT');
+        $this->db->join('course_categories as cc', 'cc.id=c.category_id', 'LEFT');
+        $this->db->join('course_dates as cd', 'cd.id=cb.course_date_id', 'LEFT');
+        $this->db->join('exams as e', 'e.id=cb.course_id', 'LEFT');
+        $this->db->join('practice_packages as pp', 'pp.id=cb.practice_package_id', 'LEFT');
+        $this->db->where('cb.course_payment_id', $payment_id);
+        $this->db->order_by('cb.id', 'ASC');
+        return $this->db->get()->result();
+    }
+
+    function getStudentEmail($booking_id){
         $this->db->select('s.email,s.lname,s.id');
         $this->db->from('course_booked as b');
         $this->db->join('course_payments as p', 'p.id=b.course_payment_id', 'LEFT');

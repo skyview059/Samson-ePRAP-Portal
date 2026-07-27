@@ -24,9 +24,8 @@
 
     <?= bookingTabAsStatus($status); ?>
     <div class="box no-border">
-        <div class="box-header with-border">
-            <!--<pre><?php // $sql; ?></pre>-->
-            <?php $this->load->view('index_filter'); ?>
+        <div class="box-header with-border">            
+            <?php $this->load->view('index_filter'); ?>            
         </div>
 
         <div class="box-body">
@@ -46,13 +45,13 @@
                         <th class="text-right">Amount</th>
                         <th>Cancelled on</th>
                         <th>IsAttend?</th>
-                        <th class="text-center" width="150">Action</th>
+                        <th class="text-center" width="180">Action</th>
                     </tr>
                     </thead>
 
                     <tbody>
-                    <?php foreach ($bookeds as $booked) { ?>
-                        <tr>
+                    <?php foreach ($bookings as $booked) { ?>
+                        <tr id="payment_<?= $booked->payment_id; ?>">
                             <td><?= ++$start ?></td>
                             <td><p class="no-margin"><?= $booked->full_name; ?><br/>
                                     <em><?= $booked->email; ?> | <?= "{$booked->phone_code}-{$booked->phone}"; ?></em>
@@ -82,6 +81,10 @@
                             </td>
                             <td class="text-center">
                                 <?php if ($booked->status != 'Cancelled') { ?>
+                                    <button type="button" class="btn btn-xs btn-primary preview"
+                                            data-id="<?= $booked->id; ?>" title="Preview">
+                                        <i class="fa fa-fw fa-search"></i>
+                                    </button>
                                     <button type="button" class="btn btn-xs btn-warning rechedule"
                                             data-id="<?= $booked->id; ?>" title="ReSchedule">
                                         <i class="fa fa-fw fa-random"></i>
@@ -140,8 +143,7 @@
 
 
 <!-- Manual Payment Modal -->
-<div class="modal fade" id="paymentModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-     aria-hidden="true">
+<div class="modal fade" id="paymentModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
     <div class="modal-dialog" role="document">
         <form name="bookedPaymentModal" id="bookedPaymentModal">
             <div class="modal-content">
@@ -285,6 +287,13 @@
     </div>
 </div>
 
+<!-- Preview Modal -->
+<div class="modal fade" id="previewModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document" id="preview_content">
+
+    </div>
+</div>
+
 
 <script type="text/javascript">
     $('body').on('click', '.manual-payment', function (e) {
@@ -296,6 +305,7 @@
         $(`#${gateway}`).prop("checked", true);
         $('#admin_txt').val($(this).data('note'));
         $('#paymentModal').modal('show');
+        $('#respond').html('');
     });
 
     $('body').on('click', '.booked-cancel', function (e) {
@@ -308,7 +318,10 @@
     /*save Booking Payment by Admin*/
     $('body').on('click', '#saveBookingPayment', function (e) {
         e.preventDefault();
-        var formData = $("#bookedPaymentModal").serialize();
+        var formData    = $("#bookedPaymentModal").serialize();
+        var payment_id  = parseInt( $('#payment_id').val() ) || 0;
+        // alert( payment_id );
+        // return false;
 
         $.ajax({
             url       : "admin/course/booked/save_manual_payment",
@@ -320,10 +333,18 @@
             },
             success   : function (respond) {
                 if (respond.Status === 'OK') {
-                    location.href = '<?= base_url('course/booked'); ?>';
+                    /* location.href = '<?= base_url('course/booked'); ?>'; */
+                    $('#respond').html('<p class="ajax_success">'+ respond.Msg +'</p>');
+                    
+                    setTimeout(() => {
+                        $(`#payment_${payment_id}`).fadeOut();
+                        $('#paymentModal').modal('hide');
+                    }, 1000 );
+
                 } else {
                     $('#respond').html('<p class="ajax_error">' + respond.Msg + '</p>');
                 }
+
             }
         });
     });
@@ -389,6 +410,23 @@
                 } else {
                     $('#respond_an').html('<p class="ajax_error">' + respond.Msg + '</p>');
                 }
+            }
+        });
+    });
+
+    /*Preview Booking Details*/
+    $('body').on('click', '.preview', function (e) {
+        var id = $(this).data('id');
+        $('#preview_content').html('<div class="modal-content"><div class="modal-body"><p class="ajax_processing">Please Wait...</p></div></div>');
+        $('#previewModal').modal('show');
+
+        $.ajax({
+            url     : "admin/course/booked/preview",
+            type    : 'post',
+            dataType: 'html',
+            data    : {id: id},
+            success : function (respond) {
+                $('#preview_content').html(respond);
             }
         });
     });

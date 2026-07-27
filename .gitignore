@@ -36,3 +36,4 @@
 .vscode
 /samson_prap_live.sql.zip
 /vendor
+/*.log

@@ -262,10 +262,10 @@ class Practice extends Admin_controller
         $btn = [];
         foreach($practices as $p ){
             $qty = '';
-            if($prefix == 'practice'){
-                $count = Tools::getPractieSchedules($p->id);
-                $qty = "<sup>({$count})</sup>";
-            }
+            // if($prefix == 'practice'){
+            //     $count = Tools::getPractieSchedules($p->id);
+            //     $qty = "<sup>({$count})</sup>";
+            // }
             $btn[] = [
                 'title' => "{$p->name} {$qty}",
                 'icon' => 'fa fa-circle-o',
