@@ -129,7 +129,7 @@ class Booking_with_registration extends MX_Controller
                 ->set('password', password_encription($post['pass']))
                 ->set('phone_Code', $post['phone_code'])
                 ->set('phone', $post['phone'])
-                ->set('country_id', $post['country_id'])
+                // ->set('country_id', $post['country_id'])
                 ->update('students');
 
             return $user->id;
@@ -141,7 +141,7 @@ class Booking_with_registration extends MX_Controller
                 'password'   => password_encription($post['pass']),
                 'phone_Code' => $post['phone_code'],
                 'phone'      => $post['phone'],
-                'country_id' => $post['country_id'],
+                // 'country_id' => $post['country_id'],
             );
             $this->db->insert('students', $data);
 
@@ -346,6 +346,8 @@ class Booking_with_registration extends MX_Controller
             'promo_code'     => $coupon_name,
         ];
 
+        $this->db->trans_start();
+
         $this->db->insert('course_payments', $cart);
         $course_payment_id = $this->db->insert_id();
 
@@ -367,8 +369,9 @@ class Booking_with_registration extends MX_Controller
             $row['course_payment_id'] = $course_payment_id;
             $this->db->insert('course_booked', $row);
         }
-
-        return $course_payment_id;
+        $this->db->trans_complete();
+        
+        return ( $this->db->trans_status() ) ? $course_payment_id : 0;
     }
 
     // this check for authenticate user

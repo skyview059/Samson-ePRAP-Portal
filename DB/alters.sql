@@ -5,3 +5,13 @@ ALTER TABLE `course_payments` CHANGE `admin_comments` `admin_comments` MEDIUMTEX
 SELECT id, fname,lname, `email` FROM `students` WHERE email in( 
     'ejemenj@gmail.com', 'melimam0@gmail.com', 'stephenkumi64@yahoo.co.uk', 'enasaly91@gmail.com', 'jacobkimanimd@gmail.com'
 );
+
+
+
+ALTER TABLE `students` ADD INDEX(`email`);
+ALTER TABLE `students` ADD INDEX(`gmc_number`);
+
+
+ALTER TABLE `students` ADD INDEX(`whatsapp_code`, `whatsapp`);
+ALTER TABLE `students` ADD INDEX(`phone_code`, `phone`);
+

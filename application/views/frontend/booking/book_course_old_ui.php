@@ -57,6 +57,7 @@
                             </div>
                         </div>
 
+                        <?php /*
                         <div class="row">
                             <div class="col-md-6">
                                 <select name="country_id" class="form-control select2" id="country_id">
@@ -64,6 +65,8 @@
                                 </select>
                             </div>
                         </div>
+                        */ ?>
+
                     </fieldset>
                     <?php endif;?>
 
@@ -192,7 +195,7 @@
                               placeholder="Comments"></textarea>
 
                     <div class="mb-15">
-                        <div class="icheck-primary mb-15">
+                        <div class="icheck-primary mb-15 hidden d-none">
                             <input type="checkbox" id="personal_data" name="personal_data" />
                             <label for="personal_data">
                                 <small>
@@ -207,9 +210,9 @@
                             <label for="terms_and_conditions">
                                 <small>
                                     I have read and agreed to the
-                                    <a href="https://www.samsoncourses.com/terms-and-conditions" style="color: #4AA2F1" target="_blank"> Terms & Conditions </a>
+                                    <a href="https://www.geniusclass.co.uk/page/terms-conditions" style="color: #4AA2F1" target="_blank"> Terms & Conditions </a>
                                     and
-                                    <a href="https://www.samsoncourses.com/privacy-policy" style="color: #4AA2F1" target="_blank"> Privacy Policy.</a>
+                                    <a href="https://www.geniusclass.co.uk/page/privacy-policy" style="color: #4AA2F1" target="_blank"> Privacy Policy.</a>
                                 </small>
                             </label>
                         </div>
