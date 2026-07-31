@@ -63,12 +63,14 @@
                         <?php foreach ($packages as $package) { ?>
                             <tr>
                                 <td><?php echo ++$start; ?></td>
-                                <td><?php echo $package->practice_name; ?></td>
+                                <td><?php echo $package->practice_name; ?>
+                                    <?php // pp($package); ?>
+                            </td>
                                 <td><?php echo $package->title; ?></td>
 <!--                                <td class="text-center">--><?php //echo intOnly($package->booked); ?><!--</td>-->
                                 <td class="text-right"><?php echo GBP($package->price); ?></td>
                                 <td class="text-center"><?php echo $package->duration; ?></td>
-                                <td class="text-center"><?php echo getPackageScenarioTypeName($package->scenario_type); ?></td>
+                                <td class="text-center"><?php echo getPackageScenarioTypeName($package->scenario_type, $package->exam_id ); ?></td>
                                 <td class="text-center"><?php echo isActive($package->status); ?></td>
                                 <td class="text-center">
                                     <?php

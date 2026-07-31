@@ -9,7 +9,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 class Practice_package extends Admin_controller
 {
 
-    function __construct()
+    public function __construct()
     {
         parent::__construct();
         $this->load->model('Practice_package_model');

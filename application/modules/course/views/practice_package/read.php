@@ -47,7 +47,7 @@
                 <tr>
                     <td>Scenario Type</td>
                     <td>:</td>
-                    <td><?php echo getPackageScenarioTypeName($scenario_type); ?></td>
+                    <td><?php echo getPackageScenarioTypeName($scenario_type, $exam_id); ?></td>
                 </tr>
                 <tr>
                     <td>Status</td>
