@@ -1465,6 +1465,68 @@ function uploadFile($FILE = [], $path = 'uploads/certificate/', $name = 'cert')
     return '';
 }
 
+/**
+ * Uploads a posted file, records it in the `attachments` table and returns its full URL.
+ *
+ * @param array  $FILE    a single $_FILES entry
+ * @param string $path    web root relative folder, trailing slash included
+ * @param string $name    prefix of the generated file name
+ * @param array  $allowed extensions or mime types, defaults to the common document/image types
+ *
+ * @return array id, name, path, url, size, type, error
+ */
+function uploadAttachment($FILE = [], $path = null, $name = 'att', $allowed = [])
+{
+    $ci     = &get_instance();
+    $path   = $path ? $path : 'uploads/attachments/' . date('Y/m/');
+    $result = ['id' => 0, 'name' => '', 'path' => '', 'url' => '', 'size' => 0, 'type' => '', 'error' => ''];
+
+    $handle = new \Verot\Upload\Upload($FILE);
+    if (!$handle->uploaded) {
+        $result['error'] = $handle->error ? $handle->error : 'No file was uploaded.';
+        return $result;
+    }
+
+    $handle->allowed = $allowed ? $allowed : [
+        'jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp',
+        'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx',
+        'csv', 'txt', 'zip',
+    ];
+
+    $original = $handle->file_src_name;
+    $mime     = $handle->file_src_mime;
+
+    $handle->file_new_name_body     = uniqid("{$name}_");
+    $handle->file_overwrite         = false;
+    $handle->image_resize           = true;  //ignored when the file is not an image
+    $handle->image_x                = 1200;
+    $handle->image_ratio_y          = true;
+    $handle->image_ratio_no_zoom_in = true;  //never blow up a small image
+    $handle->process(dirname(APPPATH) . '/' . $path);
+
+    if (!$handle->processed) {
+        $result['error'] = $handle->error;
+        return $result;
+    }
+
+    $result['name'] = substr_fk($original, 0, 100);
+    $result['path'] = $path . $handle->file_dst_name;
+    $result['size'] = (int)filesize($handle->file_dst_pathname);
+    $result['type'] = substr_fk($mime, 0, 120);
+    $result['url']  = base_url($result['path']);
+
+    $ci->db->insert('attachments', [
+        'name'        => $result['name'],
+        'path'        => $result['path'],
+        'size'        => $result['size'],
+        'type'        => $result['type'],
+        'uploaded_at' => date('Y-m-d H:i:s'),
+    ]);
+    $result['id'] = (int)$ci->db->insert_id();
+
+    return $result;
+}
+
 function download_attachment($file)
 {
     $link = '';

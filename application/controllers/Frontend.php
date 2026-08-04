@@ -17,12 +17,48 @@ class Frontend extends Frontend_controller
 
     public function ckImageUpload()
     {
-        // Upload file
+        $this->isPost();
 
+        if (!$this->student_id && !getLoginUserData('user_id')) {
+            return $this->uploadResponse(['error' => 'Please login before uploading a file.']);
+        }
 
-        echo json_encode([
-            'url' => 'https://avatars.githubusercontent.com/u/55717927?v=4&size=64'
-        ]);
+        //CKEditor posts as `upload`, a plain form may use `file` or anything else
+        $field = null;
+        foreach (['upload', 'file', 'attachment'] as $key) {
+            if (isset($_FILES[$key])) {
+                $field = $key;
+                break;
+            }
+        }
+        if (!$field && $_FILES) {
+            $field = key($_FILES);
+        }
+
+        if (!$field) {
+            return $this->uploadResponse(['error' => 'No file was posted.']);
+        }
+
+        return $this->uploadResponse(uploadAttachment($_FILES[$field], 'uploads/attachments/' . date('Y/m/')));
+    }
+
+    private function uploadResponse($file = [])
+    {
+        if (empty($file['url'])) {
+            $response = [
+                'uploaded' => 0,
+                'error'    => ['message' => empty($file['error']) ? 'Sorry! The file could not be uploaded.' : $file['error']],
+            ];
+        } else {
+            //`uploaded`/`fileName` keep the CKFinder adapter happy, `url` serves everyone else
+            $response = [
+                'uploaded' => 1,
+                'id'       => $file['id'],
+                'fileName' => $file['name'],
+                'url'      => $file['url'],
+            ];
+        }
+        $this->output->set_content_type('application/json')->set_output(json_encode($response));
     }
 
     public function book_course()

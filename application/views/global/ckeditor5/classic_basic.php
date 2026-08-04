@@ -22,7 +22,7 @@
                 ]
             },
             ckfinder: {
-                uploadUrl: "<?php echo site_url('assets/lib/ckeditor5/ckfinder/core/connector/php/connector.php?command=QuickUpload&type=Files&responseType=json'); ?>",
+                uploadUrl: "<?php echo site_url('ck-image-upload'); ?>",
             },
             toolbar: {
                 items: [
