@@ -30,11 +30,15 @@ class Booking extends Frontend_controller
         $practices = $this->Course_model->get_my_practice_courses($this->student_id);
 
         $data = [
+            'IncomingEmail' => getSettingItem('IncomingEmail'),
             'courses' => $courses,
             'practices' => $practices,
+            'size_of_data' => sizeof( $courses ) + sizeof( $practices ),           
             'pagination' => getPaginator($total, $page, $targetpath, $limit),
             'start' => 0
         ];
+
+        // dd( $data );
         
         $this->viewMemberContent('booking/my-course', $data);
     }

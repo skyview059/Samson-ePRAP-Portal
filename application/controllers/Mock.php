@@ -70,10 +70,11 @@ class Mock extends Frontend_controller
             'exam_schedule' => $exam_schedule
         );
         $this->viewMemberContent('mock/exam_room', $data);
-    }
-
+    }    
+    
     public function examRoomPractice($exam_schedule_id)
     {
+        
         if (checkPermission('online_mock', getLoginUserData('role_id')) === 0) {
             redirect('404');
         }

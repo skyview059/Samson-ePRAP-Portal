@@ -16,7 +16,9 @@ class Booking_with_registration extends MX_Controller
         }
 
         $course_payment_id = $this->createCartAndCheckout($post, $student_id);
-        $this->SendWelcomeEmail($post, $student_id);
+        if(!$student_id){
+            $this->SendWelcomeEmail($post, $student_id);
+        }        
 
         redirect(site_url("booking/checkout/{$course_payment_id}" . ($post['first_promoter'] ? "?ref={$post['first_promoter']}" : '')));
     }
@@ -89,8 +91,19 @@ class Booking_with_registration extends MX_Controller
         }
         // End::This validation is not required if the user is authenticated
 
-        $this->form_validation->set_rules('id[]', 'course', 'required');
-        $this->form_validation->set_rules('slot_id[]', 'course slot', 'required');
+        // A course + slot is required, UNLESS the student is buying a practice package on its own.
+        $hasPractice = !empty($this->input->post('practice_package_id'));
+        $hasCourse   = !empty($this->input->post('id'));
+
+        if (!$hasPractice) {
+            // nothing but a course can fulfil the order -> course + slot mandatory
+            $this->form_validation->set_rules('id[]', 'course', 'required');
+            $this->form_validation->set_rules('slot_id[]', 'course slot', 'required');
+        } elseif ($hasCourse) {
+            // practice + a course chosen -> the chosen course still needs its slot
+            $this->form_validation->set_rules('slot_id[]', 'course slot', 'required');
+        }
+
         $this->form_validation->set_rules('personal_data', 'Personal Data Collect', 'required');
         $this->form_validation->set_rules('terms_and_conditions', 'Terms and Conditions', 'required');
 
@@ -116,7 +129,7 @@ class Booking_with_registration extends MX_Controller
                 ->set('password', password_encription($post['pass']))
                 ->set('phone_Code', $post['phone_code'])
                 ->set('phone', $post['phone'])
-                ->set('country_id', $post['country_id'])
+                // ->set('country_id', $post['country_id'])
                 ->update('students');
 
             return $user->id;
@@ -128,7 +141,7 @@ class Booking_with_registration extends MX_Controller
                 'password'   => password_encription($post['pass']),
                 'phone_Code' => $post['phone_code'],
                 'phone'      => $post['phone'],
-                'country_id' => $post['country_id'],
+                // 'country_id' => $post['country_id'],
             );
             $this->db->insert('students', $data);
 
@@ -192,7 +205,7 @@ class Booking_with_registration extends MX_Controller
     private function createCartAndCheckout($post, $student_id)
     {
         $coupon_name = $post['coupon_name'];
-        $packageIds  = $post['id'];
+        $packageIds  = isset($post['id']) ? $post['id'] : [];
 
         // get coupon details
         $coupon = $this->db->from('promocodes')
@@ -275,21 +288,71 @@ class Booking_with_registration extends MX_Controller
             }
         }
 
+        // ---- Practice packages bought together with this registration ----
+        $practicePackageIds = isset($post['practice_package_id']) ? $post['practice_package_id'] : [];
+        $practiceBooked     = [];
+
+        // The same coupon is usable for practice too (packages have no per-course targeting).
+        $couponUsableForPractice = $coupon
+            && $coupon->uses < $coupon->uses_limit
+            && $coupon->end_date >= date('Y-m-d')
+            && !($coupon->already_used && $coupon->use_multiple !== 'yes')
+            && !($coupon->is_special && !in_array(auth('student')->id, $studentIDs));
+
+        // uses is incremented once overall; the course loop above may have already done it.
+        $couponAlreadyCounted = ($coupon_name !== null);
+
+        foreach ($practicePackageIds as $packageId) {
+            $package = $this->db->from('practice_packages')->where(['id' => $packageId, 'status' => 'Active'])->get()->row();
+            if (!$package) {
+                continue;
+            }
+
+            $price = $package->price;
+            if ($couponUsableForPractice) {
+                if ($coupon->discount_type === 'Fixed') {
+                    $price = $package->price - $coupon->amount;
+                } elseif ($coupon->discount_type === 'Percentage') {
+                    $price = $package->price - ($package->price * $coupon->amount / 100);
+                }
+                $coupon_name = $coupon->code;
+
+                if (!$couponAlreadyCounted) {
+                    $this->db->where('id', $coupon->id)->set('uses', 'uses + 1', FALSE)->update('promocodes');
+                    $couponAlreadyCounted = true;
+                }
+            }
+
+            $total_amount += $price;
+
+            $practiceBooked[] = [
+                'course_id'           => $package->exam_id, // practice/exam id (shares the course_id column)
+                'practice_package_id' => $package->id,
+                'course_date_id'      => 0,
+                'booked_price'        => $price,
+                'status'              => 'Pending',
+                'type'                => 'practice',
+                'expiry_date'         => date('Y-m-d', strtotime('+' . $package->duration)),
+            ];
+        }
+
         $cart = [
             'student_id'     => $student_id,
             'purchased_at'   => date('Y-m-d H:i:s'),
-            'total_items'    => count($post['id']),
+            'total_items'    => count($packageIds) + count($practiceBooked),
             'total_pay'      => $total_amount,
             'invoice_id'     => time(),
             'admin_comments' => $post['customer_comments'],
             'promo_code'     => $coupon_name,
         ];
 
+        $this->db->trans_start();
+
         $this->db->insert('course_payments', $cart);
         $course_payment_id = $this->db->insert_id();
 
         $courseBookedData = [];
-        foreach ($post['id'] as $courseId => $course) {
+        foreach ($packageIds as $courseId => $course) {
             $courseBookedData[] = [
                 'course_payment_id' => $course_payment_id,
                 'course_id'         => $courseId,
@@ -297,8 +360,18 @@ class Booking_with_registration extends MX_Controller
                 'status'            => 'Pending'
             ];
         }
-        $this->db->insert_batch('course_booked', $courseBookedData);
-        return $course_payment_id;
+        if (!empty($courseBookedData)) {
+            $this->db->insert_batch('course_booked', $courseBookedData);
+        }
+
+        // Practice rows carry extra columns, so insert them individually.
+        foreach ($practiceBooked as $row) {
+            $row['course_payment_id'] = $course_payment_id;
+            $this->db->insert('course_booked', $row);
+        }
+        $this->db->trans_complete();
+        
+        return ( $this->db->trans_status() ) ? $course_payment_id : 0;
     }
 
     // this check for authenticate user

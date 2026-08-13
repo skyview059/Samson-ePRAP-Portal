@@ -17,12 +17,48 @@ class Frontend extends Frontend_controller
 
     public function ckImageUpload()
     {
-        // Upload file
+        $this->isPost();
 
+        if (!$this->student_id && !getLoginUserData('user_id')) {
+            return $this->uploadResponse(['error' => 'Please login before uploading a file.']);
+        }
 
-        echo json_encode([
-            'url' => 'https://avatars.githubusercontent.com/u/55717927?v=4&size=64'
-        ]);
+        //CKEditor posts as `upload`, a plain form may use `file` or anything else
+        $field = null;
+        foreach (['upload', 'file', 'attachment'] as $key) {
+            if (isset($_FILES[$key])) {
+                $field = $key;
+                break;
+            }
+        }
+        if (!$field && $_FILES) {
+            $field = key($_FILES);
+        }
+
+        if (!$field) {
+            return $this->uploadResponse(['error' => 'No file was posted.']);
+        }
+
+        return $this->uploadResponse(uploadAttachment($_FILES[$field], 'uploads/attachments/' . date('Y/m/')));
+    }
+
+    private function uploadResponse($file = [])
+    {
+        if (empty($file['url'])) {
+            $response = [
+                'uploaded' => 0,
+                'error'    => ['message' => empty($file['error']) ? 'Sorry! The file could not be uploaded.' : $file['error']],
+            ];
+        } else {
+            //`uploaded`/`fileName` keep the CKFinder adapter happy, `url` serves everyone else
+            $response = [
+                'uploaded' => 1,
+                'id'       => $file['id'],
+                'fileName' => $file['name'],
+                'url'      => $file['url'],
+            ];
+        }
+        $this->output->set_content_type('application/json')->set_output(json_encode($response));
     }
 
     public function book_course()
@@ -75,8 +111,32 @@ class Frontend extends Frontend_controller
             ];
         }
 
+
+        $this->db->select('e.id as exam_id, e.name as exam');
+        $this->db->select('pp.id as package_id, pp.title, pp.description, pp.price, pp.duration');
+        $this->db->from('exams as e');
+        $this->db->join('practice_packages as pp', 'pp.exam_id = e.id', 'INNER');
+        $this->db->where('e.status', 'Active');
+        $this->db->where('pp.status', 'Active');
+        $this->db->order_by('e.id', 'ASC');
+        $this->db->order_by('pp.id', 'ASC');
+        $practiceRows = $this->db->get()->result();
+
+        $practices = [];
+        foreach ($practiceRows as $p) {
+            $practices[$p->exam_id]['exam']       = $p->exam;
+            $practices[$p->exam_id]['packages'][] = [
+                'id'          => $p->package_id,
+                'name'        => $p->title,
+                'description' => $p->description,
+                'price'       => $p->price,
+                'duration'    => $p->duration,
+            ];
+        }
+
         $view_data = [
             'course_plans'      => $data,
+            'practices'         => $practices,
             'course_payment_id' => $course_payment_id,
             'payment_info'      => $paymentInfo
         ];

@@ -45,7 +45,7 @@ function sidebar_links($tab = '')
         $html .= "><a href=\"{$link}\">{$menu}</a></li>";
     }
     $html .= '<li><a href="'.site_url('book-course').'" target="_blank"> <i class="fa fa-user-md"></i> Subscription <i class="fa fa-external-link"></i></a></li>';
-    $html .= '<li><a href="https://www.samsoncourses.com/" target="_blank"> <i class="fa fa-globe"></i> Samson Courses Website <i class="fa fa-external-link"></i></a></li>';
+    $html .= '<li><a href="https://www.geniusclass.co.uk/" target="_blank"> <i class="fa fa-globe"></i> Genius Class <i class="fa fa-external-link"></i></a></li>';
     $html .= '<li><a href="' . site_url("logout") . '"> <i class="fa fa-power-off"></i> Logout</a></li>';
     $html .= '</ul></div></nav>';
     return $html;

@@ -14,7 +14,7 @@
         "php": ">=5.2.4",        
         "mauricesvay/php-facedetection": "^0.1.0",
         "phpmailer/phpmailer": "^6.3",
-        "verot/class.upload.php": "^2.1"		
+        "verot/class.upload.php": "dev-master"
     },
     "suggest": {
         "paragonie/random_compat": "Provides better randomness in PHP 5.x"

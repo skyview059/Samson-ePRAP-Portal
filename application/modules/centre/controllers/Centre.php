@@ -162,14 +162,18 @@ class Centre extends Admin_controller{
             
             $this->db->set('exam_centre_id', $new_id );
             $this->db->where('exam_centre_id', $old_id );
-            $this->db->update('exam_schedules');            
+            $this->db->update('exam_schedules');  
+
+            $this->db->set('exam_centre_id', $new_id );
+            $this->db->where('exam_centre_id', $old_id );
+            $this->db->update('practice_schedules');            
             
             $this->db->where('id', $old_id );
             $this->db->delete('exam_centres');
             
         $this->db->trans_complete();
             
-        $this->session->set_flashdata('msgs', 'Centre Updated Successlly');
+        $this->session->set_flashdata('msgs', 'Centre Updated Successfully');
         redirect(site_url(Backend_URL . "centre?id={$mock_id}"));        
     }
 

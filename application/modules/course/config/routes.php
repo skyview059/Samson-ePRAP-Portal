@@ -35,6 +35,7 @@ $route['admin/course/booked/create']              = 'course/booked/create';
 $route['admin/course/booked/create_action']       = 'course/booked/create_action';
 $route['admin/course/booked/cancel']              = 'course/booked/cancel';
 $route['admin/course/booked/save_manual_payment'] = 'course/booked/save_manual_payment';
+$route['admin/course/booked/preview'] = 'course/booked/preview';
 
 // practice booking
 $route['admin/course/booked/practice']               = 'course/booked/practice';

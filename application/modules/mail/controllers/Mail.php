@@ -304,20 +304,38 @@ class Mail extends MX_Controller
         $this->db->insert('mails', $data);
     }
 
+    private function is_local()
+    {
+        $host = isset($_SERVER['HTTP_HOST']) ? strtolower($_SERVER['HTTP_HOST']) : '';
+        return (bool) preg_match('/^(localhost|127\.0\.0\.1|.+\.(test|local|localhost))(:\d+)?$/', $host);
+    }
+
+
     private function send()
     {
         // $send_to, $subject, $body, $cc = false, $bcc = false, $attach = null
         $mail = new PHPMailer(true);
 
         try {
-            $mail->SMTPDebug = SMTP::DEBUG_SERVER;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     //Enable verbose debug output
-            $mail->isSMTP();                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          //Send using SMTP
-            $mail->Host       = 'mail.eprap.com';                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           //Set the SMTP server to send through
-            $mail->SMTPAuth   = true;                                 //Enable SMTP authentication
-            $mail->Username   = $this->send_from;                     //SMTP username            
-            $mail->Password   = 'Aw953e337';                          //SMTP password
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;          //Enable implicit TLS encryption
-            $mail->Port       = 465;
+            $mail->isSMTP();
+            if ($this->is_local()) {
+                // Mailpit — catches everything, UI at http://127.0.0.1:8025
+                $mail->SMTPDebug   = SMTP::DEBUG_OFF;
+                $mail->Host        = '127.0.0.1';
+                $mail->Port        = 1025;
+                $mail->SMTPAuth    = false;
+                $mail->SMTPSecure  = '';
+                $mail->SMTPAutoTLS = false;
+            } else {
+                $mail->SMTPDebug  = SMTP::DEBUG_OFF;
+                $mail->Host       = 'mail.eprap.com';
+                $mail->SMTPAuth   = true;
+                $mail->Username   = $this->send_from;
+                $mail->Password   = 'Aw953e337';
+                $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+                $mail->Port       = 465;
+            }
+
 
             $mail->setFrom($this->send_from, $this->from_name);
             $mail->addAddress($this->send_to);

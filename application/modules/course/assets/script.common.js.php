@@ -34,6 +34,10 @@
         cartDetails();
     });
 
+    $('body').on('click', '.practice2buy', function () {
+        cartDetails();
+    });
+
     function cartDetails(){
         var totalAmount = 0;
         $(".want2buy").each(function (key, elem) {
@@ -54,7 +58,17 @@
             }
         });
 
-        var numberOfCourseChecked = $('input.ckbx:checked').length;
+        var practiceQty = 0;
+        $(".practice2buy").each(function (key, elem) {
+            if ($(elem).is(':checkbox:checked')) {
+                totalAmount += Number($(elem).attr('data-price'));
+                practiceQty += 1;
+            }
+        });
+
+        totalAmount = Number(totalAmount.toFixed(2));
+
+        var numberOfCourseChecked = $('input.ckbx:checked').length + practiceQty;
         $("#crs_quantity").text(numberOfCourseChecked);
         $("#total_amount").text(totalAmount);
 

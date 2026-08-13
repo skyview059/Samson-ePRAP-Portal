@@ -9,7 +9,8 @@
             <label class="col-sm-3" for="send_to">Select Department</label>
             <div class="col-sm-4">
                 <select id="send_to" name="send_to" class="form-control">                    
-                    <option value="info@samsoncourses.com">For general queries &lt;info@samsoncourses.com&gt;</option>
+                    <option value="info@geniusclass.co.uk">For general queries &lt;info@geniusclass.co.uk&gt;</option>
+                    <!-- <option value="info@samsoncourses.com">For general queries &lt;info@samsoncourses.com&gt;</option> -->
                 </select>
             </div>
         </div>

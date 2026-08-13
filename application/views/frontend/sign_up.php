@@ -28,7 +28,7 @@
                     <div class="panel-heading">Basic Information</div>
                     <div class="panel-body">
                         <div class="form-group">
-                            <label for="first_name" class="col-sm-4 control-label">Full Name <sup>*</sup></label>
+                            <label for="first_name" class="col-sm-4 control-label"><sup>*</sup> Full Name</label>
                             <div class="col-sm-8">
                                 <div class="row">                                    
                                     <div class="col-md-6">
@@ -47,7 +47,7 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="your_email" class="col-sm-4 control-label">Email <sup>*</sup></label>
+                            <label for="your_email" class="col-sm-4 control-label"><sup>*</sup> Email</label>
                             <div class="col-sm-8">
                                 <input type="text" class="form-control" name="email" id="your_email"
                                        placeholder="Email Address"
@@ -57,7 +57,7 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="whatsapp" class="col-sm-4 control-label">WhatsApp <sup>*</sup></label>
+                            <label for="whatsapp" class="col-sm-4 control-label"><sup>*</sup> WhatsApp</label>
                             <div class="col-sm-8">
                                 <div class="input-group">
                             <span class="input-group-btn">
@@ -74,33 +74,17 @@
                                 <?php echo form_error('whatsapp[number]'); ?>
                             </div>
                         </div>
-                        
-                        <div class="form-group">
-                            <label for="exam_date" class="col-sm-4 control-label">Exam Date</label>
-                            <div class="col-sm-8">
-                                <div class="input-group">
-                                <span class="input-group-addon">
-                                    <i class="fa fa-calendar"></i>
-                                </span>
-                                    <input type="text" class="form-control js_datepicker" name="exam_date"
-                                           autocomplete="off" id="exam_date" placeholder="Exam Date"
-                                           value="<?php echo $exam_date; ?>"/>
-                                </div>
-                                <?php echo form_error('exam_date'); ?>
-                            </div>
-                        </div>
 
                         
                         <div class="form-group">
-                            <label for="password" class="col-sm-4 control-label">Password <sup>*</sup></label>
+                            <label for="password" class="col-sm-4 control-label"><sup>*</sup> Password</label>
                             <div class="col-sm-8">
 
                                 <div class="row">
                                     <div class="col-sm-6">
                                         <input type="password" autocomplete="new-password" class="form-control"
                                                name="password" id="password" placeholder="Password"
-                                               value="<?php echo $password; ?>"/>
-                                        <div id="sign_up_respond_length"></div>
+                                               value="<?php echo $password; ?>"/>                                        
 
                                         <?php echo form_error('password') ?>
                                     </div>
@@ -111,12 +95,13 @@
                                         <div id="sign_up_respond2"></div>
                                     </div>
                                 </div>
+                                <div id="sign_up_respond_length"></div>
 
                             </div>
                         </div>
 
                         <div class="form-group">
-                            <label for="answer" class="col-sm-4 control-label"><?php echo $math; ?> = ?</label>
+                            <label for="answer" class="col-sm-4 control-label"><sup>*</sup> <?php echo $math; ?> = ?</label>
                             <div class="col-sm-8">
 
                                 <input type="text" class="form-control" name="answer"
@@ -128,8 +113,8 @@
 
                         <div class="form-group">
                             <div class="col-sm-8 col-sm-offset-4">
-                                <label>
-                                    <input type="checkbox" checked="checked" name="contact_by_rm" id="contact_by_rm"/>
+                                <label class="hidden d-none">
+                                    <input type="checkbox" name="contact_by_rm" id="contact_by_rm"/>
                                     &nbsp;&nbsp;I want to be discovered and contacted by employers/recruitment managers
                                 </label>
                                 <p id="RM_Warning" style="display:none;" class="ajax_error">By un-check this option you will
@@ -150,9 +135,9 @@
                                 <label>
                                     <input type="checkbox" name="agree" value="Yes" id="agree"/>
                                     &nbsp;&nbsp;I have read and agreed to the
-                                    <a target="_blank" href="https://www.samsoncourses.com/terms-and-conditions">Terms &
+                                    <a target="_blank" href="https://www.geniusclass.co.uk/page/terms-conditions">Terms &
                                         Conditions</a> and
-                                    <a target="_blank" href="https://www.samsoncourses.com/privacy-policy">Privacy
+                                    <a target="_blank" href="https://www.geniusclass.co.uk/page/privacy-policy">Privacy
                                         Policy</a>.
                                 </label>
                                 <br>

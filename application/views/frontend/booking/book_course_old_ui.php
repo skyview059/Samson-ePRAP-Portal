@@ -4,6 +4,11 @@
         .select2-container--default .select2-selection--single .select2-selection__rendered {
             line-height: 45px !important;
         }
+        .want2buy,
+        .practice2buy {
+            height: 35px !important;
+            width: 35px  !important;
+        }
 
         .btn.active.focus, .btn.active:focus, .btn.focus, .btn:active.focus, .btn:active:focus, .btn:focus {
             outline: unset;
@@ -43,8 +48,7 @@
                         <div class="row">
                             <div class="mb-15 col-md-6">
                                 <select name="phone_code" class="form-control select2">
-                                    <?php $phone_code = '';
-                                    echo getPhoneCode($phone_code); ?>
+                                    <?php echo getPhoneCode(); ?>
                                 </select>
                             </div>
 
@@ -53,6 +57,7 @@
                             </div>
                         </div>
 
+                        <?php /*
                         <div class="row">
                             <div class="col-md-6">
                                 <select name="country_id" class="form-control select2" id="country_id">
@@ -60,11 +65,13 @@
                                 </select>
                             </div>
                         </div>
+                        */ ?>
+
                     </fieldset>
                     <?php endif;?>
 
                     <fieldset>
-                        <legend><h4> Courses </h4></legend>
+                        <legend><h4> Live Courses </h4></legend>
                         <table class="table table-bordered table-striped table-condensed course_table">
                             <thead>
                             <tr>
@@ -95,7 +102,47 @@
                                             <?= showBookingDates($c, $course_payment_id); ?>
                                         </td>
                                     </tr>
-                           <?php } }?>
+                           <?php } } ?>
+                            </tbody>
+                        </table>
+                    </fieldset>
+
+                    <fieldset>
+                        <legend><h4>Subscription</h4></legend>
+                        <table class="table table-bordered table-striped table-condensed course_table">
+                            <thead>
+                            <tr>
+                                <th width="40"> Select</th>
+                                <th width="450"> Name</th>                                
+                                <th width="100" class="text-center"> Price</th>
+                                <th class="text-center"> Duration</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <?php foreach ($practices as $practice) { ?>
+                                <tr class="active">
+                                    <td colspan="4">&nbsp;&nbsp;<strong><?= $practice['exam']; ?></strong></td>
+                                </tr>
+                                <?php foreach ($practice['packages'] as $p) { ?>
+                                    <tr>
+                                        <td>
+                                            <input name="practice_package_id[<?= $p['id']; ?>]"
+                                                   class="practice2buy form-control"
+                                                   type="checkbox"
+                                                   value="<?= $p['id']; ?>"
+                                                   data-price="<?= $p['price']; ?>" />
+                                        </td>
+                                        <td>
+                                            <?= $p['name']; ?>
+                                            <?php if (!empty($p['description'])) { ?>
+                                                <br><small class="text-muted"><?= $p['description']; ?></small>
+                                            <?php } ?>
+                                        </td>                                        
+                                        <td class="text-center"><?= GBP($p['price']); ?></td>
+                                        <td class="text-center"><?= $p['duration']; ?></td>
+                                    </tr>
+                                <?php } ?>
+                           <?php } ?>
                             </tbody>
                         </table>
                     </fieldset>
@@ -148,7 +195,7 @@
                               placeholder="Comments"></textarea>
 
                     <div class="mb-15">
-                        <div class="icheck-primary mb-15">
+                        <div class="icheck-primary mb-15 hidden d-none">
                             <input type="checkbox" id="personal_data" name="personal_data" />
                             <label for="personal_data">
                                 <small>
@@ -163,9 +210,9 @@
                             <label for="terms_and_conditions">
                                 <small>
                                     I have read and agreed to the
-                                    <a href="https://www.samsoncourses.com/terms-and-conditions" style="color: #4AA2F1" target="_blank"> Terms & Conditions </a>
+                                    <a href="https://www.geniusclass.co.uk/page/terms-conditions" style="color: #4AA2F1" target="_blank"> Terms & Conditions </a>
                                     and
-                                    <a href="https://www.samsoncourses.com/privacy-policy" style="color: #4AA2F1" target="_blank"> Privacy Policy.</a>
+                                    <a href="https://www.geniusclass.co.uk/page/privacy-policy" style="color: #4AA2F1" target="_blank"> Privacy Policy.</a>
                                 </small>
                             </label>
                         </div>

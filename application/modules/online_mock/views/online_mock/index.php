@@ -127,7 +127,7 @@
                             }
                             ?></td>
                             <td class="text-center">
-                                <a href="<?= site_url('mock/exam-room/' . $exam->id.'/practice'); ?>"
+                                <a href="<?= site_url('mock/exam-room/' . $exam->id.'/practice?force=1'); ?>"
                                    target="_blank"
                                    class="btn btn-xs btn-success" <?= ($exam->datetime < date('Y-m-d H:i:s')) ? 'disabled' : '' ?>>
                                     <i class="fa fa-play"></i> Enter exam room

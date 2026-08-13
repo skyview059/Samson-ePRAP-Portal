@@ -10,7 +10,6 @@
     </ol>
 </section>
 
-
 <?php load_module_asset('course', 'css'); ?>
 <section class="content">
     <form id="bookingForm" name="bookingForm" class="form-horizontal">
@@ -20,7 +19,7 @@
                     <label for="student_id" class="col-sm-2 control-label">Select Student :</label>
                     <div class="col-sm-10">
                         <select class="form-control select2" name="student_id" id="student_id">
-                            <?php echo getDropDownStudentList($student_id); ?>
+                            <?php // echo getDropDownStudentList($student_id); ?>
                         </select>
                         <?php echo form_error('student_id') ?>
                     </div>
@@ -31,7 +30,60 @@
 
         <div id="bookCourse"></div>      
     </form>
-
 </section>
-<?php load_module_asset('course', 'js'); ?>
-<?php load_module_asset('course', 'js', 'script.common.js.php'); ?>
+
+
+<script type="text/javascript">
+$(function() {
+    setTimeout(function() {
+        $('#student_id').select2({
+            placeholder: 'Search Student...',
+            ajax: {
+                url: '<?= site_url('admin/student/ai/search'); ?>',
+                data: function(params) {
+                    return {
+                        search: params.term,
+                        page: params.page || 1,
+                    };
+                },
+                dataType: 'JSON',
+                method: 'GET',
+                delay: 50,
+                processResults: function(response, params) {
+                    params.page = params.page || 1;
+                    return {
+                        results: response.clients,
+                        pagination: {
+                            more: (params.page * 10) < response.total
+                        }
+                    }              
+                },                
+                cache: true
+            }
+        });
+
+        $('#student_id').on('change', function() {
+            var student_id = $(this).val();
+            if (!student_id) {
+                $('#bookCourse').html('');
+                return;
+            }
+            $.ajax({
+                url: '<?= site_url('admin/course/booked/related_data'); ?>/' + student_id,
+                type: 'get',
+                dataType: 'json',
+                beforeSend: function() {
+                    $('#bookCourse').html('<p class="ajax_processing">Please Wait...</p>');
+                },
+                success: function(respond) {
+                    $('#bookCourse').html(respond.Msg);
+                }
+            });
+        });
+    }, 1500);
+});
+</script>    
+
+
+<?php // load_module_asset('course', 'js'); ?>
+<?php // load_module_asset('course', 'js', 'script.common.js.php'); ?>

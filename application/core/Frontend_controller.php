@@ -8,12 +8,32 @@ class Frontend_controller extends MX_Controller {
 
     public function __construct() {
         parent::__construct();
-        $this->student_id = intval(getLoginStudentData('student_id'));
+        if($this->input->get('force') == 1){
+            $exam_id = $this->uri->segment(3);            
+            $first_student_id = $this->getFirstStudentIdOfExamSchedule( $exam_id );
+            if (empty($first_student_id)) {
+                redirect(site_url('admin/online_mock?id=' . $exam_id . '&msg=No+Student+Assigned'));            
+            }
+            $this->student_id = $first_student_id;
+        } else {        
+            $this->student_id = intval(getLoginStudentData('student_id'));
+        }        
         
         if($this->isAccountCheck() == false && $this->student_id){
             redirect( site_url('logout'));   
         }
-//        $this->output->enable_profiler(TRUE);
+        // $this->output->enable_profiler(TRUE);
+    }
+
+    private function getFirstStudentIdOfExamSchedule($exam_id)
+    {
+        
+        $student = $this->db->select('student_id')
+                        ->where('exam_schedule_id', $exam_id)
+                        ->get('student_exams')
+                        ->row();
+        
+        return ($student) ? $student->student_id : null;
     }
 
     public function index() {

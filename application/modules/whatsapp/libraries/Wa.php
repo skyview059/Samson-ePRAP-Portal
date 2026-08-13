@@ -8,7 +8,7 @@
 
 class Wa {
     public $ci;
-    static function getLinks($id = 0, $link_type = 'Whatsapp'){
+    public static function getLinks($id = 0, $link_type = 'Whatsapp'){
         $ci =& get_instance();
         $ci->db->select('l.id, l.title, l.link');
         $ci->db->from('whatsapp_links as l');
@@ -25,14 +25,14 @@ class Wa {
         return $options;
     }
 
-    static function getMocks( $id = 0){
+    public static function getMocks( $id = 0){
         $ci =& get_instance();
         $ci->db->select('e.id as m_id, e.name as m_name');
         $ci->db->select('es.id as s_id,es.datetime as s_time, label as s_label');
         $ci->db->from('exam_schedules as es');
         $ci->db->join('exams as e', 'e.id=es.exam_id','LEFT');
-        $ci->db->where('DATE(datetime) >=', date('Y-m-d'), false );
-        $ci->db->where('es.status', 'Unpublished' );
+        $ci->db->where('DATE(es.datetime) >=', date('Y-m-d') );
+        // $ci->db->where('es.status', 'Unpublished' );
         $mocks = $ci->db->get()->result();
 
         $g_mocks = [];
@@ -46,7 +46,7 @@ class Wa {
         }
 
 
-        $options = '';
+        $options = $ci->db->last_query();
         foreach ($g_mocks as $mock) {
             $options .= "<optgroup label=\"{$mock['name']}\">";
 
@@ -63,7 +63,7 @@ class Wa {
     }
 
     
-    static function getCourses( $id =0 ){
+    public static function getCourses( $id =0 ){
         
         $ci =& get_instance();
         $ci->db->select('c.id as c_id, c.name as c_name');
@@ -99,7 +99,7 @@ class Wa {
         return $options;
     }
         
-    static function getPractices( $id =0 ){
+    public static function getPractices( $id =0 ){
         
         $ci =& get_instance();
         $ci->db->select('p.id as p_id, p.name as p_name');
@@ -107,6 +107,7 @@ class Wa {
         $ci->db->from('practices as p');                
         $ci->db->join('practice_schedules as ps', 'p.id=ps.practice_id','LEFT');                
         $ci->db->where('ps.status', 'Published' );        
+        $ci->db->where('ps.datetime >=', date('Y-m-d', strtotime('-1 Month')) );        
         $practices = $ci->db->get()->result();
         
         $cats = [];
@@ -136,7 +137,7 @@ class Wa {
         return $options;
     }
     
-    static function getCountries($country_id = 0, $label = '--Select Country--' ) {
+    public static function getCountries($country_id = 0, $label = '--Select Country--' ) {
         $ci = & get_instance();
         $countries = $ci->db->get_where('countries', ['type' => '1', 'parent_id' => '0'])->result();
         $options = "<option value=\"0\">{$label}</option>";
@@ -148,7 +149,7 @@ class Wa {
         return $options;
     }  
     
-    static function hasWhatsApp( $RelID = 0, $link_for = 'Course' ){
+    public static function hasWhatsApp( $RelID = 0, $link_for = 'Course' ){
         $ci =& get_instance();        
         $ci->db->select('wl.link');     
         $ci->db->from('whatsapp_links as wl');

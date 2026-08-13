@@ -6,7 +6,7 @@
 
 class Whatsapp extends Admin_controller
 {
-    function __construct()
+    public function __construct()
     {
         parent::__construct();
         $this->load->model('Whatsapp_model');
@@ -219,6 +219,8 @@ class Whatsapp extends Admin_controller
     {
         ajaxAuthorized();
         $students = $this->input->post('students');
+        $whatsapp_id = $this->input->post('whatsapp_id');
+        $mail_body = $this->input->post('mail_body');
         if (empty($students)) {
             echo ajaxRespond('Fail', '<p class="ajax_error">Please Select Student to Send Link</p>');
             exit;
@@ -226,14 +228,28 @@ class Whatsapp extends Admin_controller
         $bcc_emails = $this->Whatsapp_model->getStudentEmails($students);
         $data = [
             'students'  => $bcc_emails,
-            'mail_body'  => $this->input->post('mail_body')
+            'mail_body'  => ($mail_body) ?: $this->getWhatsAppMailBody($whatsapp_id)            
         ];
+
+        $this->saveLinkSentLog($whatsapp_id, $students);
 
         Modules::run('mail/sendLinkMail', $data);
         echo ajaxRespond('OK', 'Link Sent to Student');
     }
 
-    function saveLinkSentLog($whatsapp_id, $students)
+    private function getWhatsAppMailBody($wa_id){        
+        $whatsapp = $this->db->select('id,title,link_type,link_for,link')        
+                ->get('whatsapp_links')
+                ->row();
+        $html = '';
+        if($whatsapp){
+            $html .= "<h3>Title: {$whatsapp->title}</h3>";
+            $html .= "<p>Joining Link: {$whatsapp->link}</p>";
+        }
+        return $html;
+    }
+
+    public function saveLinkSentLog($whatsapp_id, $students)
     {
         $save      = [];
         $timestamp = date('Y-m-d H:i:s');
@@ -249,7 +265,7 @@ class Whatsapp extends Admin_controller
         }
     }
 
-    function get_rel_id()
+    public function get_rel_id()
     {
         $link_for = $this->input->post('link_for');
         $rel_id   = (int)$this->input->post('rel_id');

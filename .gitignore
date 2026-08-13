@@ -35,3 +35,5 @@
 /application/config/config.local.php
 .vscode
 /samson_prap_live.sql.zip
+/vendor
+/*.log

@@ -31,13 +31,13 @@ class Booked extends Admin_controller
         $config['per_page']          = 50;
         $config['page_query_string'] = TRUE;
         $config['total_rows']        = $this->Booked_model->total_rows($category_id, $course_id, $status, $course_date_id);
-        $bookeds                     = $this->Booked_model->get_limit_data($config['per_page'], $start, $category_id, $course_id, $status, $course_date_id);
+        $bookings                    = $this->Booked_model->get_limit_data($config['per_page'], $start, $category_id, $course_id, $status, $course_date_id);
 
         $this->load->library('pagination');
         $this->pagination->initialize($config);
 
         $data = array(
-            'bookeds'        => $bookeds,
+            'bookings'       => $bookings,            
             'pagination'     => $this->pagination->create_links(),
             'total_rows'     => $config['total_rows'],
             'start'          => $start,
@@ -325,32 +325,35 @@ class Booked extends Admin_controller
         ajaxAuthorized();
 
         $postData = $this->input->post();
+        $payment_id = (int) $postData['payment_id']; 
 
         if (empty($postData['course_booked_id'])) {
             echo ajaxRespond("FAIL", "Course booked ID not found!");
             exit;
         }
 
-        $payment = [
-            'status'         => $postData['payment_status'],
-            'total_pay'      => $postData['payment_amount'],
-            'gateway'        => $postData['gateway'],
-            'admin_comments' => $postData['admin_remark']
-        ];
-        $this->db->where('id', $postData['payment_id']);
-        $this->db->update('course_payments', $payment);
+        $this->db->trans_start();       
+        $this->db->where('id', $payment_id )
+                ->update('course_payments', [
+                    'status'         => $postData['payment_status'],
+                    'total_pay'      => $postData['payment_amount'],
+                    'gateway'        => $postData['gateway'],
+                    'admin_comments' => $postData['admin_remark']
+                ]);
+        
+        $this->db->where('course_payment_id', $payment_id )
+                ->update('course_booked',[
+                    'status'       => $postData['booking_status'],
+                    'admin_remark' => $postData['admin_remark'],
+                ]);
+        $this->db->trans_complete();
 
-        $booking = array(
-            'status'       => $postData['booking_status'],
-            'admin_remark' => $postData['admin_remark'],
-        );
-        $this->db->where('id', $postData['course_booked_id']);
-        if ($this->db->update('course_booked', $booking)) {
-            $this->session->set_flashdata('msgs', 'Booked has been Cancelled.');
-            echo ajaxRespond('OK', $postData['course_booked_id']);
+        if ( $this->db->trans_status() === FALSE ) {
+            // $this->session->set_flashdata('msge', "Couldn't save the payment.");
+            echo ajaxRespond("FAIL", "Couldn't save the payment.");
         } else {
-            $this->session->set_flashdata('msge', "Couldn't booked cancel.");
-            echo ajaxRespond("FAIL", "Couldn't booked cancel.");
+            // $this->session->set_flashdata('msgs', 'Payment has been saved.');
+            echo ajaxRespond('OK', 'Payment has been saved.' );
         }
     }
 
@@ -397,6 +400,21 @@ class Booked extends Admin_controller
             'course_date_id' => $b->course_date_id
         ];
         echo $this->load->view('booked/reschedule', $data, true);
+    }
+
+    public function preview()
+    {
+        $booking_id = (int)$this->input->post('id');
+
+        $payment  = $this->Booked_model->getPaymentByBooking($booking_id);
+        $bookings = $payment ? $this->Booked_model->getBookingsByPayment($payment->id) : [];
+
+        $data = [
+            'payment'  => $payment,
+            'bookings' => $bookings,            
+            'clicked'  => $booking_id,
+        ];
+        echo $this->load->view('booked/preview', $data, true);
     }
 
     public function reschedule_save()

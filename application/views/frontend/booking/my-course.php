@@ -47,63 +47,14 @@
                     <?php } ?>
                     </tbody>
                 </table>
-            </div>
-
-            <h3>Cancellation Policy</h3>
-
-            <table class="table table-bordered table-striped table-condensed">
-                <thead>
-                <tr>
-                    <th>Days before course start date</th>
-                    <th>Amount to be refunded</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td>28 days or more</td>
-                    <td>100%</td>
-                </tr>
-                <tr>
-                    <td>21 days or more</td>
-                    <td>50%</td>
-                </tr>
-                <tr>
-                    <td>14 days or more</td>
-                    <td>25%</td>
-                </tr>
-                <tr>
-                    <td>7 days or less</td>
-                    <td>0%</td>
-                </tr>
-                </tbody>
-            </table>
-
-
-            <p class="text-red">You can re-schedule your course instead of cancelling
-                <a href="mailto:info@samsoncourses.com">
-                    <i class="fa fa-envelope-o"></i>
-                    info@samsoncourses.com
-                </a>
-            </p>
-
-            <?= $pagination; ?>
-        <?php } else { ?>
-
-            <div style="padding: 100px 25px;">
-                <center>
-                    <a href="<?= site_url('booking/course'); ?>" class="btn btn-success">
-                        Click Here to Book Course
-                        <i class="fa fa-arrow-right"></i>
-                    </a>
-                </center>
-            </div>
+            </div>            
         <?php } ?>
 
         <p>&nbsp;</p>
         <p>&nbsp;</p>
 
         <?php if ($practices) { ?>
-            <h3 class="text-center" style="font-weight: bold">Your Practice Courses</h3>
+            <h3 class="text-center" style="font-weight: bold">My Subscriptions</h3>
             <p>&nbsp;</p>
             <div class="table-responsive">
                 <table class="table table-bordered table-striped table-condensed">
@@ -132,7 +83,12 @@
                     </tbody>
                 </table>
             </div>
+        <?php }  ?>
 
+        <?= $pagination; ?>
+
+
+        <?php if ($size_of_data > 0) { ?>
             <h3>Cancellation Policy</h3>
 
             <table class="table table-bordered table-striped table-condensed">
@@ -161,18 +117,15 @@
                 </tr>
                 </tbody>
             </table>
-
-
-            <p class="text-red">You can re-schedule your course instead of cancelling
-                <a href="mailto:info@samsoncourses.com">
+    
+            <p class="text-red">You can re-schedule your course/subscription instead of cancelling
+                <a href="mailto:<?= $IncomingEmail; ?>">
                     <i class="fa fa-envelope-o"></i>
-                    info@samsoncourses.com
+                    <?= $IncomingEmail; ?>
                 </a>
             </p>
 
-            <?= $pagination; ?>
         <?php } else { ?>
-
             <div style="padding: 100px 25px;">
                 <center>
                     <a href="<?= site_url('booking/course'); ?>" class="btn btn-success">
@@ -182,6 +135,8 @@
                 </center>
             </div>
         <?php } ?>
+
+
     </div>
 </div>
 

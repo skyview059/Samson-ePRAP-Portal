@@ -81,9 +81,9 @@
                 <label for="scenario_type" class="col-sm-2 control-label">Scenario Type<sup>*</sup></label>
                 <div class="col-sm-10" style="padding-top:8px;">
                     <?php echo htmlRadio('scenario_type', $scenario_type, array(
-                        'Old'  => 'PLAB 2 scenario bank',
-                        'New'  => 'PLAB 2 new scenario',
-                        'Both' => 'Complete PLAB2 scenario bank'
+                        'Old'  => 'Only Old ',
+                        'New'  => 'Only New',
+                        'Both' => 'Both Scenario'
                     )); ?>
                 </div>
             </div>
