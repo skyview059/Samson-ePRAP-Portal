@@ -1,18 +1,19 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
 <?php load_module_asset('users', 'css'); ?>
+<?php $is_sca = ($exam_type == 'SCA'); ?>
 <section class="content-header">
     <h1>Assess<small><?php echo $button ?></small></h1>
     <ol class="breadcrumb">
         <li><a href="<?php echo Backend_URL ?>"><i class="fa fa-dashboard"></i> Admin</a></li>
         <li><a href="<?php echo Backend_URL ?>assess">Assess</a></li>
-        <li class="active">Domains Grades</li>
+        <li class="active"><?php echo $is_sca ? 'Domains Grades' : 'Quantitative Feedback'; ?></li>
     </ol>
 </section>
 
 <section class="content">
     <div class="box no-border">
         <div class="box-header with-border">
-            <h3 class="box-title">Domains Grades/ <?= $summery_std_scen; ?></h3>
+            <h3 class="box-title"><?php echo $is_sca ? 'Domains Grades' : 'Quantitative Feedback'; ?> / <?= $summery_std_scen; ?></h3>
         </div>
 
         <div class="box-body">
@@ -21,13 +22,7 @@
                     <div class="col-md-12">
                         <table class="table table-bordered">
                             <tbody>
-                                <!-- <tr>
-                                    <th> Station </th>
-                                    <th class="col-md-4">Data-gathering, technical and assessment skills</th>
-                                    <th class="col-md-2">Clinical management Skills</th>
-                                    <th class="col-md-2">Interpersonal Skills</th>
-                                    <th class="col-md-1">Total Mark </th>
-                                </tr> -->
+                            <?php if ($is_sca): ?>
                                 <tr>
                                     <th> Station </th>
                                     <th class="col-md-3">Data gathering & diagnosis</th>
@@ -35,34 +30,34 @@
                                     <th class="col-md-3">Relating to others</th>
                                     <th class="col-md-1 text-center">Total Mark </th>
                                 </tr>
-                                
+
                                 <tr>
                                     <td><?= $result_details->scenario_name; ?></td>
                                     <td>
                                         <?php echo htmlRadio('technical_skills', $technical_skills, array(
-                                            0=>'(0) Clear Fail', 
-                                            1=>'(1) Fail', 
-                                            2=>'(2) Pass', 
+                                            0=>'(0) Clear Fail',
+                                            1=>'(1) Fail',
+                                            2=>'(2) Pass',
                                             3=>'(3) Clear Pass'), 'class="icheck-radio"', true); ?>
                                         <p><?php echo form_error('technical_skills') ?></p>
                                     </td>
                                     <td>
                                         <?php echo htmlRadio('clinical_skills', $clinical_skills, array(
-                                            0=>'<span class="text-red">(0) Clear Fail</span>', 
-                                            1=>'<span class="text-red">(1) Fail</span>', 
+                                            0=>'<span class="text-red">(0) Clear Fail</span>',
+                                            1=>'<span class="text-red">(1) Fail</span>',
                                             2=>'<span class="text-red">(2) Fail</span>',
                                             "2.5"=>'<span class="text-red">(2.5) Fail</span>',
-                                            "3"=>'<span class="text-green">(3) Pass</span>', 
-                                            "3.5"=>'<span class="text-green">(3.5) Pass</span>', 
+                                            "3"=>'<span class="text-green">(3) Pass</span>',
+                                            "3.5"=>'<span class="text-green">(3.5) Pass</span>',
                                             "4.5"=>'<span class="text-green">(4.5) Clear Pass</span>'
                                             ), 'class="icheck-radio"', true); ?>
                                         <p><?php echo form_error('clinical_skills') ?></p>
                                     </td>
                                     <td>
                                         <?php echo htmlRadio('interpersonal_skills', $interpersonal_skills, array(
-                                            0=>'(0) Clear Fail', 
-                                            1=>'(1) Fail', 
-                                            2=>'(2) Pass', 
+                                            0=>'(0) Clear Fail',
+                                            1=>'(1) Fail',
+                                            2=>'(2) Pass',
                                             3=>'(3) Clear Pass'
                                             ), 'class="icheck-radio"', true); ?>
                                         <p><?php echo form_error('interpersonal_skills') ?></p>
@@ -71,10 +66,35 @@
                                         <?= floatval($technical_skills+$clinical_skills+$interpersonal_skills);?>
                                     </span></td>
                                 </tr>
+                            <?php else: ?>
+                                <tr>
+                                    <th> Station </th>
+                                    <th class="col-md-4">Data-gathering, technical and assessment skills</th>
+                                    <th class="col-md-2">Clinical management Skills</th>
+                                    <th class="col-md-2">Interpersonal Skills</th>
+                                    <th class="col-md-1">Total Mark </th>
+                                </tr>
+                                <tr>
+                                    <td><?= $result_details->scenario_name; ?></td>
+                                    <td>
+                                        <?php echo htmlRadio('technical_skills', $technical_skills, array(0=>0, 1=>1, 2=>2, 3=>3, 4=>4), 'class="icheck-radio"'); ?>
+                                        <p><?php echo form_error('technical_skills') ?></p>
+                                    </td>
+                                    <td>
+                                        <?php echo htmlRadio('clinical_skills', $clinical_skills, array(0=>0, 1=>1, 2=>2, 3=>3, 4=>4), 'class="icheck-radio"'); ?>
+                                        <p><?php echo form_error('clinical_skills') ?></p>
+                                    </td>
+                                    <td>
+                                        <?php echo htmlRadio('interpersonal_skills', $interpersonal_skills, array(0=>0, 1=>1, 2=>2, 3=>3, 4=>4), 'class="icheck-radio"'); ?>
+                                        <p><?php echo form_error('interpersonal_skills') ?></p>
+                                    </td>
+                                    <td class="text-center"><span class="badge bg-yellow" id="total_mark"><?= intval($technical_skills+$clinical_skills+$interpersonal_skills);?></span></td>
+                                </tr>
+                            <?php endif; ?>
 
                             </tbody>
                         </table>
-                        
+
                     </div>
                     <div class="col-md-12 text-center" style="padding-top:20px;">
                         <input type="hidden" name="result_detail_id" value="<?php echo $result_detail_id; ?>"/>

@@ -48,7 +48,7 @@ class Assess_model extends Fm_model{
         $this->db->group_by('sr.exam_schedule_id');
         $exam_to_scenario_sql = $this->db->get_compiled_select();
         
-        $this->db->select('es.id, se.student_id, es.exam_id, e.name as exam_name, es.datetime, ec.name as center_name, ec.address as center_address');
+        $this->db->select('es.id, se.student_id, es.exam_id, e.name as exam_name, e.exam_type, es.datetime, ec.name as center_name, ec.address as center_address');
         $this->db->select('ets.total_questions, ets.scenario_ids');
         $this->db->from('exam_schedules as es');
         $this->db->join('student_exams as se', 'se.exam_schedule_id=es.id and se.student_id="'.$student_id.'" and se.status="Enrolled"', 'inner');
@@ -114,10 +114,12 @@ class Assess_model extends Fm_model{
     }
     
     function getResultDetailsById($result_detail_id) {
-        $this->db->select('rd.*, r.student_id, r.exam_schedule_id, s.name as scenario_name');
+        $this->db->select('rd.*, r.student_id, r.exam_schedule_id, s.name as scenario_name, e.exam_type');
         $this->db->from('result_details as rd');
         $this->db->join('results as r', 'r.id=rd.result_id', 'left');
         $this->db->join('scenarios as s', 's.id=rd.scenario_id', 'left');
+        $this->db->join('exam_schedules as es', 'es.id=r.exam_schedule_id', 'left');
+        $this->db->join('exams as e', 'e.id=es.exam_id', 'left');
         $this->db->where('rd.id', $result_detail_id);
         return $this->db->get()->row();
     }

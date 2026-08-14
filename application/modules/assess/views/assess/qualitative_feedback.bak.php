@@ -1,6 +1,5 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
 <?php load_module_asset('users', 'css'); ?>
-<?php $is_sca = ($exam_type == 'SCA'); ?>
 <style type="text/css">
 .checkbox label:after {
   content: '';
@@ -48,27 +47,20 @@
     <ol class="breadcrumb">
         <li><a href="<?php echo Backend_URL ?>"><i class="fa fa-dashboard"></i> Admin</a></li>
         <li><a href="<?php echo Backend_URL ?>examine">Examine</a></li>
-        <li class="active">Qualitative Feedback</li>
+        <li class="active">Quantitative Feedback</li>
     </ol>
 </section>
 
 <section class="content">
     <div class="box no-border">
         <div class="box-header with-border">
-            <h3 class="box-title"><?php echo $is_sca ? 'Feedback statements' : 'Qualitative Feedback'; ?> / <?= $summery_std_scen; ?></h3>
+            <h3 class="box-title">Qualitative Feedback / <?= $summery_std_scen; ?></h3>
         </div>
 
         <div class="box-body">
             <form class="form-horizontal" action="<?php echo $action; ?>" method="post">
                 <div class="row">
                     <div class="col-md-12">
-
-                    <?php if ($is_sca): ?>
-
-                        <?php $this->load->view('assess/assess/partials/feedback_statements'); ?>
-
-                    <?php else: ?>
-
                         <table class="table table-bordered">
                             <tbody>
                                 <tr>
@@ -158,7 +150,7 @@
                                               <span class="cr"><i class="cr-icon glyphicon glyphicon-remove"></i></span>
                                            </label>
                                         </div>
-
+                                        
                                     </td>
                                     <td class="text-center">
                                         <div class="checkbox">
@@ -172,9 +164,6 @@
 
                             </tbody>
                         </table>
-
-                    <?php endif; ?>
-
                     </div>
                     <div class="col-md-12 text-center" style="padding-top:20px;">
                         <input type="hidden" name="result_detail_id" value="<?php echo $result_detail_id; ?>"/>

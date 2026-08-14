@@ -1,4 +1,5 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
+<?php $is_sca = (isset($results->exam_type) && $results->exam_type == 'SCA'); ?>
 <style type="text/css">
     .result thead tr th,
     .result tfoot tr th,
@@ -71,7 +72,12 @@
                         <th class="text-center">Introduces himself </th>
                         <th class="text-center">State the role</th>
                         <th class="text-center">Checks patient’s name preference </th>
-                        <th class="text-center">Starts station well</th>                                
+                        <?php if ($is_sca): ?>
+                        <th class="text-center">Welcomes the patient</th>
+                        <th class="text-center">Starts with open-end question</th>
+                        <?php else: ?>
+                        <th class="text-center">Starts station well</th>
+                        <?php endif; ?>
                     </tr>
                 </thead>
                 <tbody>
@@ -87,7 +93,12 @@
                             <td class="text-center"><?php echo $result->introduces_himself; ?></td>
                             <td class="text-center"><?php echo $result->state_the_role; ?></td>
                             <td class="text-center"><?php echo $result->name_preference; ?></td>
+                            <?php if ($is_sca): ?>
+                            <td class="text-center"><?php echo $result->welcomes_patient; ?></td>
+                            <td class="text-center"><?php echo $result->starts_with_open_end; ?></td>
+                            <?php else: ?>
                             <td class="text-center"><?php echo $result->starts_station_well; ?></td>
+                            <?php endif; ?>
                         </tr>
 <?php } ?>
                 </tbody>
@@ -174,8 +185,45 @@
             </table></div>
     </div>
     <div class="panel panel-default">
-        <div class="panel-heading">Qualitative Feedback</div>
-        <div class="panel-body table-responsive"><table class="table table-condensed table-striped table-bordered">
+        <div class="panel-heading"><?php echo $is_sca ? 'Feedback Statements' : 'Qualitative Feedback'; ?></div>
+        <div class="panel-body table-responsive">
+            <?php if ($is_sca): ?>
+            <table class="table table-condensed table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th class="text-center" width='40'>S/L</th>
+                        <th width="250">Scenario</th>
+                        <th>Feedback statements</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    $sl = 0;
+                    foreach ($results->details as $result) {
+                        ?>
+                        <tr id="result_details_id_<?= $result->id; ?>">
+                            <td class="text-center"><?= sprintf('%02d', ++$sl); ?></td>
+                            <td><?= $result->name; ?></td>
+                            <td>
+                                <?php if ( ! empty($result->feedback_statements)) { ?>
+                                    <?php foreach ($result->feedback_statements as $domain_name => $statements) { ?>
+                                        <strong><?php echo html_escape($domain_name); ?></strong>
+                                        <ul style="margin-bottom:10px;">
+                                            <?php foreach ($statements as $statement) { ?>
+                                                <li><?php echo html_escape($statement->subject); ?></li>
+                                            <?php } ?>
+                                        </ul>
+                                    <?php } ?>
+                                <?php } else { ?>
+                                    <span class="text-muted">No feedback statements selected.</span>
+                                <?php } ?>
+                            </td>
+                        </tr>
+                    <?php } ?>
+                </tbody>
+            </table>
+            <?php else: ?>
+            <table class="table table-condensed table-striped table-bordered">
                 <thead>
                     <tr>    
                         <th class="text-center" width='40'>S/L</th>
@@ -215,7 +263,9 @@
 <?php } ?>
 
                 </tbody>
-            </table>  </div>
+            </table>
+            <?php endif; ?>
+        </div>
     </div>
     <div class="panel panel-default">
         <div class="panel-heading">Examiner’s comments</div>

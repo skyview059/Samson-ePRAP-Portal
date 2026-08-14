@@ -1,5 +1,6 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
 <?php load_module_asset('users', 'css'); ?>
+<?php $is_sca = ($exam_type == 'SCA'); ?>
 <section class="content-header">
     <h1>Assess <small>Review</small></h1>
     <ol class="breadcrumb">
@@ -122,19 +123,17 @@
                                         <div class="row">
                                             <div class="col-md-8 col-md-offset-3">
                                                 <div class="form-group">
-                                                    <label for="patient_name" class="col-sm-3 control-label">Identifies Patient :</label>
-                                                    <div class="col-sm-9" style="padding-top:8px;">
+                                                    <label for="patient_name" class="col-sm-4 control-label">Identifies Patient :</label>
+                                                    <div class="col-sm-8" style="padding-top:8px;">
                                                         <?php echo htmlRadio('patient_name', $patient_name, array('Yes' => 'Yes', 'No' => 'No'), 'class="icheck-radio"'); ?>
                                                         <div class="clearfix"></div>
                                                         <?php echo form_error('patient_name') ?>
                                                     </div>
-                                                </div>
-
-                                                
+                                                </div>                                                
 
                                                 <div class="form-group">
-                                                    <label for="greet_the_patient" class="col-sm-3 control-label">Greet the patient :</label>
-                                                    <div class="col-sm-9" style="padding-top:8px;">
+                                                    <label for="greet_the_patient" class="col-sm-4 control-label">Greet the patient :</label>
+                                                    <div class="col-sm-8" style="padding-top:8px;">
                                                         <?php echo htmlRadio('greet_the_patient', $greet_the_patient, array('Yes' => 'Yes', 'No' => 'No'), 'class="icheck-radio"'); ?>
                                                         <div class="clearfix"></div>
                                                         <?php echo form_error('greet_the_patient') ?>
@@ -142,8 +141,8 @@
                                                 </div>
 
                                                 <div class="form-group">
-                                                    <label for="introduces_himself" class="col-sm-3 control-label">Introduces himself :</label>
-                                                    <div class="col-sm-9" style="padding-top:8px;">
+                                                    <label for="introduces_himself" class="col-sm-4 control-label">Introduces himself :</label>
+                                                    <div class="col-sm-8" style="padding-top:8px;">
                                                         <?php echo htmlRadio('introduces_himself', $introduces_himself, array('Yes' => 'Yes', 'No' => 'No'), 'class="icheck-radio"'); ?>
                                                         <div class="clearfix"></div>
                                                         <?php echo form_error('introduces_himself') ?>
@@ -151,8 +150,8 @@
                                                 </div>
 
                                                 <div class="form-group">
-                                                    <label for="state_the_role" class="col-sm-3 control-label">State the role :</label>
-                                                    <div class="col-sm-9" style="padding-top:8px;">
+                                                    <label for="state_the_role" class="col-sm-4 control-label">State the role :</label>
+                                                    <div class="col-sm-8" style="padding-top:8px;">
                                                         <?php echo htmlRadio('state_the_role', $state_the_role, array('Yes' => 'Yes', 'No' => 'No'), 'class="icheck-radio"'); ?>
                                                         <div class="clearfix"></div>
                                                         <?php echo form_error('state_the_role') ?>
@@ -160,40 +159,42 @@
                                                 </div>
 
                                                 <div class="form-group">
-                                                    <label for="name_preference" class="col-sm-3 control-label">Checks patient's name preference :</label>
-                                                    <div class="col-sm-9" style="padding-top:8px;">
+                                                    <label for="name_preference" class="col-sm-4 control-label">Checks patient's name preference :</label>
+                                                    <div class="col-sm-8" style="padding-top:8px;">
                                                         <?php echo htmlRadio('name_preference', $name_preference, array('Yes' => 'Yes', 'No' => 'No'), 'class="icheck-radio"'); ?>
                                                         <div class="clearfix"></div>
                                                         <?php echo form_error('name_preference') ?>
                                                     </div>
                                                 </div>
 
-                                                <!-- <div class="form-group">
-                                                    <label for="starts_station_well" class="col-sm-3 control-label">Starts station well :</label>
-                                                    <div class="col-sm-9" style="padding-top:8px;">
+                                                <?php if ( ! $is_sca): ?>
+                                                <div class="form-group">
+                                                    <label for="starts_station_well" class="col-sm-4 control-label">Starts station well :</label>
+                                                    <div class="col-sm-8" style="padding-top:8px;">
                                                         <?php echo htmlRadio('starts_station_well', $starts_station_well, array('Yes' => 'Yes', 'No' => 'No'), 'class="icheck-radio"'); ?>
                                                         <div class="clearfix"></div>
                                                         <?php echo form_error('starts_station_well') ?>
                                                     </div>
-                                                </div> -->
-
+                                                </div>
+                                                <?php else: ?>
                                                 <div class="form-group">
-                                                    <label for="welcomes_patient" class="col-sm-3 control-label">Welcomes the patient :</label>
-                                                    <div class="col-sm-9" style="padding-top:8px;">
+                                                    <label for="welcomes_patient" class="col-sm-4 control-label">Welcomes the patient :</label>
+                                                    <div class="col-sm-8" style="padding-top:8px;">
                                                         <?php echo htmlRadio('welcomes_patient', $welcomes_patient, array('Yes' => 'Yes', 'No' => 'No'), 'class="icheck-radio"'); ?>
                                                         <div class="clearfix"></div>
                                                         <?php echo form_error('welcomes_patient') ?>
                                                     </div>
                                                 </div>
-                                                
+
                                                 <div class="form-group">
-                                                    <label for="starts_with_open_end" class="col-sm-3 control-label">Starts with open-end question :</label>
-                                                    <div class="col-sm-9" style="padding-top:8px;">
+                                                    <label for="starts_with_open_end" class="col-sm-4 control-label">Starts with open-end question :</label>
+                                                    <div class="col-sm-8" style="padding-top:8px;">
                                                         <?php echo htmlRadio('starts_with_open_end', $starts_with_open_end, array('Yes' => 'Yes', 'No' => 'No'), 'class="icheck-radio"'); ?>
                                                         <div class="clearfix"></div>
                                                         <?php echo form_error('starts_with_open_end') ?>
                                                     </div>
                                                 </div>
+                                                <?php endif; ?>
 
 
                                             </div>
@@ -252,7 +253,7 @@
                                     <h4 class="box-title">
                                         <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseThree">
                                             <i class="more-less glyphicon glyphicon-plus"></i>
-                                            Quantitative Feedback
+                                            <?php echo $is_sca ? 'Domains Grades' : 'Quantitative Feedback'; ?>
                                         </a>
                                     </h4>
                                 </div>
@@ -262,6 +263,49 @@
                                             <div class="col-md-12">
                                                 <table class="table table-bordered">
                                                     <tbody>
+                                                    <?php if ($is_sca): ?>
+                                                        <tr>
+                                                            <th> Station </th>
+                                                            <th class="col-md-3">Data gathering & diagnosis</th>
+                                                            <th class="col-md-3">Clinical management & complexity</th>
+                                                            <th class="col-md-3">Relating to others</th>
+                                                            <th class="col-md-1 text-center">Total Mark </th>
+                                                        </tr>
+
+                                                        <tr>
+                                                            <td><?= $result_details->scenario_name; ?></td>
+                                                            <td>
+                                                                <?php echo htmlRadio('technical_skills', $technical_skills, array(
+                                                                    0=>'(0) Clear Fail',
+                                                                    1=>'(1) Fail',
+                                                                    2=>'(2) Pass',
+                                                                    3=>'(3) Clear Pass'), 'class="icheck-radio"', true); ?>
+                                                                <br/><?php echo form_error('technical_skills') ?>
+                                                            </td>
+                                                            <td>
+                                                                <?php echo htmlRadio('clinical_skills', $clinical_skills, array(
+                                                                    0=>'<span class="text-red">(0) Clear Fail</span>',
+                                                                    1=>'<span class="text-red">(1) Fail</span>',
+                                                                    2=>'<span class="text-red">(2) Fail</span>',
+                                                                    "2.5"=>'<span class="text-red">(2.5) Fail</span>',
+                                                                    "3"=>'<span class="text-green">(3) Pass</span>',
+                                                                    "3.5"=>'<span class="text-green">(3.5) Pass</span>',
+                                                                    "4.5"=>'<span class="text-green">(4.5) Clear Pass</span>'
+                                                                    ), 'class="icheck-radio"', true); ?>
+                                                                <?php echo form_error('clinical_skills') ?>
+                                                            </td>
+                                                            <td>
+                                                                <?php echo htmlRadio('interpersonal_skills', $interpersonal_skills, array(
+                                                                    0=>'(0) Clear Fail',
+                                                                    1=>'(1) Fail',
+                                                                    2=>'(2) Pass',
+                                                                    3=>'(3) Clear Pass'
+                                                                    ), 'class="icheck-radio"', true); ?>
+                                                                <?php echo form_error('interpersonal_skills') ?>
+                                                            </td>
+                                                            <td class="text-center"><span class="badge bg-yellow" id="total_mark"><?= floatval($technical_skills+$clinical_skills+$interpersonal_skills); ?></span></td>
+                                                        </tr>
+                                                    <?php else: ?>
                                                         <tr>
                                                             <th> Station </th>
                                                             <th class="col-md-4">Data-gathering, technical and assessment skills</th>
@@ -286,6 +330,7 @@
                                                             </td>
                                                             <td class="text-center"><span class="badge bg-yellow" id="total_mark"><?= $technical_skills+$clinical_skills+$interpersonal_skills ?></span></td>
                                                         </tr>
+                                                    <?php endif; ?>
                                                     </tbody>
                                                 </table>
                                             </div>
@@ -298,7 +343,7 @@
                                     <h4 class="box-title">
                                         <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseFour">
                                             <i class="more-less glyphicon glyphicon-plus"></i>
-                                            Qualitative Feedback
+                                            <?php echo $is_sca ? 'Feedback Statements' : 'Qualitative Feedback'; ?>
                                         </a>
                                     </h4>
                                 </div>
@@ -306,6 +351,11 @@
                                     <div class="box-body">
                                         <div class="row">
                                             <div class="col-md-12">
+                                            <?php if ($is_sca): ?>
+
+                                                <?php $this->load->view('assess/assess/partials/feedback_statements'); ?>
+
+                                            <?php else: ?>
                                                 <table class="table table-bordered">
                                                     <tbody>
                                                         <tr>
@@ -409,6 +459,7 @@
 
                                                     </tbody>
                                                 </table>
+                                            <?php endif; ?>
                                             </div>
                                         </div>
                                     </div>
@@ -431,16 +482,14 @@
                                                     <label for="overall_judgment" class="col-sm-4 control-label">Overall Judgment: </label>
                                                     <div class="col-sm-8" style="padding-top:8px;">
                                                         
-                                                        <?php 
-                                                            echo htmlRadio('overall_judgment', $overall_judgment, array(
-                                                            'Fail' => 'Fail',
-                                                            'Borderline' => 'Borderline',
-                                                            'Pass' => 'Pass',
-                                                            'Very Good' => 'Very Good',
-                                                            'Excellent' => 'Excellent'
-                                                            ), 'class="icheck-radio"');?>
-                                                        
-                                                        
+                                                        <?php
+                                                            // SCA and PLAB Part 2 use different judgment scales
+                                                            $judgment_options = $is_sca
+                                                                ? array('Pass' => 'Pass', 'Bare Pass' => 'Bare Pass', 'Bare Fail' => 'Bare Fail', 'Fail' => 'Fail')
+                                                                : array('Fail' => 'Fail', 'Borderline' => 'Borderline', 'Pass' => 'Pass', 'Very Good' => 'Very Good', 'Excellent' => 'Excellent');
+                                                            echo htmlRadio('overall_judgment', $overall_judgment, $judgment_options, 'class="icheck-radio"');?>
+
+
                                                         <?php echo form_error('overall_judgment') ?>
                                                     </div>
                                                 </div>

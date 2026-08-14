@@ -1,3 +1,4 @@
+<?php $is_sca = (isset($results->exam_type) && $results->exam_type == 'SCA'); ?>
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -81,14 +82,19 @@
                                         <th class="text-center">Introduces himself </th>
                                         <th class="text-center">State the role</th>
                                         <th class="text-center">Checks patient’s name preference </th>
-                                        <th class="text-center">Starts station well</th>                                
+                                        <?php if ($is_sca): ?>
+                                        <th class="text-center">Welcomes the patient</th>
+                                        <th class="text-center">Starts with open-end question</th>
+                                        <?php else: ?>
+                                        <th class="text-center">Starts station well</th>
+                                        <?php endif; ?>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                <?php 
+                                <?php
                                 $sl = 0;
                                 foreach ($results->details as $result) { ?>
-                                    <tr>                                
+                                    <tr>
                                         <td class="text-center"><?= sprintf('%02d', ++$sl); ?></td>
                                         <td><?= $result->name; ?></td>
                                         <td class="text-center"><?php echo $result->patient; ?></td>
@@ -96,7 +102,12 @@
                                         <td class="text-center"><?php echo $result->introduces_himself; ?></td>
                                         <td class="text-center"><?php echo $result->state_the_role; ?></td>
                                         <td class="text-center"><?php echo $result->name_preference; ?></td>
+                                        <?php if ($is_sca): ?>
+                                        <td class="text-center"><?php echo $result->welcomes_patient; ?></td>
+                                        <td class="text-center"><?php echo $result->starts_with_open_end; ?></td>
+                                        <?php else: ?>
                                         <td class="text-center"><?php echo $result->starts_station_well; ?></td>
+                                        <?php endif; ?>
                                     </tr>
                                 <?php } ?>
                                 </tbody>
@@ -185,9 +196,45 @@
                             </table>
                         </fieldset>
 
-                        <!-- <h4 class="h4 text-center"><u>Qualitative Feedback</u></h4> -->                                
+                        <!-- <h4 class="h4 text-center"><u>Qualitative Feedback</u></h4> -->
                         <fieldset>
-                            <legend>Qualitative Feedback</legend> 
+                            <legend><?php echo $is_sca ? 'Feedback Statements' : 'Qualitative Feedback'; ?></legend>
+                            <?php if ($is_sca): ?>
+                            <table class="table table-condensed table-striped table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center" width='40'>S/L</th>
+                                        <th width="200">Scenario</th>
+                                        <th>Feedback statements</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php
+                                    $sl = 0;
+                                    foreach ($results->details as $result) {
+                                        ?>
+                                        <tr>
+                                            <td class="text-center"><?= sprintf('%02d', ++$sl); ?></td>
+                                            <td><?= $result->name; ?></td>
+                                            <td>
+                                                <?php if ( ! empty($result->feedback_statements)) { ?>
+                                                    <?php foreach ($result->feedback_statements as $domain_name => $statements) { ?>
+                                                        <strong style="font-weight:bold;"><?php echo html_escape($domain_name); ?></strong>
+                                                        <ul style="margin:0 0 10px 0;">
+                                                            <?php foreach ($statements as $statement) { ?>
+                                                                <li><?php echo html_escape($statement->subject); ?></li>
+                                                            <?php } ?>
+                                                        </ul>
+                                                    <?php } ?>
+                                                <?php } else { ?>
+                                                    No feedback statements selected.
+                                                <?php } ?>
+                                            </td>
+                                        </tr>
+                                    <?php } ?>
+                                </tbody>
+                            </table>
+                            <?php else: ?>
                             <table class="table table-condensed table-striped table-bordered">
                                 <thead>
                                     <tr>    
@@ -228,7 +275,8 @@
                                     <?php } ?>
 
                                 </tbody>
-                            </table>                                                
+                            </table>
+                            <?php endif; ?>
                         </fieldset>
 
 

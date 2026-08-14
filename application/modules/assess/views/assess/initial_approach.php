@@ -1,5 +1,6 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed'); ?>
 <?php load_module_asset('users', 'css'); ?>
+<?php $is_sca = ($exam_type == 'SCA'); ?>
 <section class="content-header">
     <h1>Examine<small><?php echo $button ?></small></h1>
     <ol class="breadcrumb">
@@ -64,8 +65,7 @@
                             </div>
                         </div>
 
-                        <!--
-                        /* this on for exam_type != 'SCA'*/
+                        <?php if ( ! $is_sca): ?>
                         <div class="form-group">
                             <label for="starts_station_well" class="col-sm-3 control-label">Starts station well :</label>
                             <div class="col-sm-9" style="padding-top:8px;">
@@ -73,10 +73,8 @@
                                 <div class="clearfix"></div>
                                 <?php echo form_error('starts_station_well') ?>
                             </div>
-                        </div> 
-                        -->
-
-
+                        </div>
+                        <?php else: ?>
                         <div class="form-group">
                             <label for="welcomes_patient" class="col-sm-3 control-label">Welcomes the patient :</label>
                             <div class="col-sm-9" style="padding-top:8px;">
@@ -85,7 +83,7 @@
                                 <?php echo form_error('welcomes_patient') ?>
                             </div>
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="starts_with_open_end" class="col-sm-3 control-label">Starts with open-end question :</label>
                             <div class="col-sm-9" style="padding-top:8px;">
@@ -94,6 +92,7 @@
                                 <?php echo form_error('starts_with_open_end') ?>
                             </div>
                         </div>
+                        <?php endif; ?>
 
 
                         <div class="form-group" style="margin-top: 25px;">

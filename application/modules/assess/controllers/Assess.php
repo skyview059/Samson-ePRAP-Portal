@@ -154,6 +154,7 @@ class Assess extends Admin_controller{
                 'button' => 'Update',
                 'action' => site_url(Backend_URL . 'assess/initial_approach_action'),
                 'exam_info' => $exam_info,
+                'exam_type' => $exam_info->exam_type,
                 'result_detail_id' => set_value('result_detail_id', $result_detail_id),
                 'patient_name' => set_value('patient_name', $result_data->patient),
                 'greet_the_patient' => set_value('greet_the_patient', $result_data->greet_the_patient),
@@ -175,15 +176,16 @@ class Assess extends Admin_controller{
     }
 
     public function initial_approach_action() {
-        $this->_rules_initial_approach();
         $result_detail_id = (int) $this->input->post('result_detail_id');
         $result_details = $this->Assess_model->getResultDetailsById($result_detail_id);
-        
+
         if(empty($result_details)){
             $this->session->set_flashdata('msge', 'The exam you are trying to access doesn\'t exists!!');
-            redirect(site_url(Backend_URL . 'assess/initial_approach/' . $result_details->scenario_id));
+            redirect(site_url(Backend_URL . 'assess/search_student'));
         }
-         
+
+        $this->_rules_initial_approach($result_details->exam_type);
+
         if ($this->form_validation->run() == FALSE) {
             $this->initial_approach($result_details->scenario_id);
         } else {
@@ -213,6 +215,7 @@ class Assess extends Admin_controller{
             $data = array(
                 'button' => 'Update',
                 'action' => site_url(Backend_URL . 'assess/face_action'),
+                'exam_type' => $result_details->exam_type,
                 'result_detail_id' => set_value('result_detail_id', $result_detail_id),
                 'face' => set_value('face', $result_details->face),
                 'summery_std_scen' => Tools::getStudentNameByResultID( $result_detail_id )
@@ -258,6 +261,7 @@ class Assess extends Admin_controller{
             $data = array(
                 'button' => 'Update',
                 'action' => site_url(Backend_URL . 'assess/quantitative_feedback_action'),
+                'exam_type' => $result_details->exam_type,
                 'result_details' => $result_details,
                 'result_detail_id' => set_value('result_detail_id', $result_detail_id),
                 'technical_skills' => set_value('technical_skills', $result_details->technical_skills),
@@ -307,6 +311,7 @@ class Assess extends Admin_controller{
             $data = array(
                 'button' => 'Update',
                 'action' => site_url(Backend_URL . 'assess/qualitative_feedback_action'),
+                'exam_type' => $result_details->exam_type,
                 'result_details' => $result_details,
                 'result_detail_id' => set_value('result_detail_id', $result_detail_id),
                 'consultation' => set_value('consultation', $result_details->consultation),
@@ -347,34 +352,42 @@ class Assess extends Admin_controller{
             redirect(site_url(Backend_URL . 'assess/quantitative_feedback/' . $result_detail_id));
         }
         
-        $consultation = !empty($this->input->post('consultation')) ? $this->input->post('consultation') : 0;
-        $issues = !empty($this->input->post('issues')) ? $this->input->post('issues', TRUE) : 0;
-        $diagnosis = !empty($this->input->post('diagnosis')) ? $this->input->post('diagnosis', TRUE) : 0;
-        $examination = !empty($this->input->post('examination')) ? $this->input->post('examination', TRUE) : 0;
-        $findings = !empty($this->input->post('findings')) ? $this->input->post('findings', TRUE) : 0;
-        $management = !empty($this->input->post('management')) ? $this->input->post('management', TRUE) : 0;
-        $rapport = !empty($this->input->post('rapport')) ? $this->input->post('rapport', TRUE) : 0;
-        $listening = !empty($this->input->post('listening')) ? $this->input->post('listening', TRUE) : 0;
-        $language = !empty($this->input->post('language')) ? $this->input->post('language', TRUE) : 0;
-        $time = !empty($this->input->post('time')) ? $this->input->post('time', TRUE) : 0;
+        if ($result_details->exam_type == 'SCA') {
 
+            $data = array(
+                'step' => 'Qualitative Feedback'
+            );
 
-        $data = array(
-            'consultation' => $consultation,
-            'issues' => $issues,
-            'diagnosis' => $diagnosis,
-            'examination' => $examination,
-            'findings' => $findings,
-            'management' => $management,
-            'rapport' => $rapport,
-            'listening' => $listening,
-            'language' => $language,
-            'time' => $time,
-            'step' => 'Qualitative Feedback'
-        );
+            $feedback_statements = $this->input->post('feedback_statements');
+            $this->Assess_model->saveFeedbackStatements($result_detail_id, is_array($feedback_statements) ? $feedback_statements : array());
 
-        $feedback_statements = $this->input->post('feedback_statements');
-        $this->Assess_model->saveFeedbackStatements($result_detail_id, is_array($feedback_statements) ? $feedback_statements : array());
+        } else {
+
+            $consultation = !empty($this->input->post('consultation')) ? $this->input->post('consultation') : 0;
+            $issues = !empty($this->input->post('issues')) ? $this->input->post('issues', TRUE) : 0;
+            $diagnosis = !empty($this->input->post('diagnosis')) ? $this->input->post('diagnosis', TRUE) : 0;
+            $examination = !empty($this->input->post('examination')) ? $this->input->post('examination', TRUE) : 0;
+            $findings = !empty($this->input->post('findings')) ? $this->input->post('findings', TRUE) : 0;
+            $management = !empty($this->input->post('management')) ? $this->input->post('management', TRUE) : 0;
+            $rapport = !empty($this->input->post('rapport')) ? $this->input->post('rapport', TRUE) : 0;
+            $listening = !empty($this->input->post('listening')) ? $this->input->post('listening', TRUE) : 0;
+            $language = !empty($this->input->post('language')) ? $this->input->post('language', TRUE) : 0;
+            $time = !empty($this->input->post('time')) ? $this->input->post('time', TRUE) : 0;
+
+            $data = array(
+                'consultation' => $consultation,
+                'issues' => $issues,
+                'diagnosis' => $diagnosis,
+                'examination' => $examination,
+                'findings' => $findings,
+                'management' => $management,
+                'rapport' => $rapport,
+                'listening' => $listening,
+                'language' => $language,
+                'time' => $time,
+                'step' => 'Qualitative Feedback'
+            );
+        }
 
         $this->Assess_model->updateResultDetails($result_detail_id, $data);
         $this->session->set_flashdata('msgs', 'Student Qualitative Feedback Added Successfully');
@@ -389,6 +402,7 @@ class Assess extends Admin_controller{
             $data = array(
                 'button' => 'Update',
                 'action' => site_url(Backend_URL . 'assess/overall_judgment_action'),
+                'exam_type' => $result_details->exam_type,
                 'result_details' => $result_details,
                 'result_detail_id' => set_value('result_detail_id', $result_detail_id),
                 'overall_judgment' => set_value('overall_judgment', $result_details->overall_judgment),
@@ -479,6 +493,7 @@ class Assess extends Admin_controller{
             $data = array(
                 'button' => 'Update',
                 'action' => site_url(Backend_URL . 'assess/review_action'),
+                'exam_type' => $result_details->exam_type,
                 'result_details' => $result_details,
                 'result_detail_id' => set_value('result_detail_id', $result_detail_id),
                 'patient_name' => set_value('patient_name', $result_details->patient),
@@ -505,7 +520,11 @@ class Assess extends Admin_controller{
                 'time' => set_value('time', $result_details->time),
                 'overall_judgment' => set_value('overall_judgment', $result_details->overall_judgment),
                 'comments' => set_value('comments', $result_details->examiner_comments),
-                'summery_std_scen' => Tools::getStudentNameByResultID( $result_detail_id )
+                'summery_std_scen' => Tools::getStudentNameByResultID( $result_detail_id ),
+
+                // SCA feedback statements (sca_feedback_domains / sca_feedback_statements)
+                'feedback_domains' => $this->Assess_model->getFeedbackDomains(),
+                'selected_statements' => $this->Assess_model->getSelectedFeedbackStatements($result_detail_id)
             );
             $this->viewAdminContent('assess/assess/review', $data);
         } else {
@@ -517,32 +536,23 @@ class Assess extends Admin_controller{
     }
 
     public function review_action() {
-        $this->_rules_review();
         $result_detail_id = (int) $this->input->post('result_detail_id');
         // $result_detail_id = 705789;
         $result_details = $this->Assess_model->getResultDetailsById($result_detail_id);
-        
+
         if(empty($result_details)){
             $this->session->set_flashdata('msge', 'The exam you are trying to access doesn\'t exists!!');
             redirect(site_url(Backend_URL . 'assess/comment/' . $result_detail_id));
         }
-        
+
+        $is_sca = ($result_details->exam_type == 'SCA');
+        $this->_rules_review($result_details->exam_type);
+
         if ($this->form_validation->run() == FALSE) {
-            
+
             $this->session->set_flashdata('msge', 'Please, fill the required fields');
             $this->review($result_detail_id);
         }else {
-            
-            $consultation = !empty($this->input->post('consultation')) ? $this->input->post('consultation') : 0;
-            $issues = !empty($this->input->post('issues')) ? $this->input->post('issues', TRUE) : 0;
-            $diagnosis = !empty($this->input->post('diagnosis')) ? $this->input->post('diagnosis', TRUE) : 0;
-            $examination = !empty($this->input->post('examination')) ? $this->input->post('examination', TRUE) : 0;
-            $findings = !empty($this->input->post('findings')) ? $this->input->post('findings', TRUE) : 0;
-            $management = !empty($this->input->post('management')) ? $this->input->post('management', TRUE) : 0;
-            $rapport = !empty($this->input->post('rapport')) ? $this->input->post('rapport', TRUE) : 0;
-            $listening = !empty($this->input->post('listening')) ? $this->input->post('listening', TRUE) : 0;
-            $language = !empty($this->input->post('language')) ? $this->input->post('language', TRUE) : 0;
-            $time = !empty($this->input->post('time')) ? $this->input->post('time', TRUE) : 0;
 
             $data = array(
                 'patient' => $this->input->post('patient_name', TRUE),
@@ -550,26 +560,38 @@ class Assess extends Admin_controller{
                 'introduces_himself' => $this->input->post('introduces_himself', TRUE),
                 'state_the_role' => $this->input->post('state_the_role', TRUE),
                 'name_preference' => $this->input->post('name_preference', TRUE),
-                'starts_station_well' => $this->input->post('starts_station_well', TRUE),
                 'face' => $this->input->post('face', TRUE),
                 'technical_skills' => $this->input->post('technical_skills', TRUE),
                 'clinical_skills' => $this->input->post('clinical_skills', TRUE),
                 'interpersonal_skills' => $this->input->post('interpersonal_skills', TRUE),
-                'consultation' => $consultation,
-                'issues' => $issues,
-                'diagnosis' => $diagnosis,
-                'examination' => $examination,
-                'findings' => $findings,
-                'management' => $management,
-                'rapport' => $rapport,
-                'listening' => $listening,
-                'language' => $language,
-                'time' => $time,
                 'overall_judgment' => $this->input->post('overall_judgment', TRUE),
                 'examiner_comments' => $this->input->post('comments'),
                 'end_datetime' => date("Y-m-d H:i:s"),
                 'step' => 'Complete'
             );
+
+            if ($is_sca) {
+
+                $data['welcomes_patient'] = $this->input->post('welcomes_patient', TRUE);
+                $data['starts_with_open_end'] = $this->input->post('starts_with_open_end', TRUE);
+
+                $feedback_statements = $this->input->post('feedback_statements');
+                $this->Assess_model->saveFeedbackStatements($result_detail_id, is_array($feedback_statements) ? $feedback_statements : array());
+
+            } else {
+
+                $data['starts_station_well'] = $this->input->post('starts_station_well', TRUE);
+                $data['consultation'] = !empty($this->input->post('consultation')) ? $this->input->post('consultation') : 0;
+                $data['issues'] = !empty($this->input->post('issues')) ? $this->input->post('issues', TRUE) : 0;
+                $data['diagnosis'] = !empty($this->input->post('diagnosis')) ? $this->input->post('diagnosis', TRUE) : 0;
+                $data['examination'] = !empty($this->input->post('examination')) ? $this->input->post('examination', TRUE) : 0;
+                $data['findings'] = !empty($this->input->post('findings')) ? $this->input->post('findings', TRUE) : 0;
+                $data['management'] = !empty($this->input->post('management')) ? $this->input->post('management', TRUE) : 0;
+                $data['rapport'] = !empty($this->input->post('rapport')) ? $this->input->post('rapport', TRUE) : 0;
+                $data['listening'] = !empty($this->input->post('listening')) ? $this->input->post('listening', TRUE) : 0;
+                $data['language'] = !empty($this->input->post('language')) ? $this->input->post('language', TRUE) : 0;
+                $data['time'] = !empty($this->input->post('time')) ? $this->input->post('time', TRUE) : 0;
+            }
 
             $review_update = $this->Assess_model->updateResultDetails($result_detail_id, $data);
             if($review_update){
@@ -597,13 +619,19 @@ class Assess extends Admin_controller{
         $this->viewAdminContent('assess/assess/exam_is_over');            
     }
     
-     public function _rules_initial_approach() {
+     public function _rules_initial_approach($exam_type = 'PLAB Part 2') {
         $this->form_validation->set_rules('patient_name', 'name of the patient', 'trim|required');
         $this->form_validation->set_rules('greet_the_patient', 'greet the patient', 'trim|required');
         $this->form_validation->set_rules('introduces_himself', 'introduces himself', 'trim|required');
         $this->form_validation->set_rules('state_the_role', 'state the role', 'trim|required');
         $this->form_validation->set_rules('name_preference', 'checks patient\'s name preference', 'trim|required');
-        $this->form_validation->set_rules('starts_station_well', 'starts station well', 'trim|required');
+
+        if ($exam_type == 'SCA') {
+            $this->form_validation->set_rules('welcomes_patient', 'welcomes the patient', 'trim|required');
+            $this->form_validation->set_rules('starts_with_open_end', 'starts with open-end question', 'trim|required');
+        } else {
+            $this->form_validation->set_rules('starts_station_well', 'starts station well', 'trim|required');
+        }
 
         $this->form_validation->set_rules('result_detail_id', 'result_detail_id', 'trim');
         $this->form_validation->set_error_delimiters('<span class="text-danger">', '</span>');
@@ -631,14 +659,21 @@ class Assess extends Admin_controller{
         $this->form_validation->set_error_delimiters('<span class="text-danger">', '</span>');
     }
     
-    public function _rules_review() {
-        
+    public function _rules_review($exam_type = 'PLAB Part 2') {
+
         $this->form_validation->set_rules('patient_name', 'name of the patient', 'trim|required');
         $this->form_validation->set_rules('greet_the_patient', 'greet the patient', 'trim|required');
         $this->form_validation->set_rules('introduces_himself', 'introduces himself', 'trim|required');
         $this->form_validation->set_rules('state_the_role', 'state the role', 'trim|required');
         $this->form_validation->set_rules('name_preference', 'checks patient’s name preference', 'trim|required');
-        $this->form_validation->set_rules('starts_station_well', 'starts station well', 'trim|required');
+
+        if ($exam_type == 'SCA') {
+            $this->form_validation->set_rules('welcomes_patient', 'welcomes the patient', 'trim|required');
+            $this->form_validation->set_rules('starts_with_open_end', 'starts with open-end question', 'trim|required');
+        } else {
+            $this->form_validation->set_rules('starts_station_well', 'starts station well', 'trim|required');
+        }
+
         $this->form_validation->set_rules('face', 'Face must be selected', 'trim|required', array('required' => 'Student Face Must Be Selected!'));
         $this->form_validation->set_rules('technical_skills', 'Technical Skills', 'trim|required', array('required' => 'Data-gathering, technical and assessment skills is required!'));
         $this->form_validation->set_rules('clinical_skills', 'Clinical Skills', 'trim|required', array('required' => 'Clinical management skills is required'));

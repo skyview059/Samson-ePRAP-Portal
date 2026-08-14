@@ -23,57 +23,19 @@
                             <label for="inputEmail3" class="col-sm-2 control-label">Overall Judgment</label>
                             <div class="col-sm-10">
 
-                            <?php /* 
+                            <?php
+                                // SCA and PLAB Part 2 use different judgment scales (result_details.overall_judgment enum holds the union)
+                                $judgment_options = ($exam_type == 'SCA')
+                                    ? array('Pass', 'Bare Pass', 'Bare Fail', 'Fail')
+                                    : array('Fail', 'Borderline', 'Pass', 'Very Good', 'Excellent');
+                            ?>
+                            <?php foreach ($judgment_options as $option): ?>
                                 <div class="radio">
                                     <label>
-                                        <?php echo htmlRadio('overall_judgment', $overall_judgment, array('Fail' => 'Fail'), 'class="icheck-radio"'); ?>
+                                        <?php echo htmlRadio('overall_judgment', $overall_judgment, array($option => $option), 'class="icheck-radio"'); ?>
                                     </label>
                                 </div>
-                                <div class="radio">
-                                    <label>
-                                        <?php echo htmlRadio('overall_judgment', $overall_judgment, array('Borderline' => 'Borderline'), 'class="icheck-radio"'); ?>
-                                    </label>
-                                </div>
-                                <div class="radio">
-                                    <label>
-                                        <?php echo htmlRadio('overall_judgment', $overall_judgment, array('Pass' => 'Pass'), 'class="icheck-radio"'); ?>
-                                    </label>
-                                </div>
-                                <div class="radio">
-                                    <label>
-                                        <?php echo htmlRadio('overall_judgment', $overall_judgment, array('Very Good' => 'Very Good'), 'class="icheck-radio"'); ?>
-                                    </label>
-                                </div>
-                                <div class="radio">
-                                    <label>
-                                        <?php echo htmlRadio('overall_judgment', $overall_judgment, array('Excellent' => 'Excellent'), 'class="icheck-radio"'); ?>
-                                    </label>
-                                </div>
-                            */ ?>
-
-
-                                <div class="radio">
-                                    <label>
-                                        <?php echo htmlRadio('overall_judgment', $overall_judgment, array('Pass' => 'Pass'), 'class="icheck-radio"'); ?>
-                                    </label>
-                                </div>
-                                <div class="radio">
-                                    <label>
-                                        <?php echo htmlRadio('overall_judgment', $overall_judgment, array('Bare Pass' => 'Bare Pass'), 'class="icheck-radio"'); ?>
-                                    </label>
-                                </div>
-                                <div class="radio">
-                                    <label>
-                                        <?php echo htmlRadio('overall_judgment', $overall_judgment, array('Bare Fail' => 'Bare Fail'), 'class="icheck-radio"'); ?>
-                                    </label>
-                                </div>
-                                <div class="radio">
-                                    <label>
-                                        <?php echo htmlRadio('overall_judgment', $overall_judgment, array('Fail' => 'Fail'), 'class="icheck-radio"'); ?>
-                                    </label>
-                                </div>
-                                
-
+                            <?php endforeach; ?>
 
                                 <div class="clearfix"></div>
                                 <?php echo form_error('overall_judgment') ?>
