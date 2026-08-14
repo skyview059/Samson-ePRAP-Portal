@@ -40,8 +40,7 @@ function getTodayExamScheduleDropDownByTeacher($selected = 0, $admin = false )
     $options = '';
     if(!$schedules){
         return '<option value="0">-No Exam Found!-</option>';
-    }
-    
+    }    
     
     foreach ($schedules as $s ) {
         $time = globalDateTimeFormat($s->datetime);

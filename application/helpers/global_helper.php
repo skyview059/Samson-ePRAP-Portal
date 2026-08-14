@@ -29,6 +29,18 @@ function pp($data)
     print_r($data);
     echo '</pre>';
 }
+function pp4dev($string, $sl = 0)
+{
+    $output = '';
+    $role_id = getLoginUserData('role_id');
+    if($role_id == 1){
+        $output .= "<p><span class='btn btn-xs btn-default' data-toggle='collapse' data-target='#query_box_{$sl}' aria-expanded='false' aria-controls='query_box_{$sl}'>
+                Show Query <i class='fa fa-angle-down'></i>
+            </span></p>";
+        $output .= ("<pre id='query_box_{$sl}' class='collapse'>{$string}</pre>");
+    }  
+    return $output;
+}
 
 function getLoginUserData($key = '')
 {
@@ -132,7 +144,7 @@ function numericDropDown2($i = 0, $end = 12, $incr = 1, $selected = 0)
     return $option;
 }
 
-function htmlRadio($name = 'input_radio', $selected = '', $array = ['Male' => 'Male', 'Female' => 'Female'], $attr = '')
+function htmlRadio($name = 'input_radio', $selected = '', $array = [], $attr = '', $br = false)
 {
     $radio = '';
     $id    = 0;
@@ -145,6 +157,7 @@ function htmlRadio($name = 'input_radio', $selected = '', $array = ['Male' => 'M
             $radio .= (trim_fk($selected) == $key) ? ' checked ' : '';
             $radio .= 'value="' . $key . '" />&nbsp;' . $value;
             $radio .= '&nbsp;&nbsp;&nbsp;</label>';
+            $radio .= ($br) ? '<br/>' : '';
         }
     }
     // $radio .= '</div>';

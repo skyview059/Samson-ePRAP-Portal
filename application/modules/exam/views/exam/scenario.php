@@ -198,8 +198,8 @@
             success: function (jsonRespond) {
                 $('.js_assessor').html(jsonRespond.Msg);
                 setTimeout(function () {
-                    $('#assessor_popup').modal('toggle');
-                }, 2000);
+                    $('#assessor_popup').modal('hide');
+                }, 500);
             }
         });
     }

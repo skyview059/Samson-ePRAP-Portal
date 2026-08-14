@@ -130,6 +130,8 @@
                                                     </div>
                                                 </div>
 
+                                                
+
                                                 <div class="form-group">
                                                     <label for="greet_the_patient" class="col-sm-3 control-label">Greet the patient :</label>
                                                     <div class="col-sm-9" style="padding-top:8px;">
@@ -158,7 +160,7 @@
                                                 </div>
 
                                                 <div class="form-group">
-                                                    <label for="name_preference" class="col-sm-3 control-label">Checks patient’s name preference :</label>
+                                                    <label for="name_preference" class="col-sm-3 control-label">Checks patient's name preference :</label>
                                                     <div class="col-sm-9" style="padding-top:8px;">
                                                         <?php echo htmlRadio('name_preference', $name_preference, array('Yes' => 'Yes', 'No' => 'No'), 'class="icheck-radio"'); ?>
                                                         <div class="clearfix"></div>
@@ -166,14 +168,34 @@
                                                     </div>
                                                 </div>
 
-                                                <div class="form-group">
+                                                <!-- <div class="form-group">
                                                     <label for="starts_station_well" class="col-sm-3 control-label">Starts station well :</label>
                                                     <div class="col-sm-9" style="padding-top:8px;">
                                                         <?php echo htmlRadio('starts_station_well', $starts_station_well, array('Yes' => 'Yes', 'No' => 'No'), 'class="icheck-radio"'); ?>
                                                         <div class="clearfix"></div>
                                                         <?php echo form_error('starts_station_well') ?>
                                                     </div>
+                                                </div> -->
+
+                                                <div class="form-group">
+                                                    <label for="welcomes_patient" class="col-sm-3 control-label">Welcomes the patient :</label>
+                                                    <div class="col-sm-9" style="padding-top:8px;">
+                                                        <?php echo htmlRadio('welcomes_patient', $welcomes_patient, array('Yes' => 'Yes', 'No' => 'No'), 'class="icheck-radio"'); ?>
+                                                        <div class="clearfix"></div>
+                                                        <?php echo form_error('welcomes_patient') ?>
+                                                    </div>
                                                 </div>
+                                                
+                                                <div class="form-group">
+                                                    <label for="starts_with_open_end" class="col-sm-3 control-label">Starts with open-end question :</label>
+                                                    <div class="col-sm-9" style="padding-top:8px;">
+                                                        <?php echo htmlRadio('starts_with_open_end', $starts_with_open_end, array('Yes' => 'Yes', 'No' => 'No'), 'class="icheck-radio"'); ?>
+                                                        <div class="clearfix"></div>
+                                                        <?php echo form_error('starts_with_open_end') ?>
+                                                    </div>
+                                                </div>
+
+
                                             </div>
                                         </div>
                                     </div>

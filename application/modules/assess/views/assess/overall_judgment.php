@@ -22,6 +22,8 @@
                         <div class="form-group">
                             <label for="inputEmail3" class="col-sm-2 control-label">Overall Judgment</label>
                             <div class="col-sm-10">
+
+                            <?php /* 
                                 <div class="radio">
                                     <label>
                                         <?php echo htmlRadio('overall_judgment', $overall_judgment, array('Fail' => 'Fail'), 'class="icheck-radio"'); ?>
@@ -47,6 +49,32 @@
                                         <?php echo htmlRadio('overall_judgment', $overall_judgment, array('Excellent' => 'Excellent'), 'class="icheck-radio"'); ?>
                                     </label>
                                 </div>
+                            */ ?>
+
+
+                                <div class="radio">
+                                    <label>
+                                        <?php echo htmlRadio('overall_judgment', $overall_judgment, array('Pass' => 'Pass'), 'class="icheck-radio"'); ?>
+                                    </label>
+                                </div>
+                                <div class="radio">
+                                    <label>
+                                        <?php echo htmlRadio('overall_judgment', $overall_judgment, array('Bare Pass' => 'Bare Pass'), 'class="icheck-radio"'); ?>
+                                    </label>
+                                </div>
+                                <div class="radio">
+                                    <label>
+                                        <?php echo htmlRadio('overall_judgment', $overall_judgment, array('Bare Fail' => 'Bare Fail'), 'class="icheck-radio"'); ?>
+                                    </label>
+                                </div>
+                                <div class="radio">
+                                    <label>
+                                        <?php echo htmlRadio('overall_judgment', $overall_judgment, array('Fail' => 'Fail'), 'class="icheck-radio"'); ?>
+                                    </label>
+                                </div>
+                                
+
+
                                 <div class="clearfix"></div>
                                 <?php echo form_error('overall_judgment') ?>
                             </div>

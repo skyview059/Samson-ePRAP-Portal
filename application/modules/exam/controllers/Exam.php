@@ -224,13 +224,16 @@ class Exam extends Admin_controller
 
     public function get_assessor()
     {
-        $id = $this->input->post('id');
-        $this->db->select('u.id,first_name,last_name,r.role_name');
-        $this->db->from('users as u');
-        $this->db->join('roles as r', 'r.id=u.role_id', 'LEFT');
-        $this->db->where_in('role_id', [2, 3, 4, 5]);
-        $this->db->where('u.status', 'Active');
-        $data['assessors'] = $this->db->get()->result();
+        $id = (int) $this->input->post('id');
+        // Super admin (role 1) can also be listed as an assessor
+        $role_ids = $this->role_id == 1 ? [1, 2, 3, 4, 5] : [2, 3, 4, 5];
+
+        $data['assessors'] = $this->db->select('u.id,first_name,last_name,r.role_name')
+            ->from('users as u')
+            ->join('roles as r', 'r.id=u.role_id', 'LEFT')
+            ->where_in('u.role_id', $role_ids)
+            ->where('u.status', 'Active')
+            ->get()->result();
 
         $data['marked'] = $this->Exam_model->marked($id);
         $this->viewAdminContent('exam/exam/get_assessor', $data);
@@ -536,7 +539,7 @@ class Exam extends Admin_controller
             'module'   => 'Mock Exams',
             'icon'     => 'fa-edit',
             'href'     => 'exam',
-            'children' => $this->_get_course_names()
+            'children' => $this->_get_course_names('exam')
         ];
 //        $menus['children'][] = [
 //            'title' => ' &nbsp;Add an Exam',

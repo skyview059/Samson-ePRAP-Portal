@@ -141,7 +141,92 @@ class Assess_model extends Fm_model{
         return $students;
     }
     
-    function getExamScenarios($exam_schedule_id) {        
+    /**
+     * SCA feedback domains, each with its own ->statements list.
+     * Returns an empty array when the reference tables have not been imported yet.
+     */
+    function getFeedbackDomains() {
+
+        if ( ! $this->db->table_exists('sca_feedback_domains')) {
+            return array();
+        }
+
+        $this->db->select('id, name, standard, sort_order');
+        $this->db->from('sca_feedback_domains');
+        $this->db->order_by('sort_order', 'ASC');
+        $this->db->order_by('id', 'ASC');
+        $domains = $this->db->get()->result();
+
+        if ( ! $domains) {
+            return array();
+        }
+
+        $this->db->select('id, domain_id, sl_no, subject, description');
+        $this->db->from('sca_feedback_statements');
+        $this->db->order_by('domain_id', 'ASC');
+        $this->db->order_by('sl_no', 'ASC');
+        $statements = $this->db->get()->result();
+
+        $by_domain = array();
+        foreach ($statements as $statement) {
+            $by_domain[$statement->domain_id][] = $statement;
+        }
+
+        foreach ($domains as $domain) {
+            $domain->statements = isset($by_domain[$domain->id]) ? $by_domain[$domain->id] : array();
+        }
+
+        return $domains;
+    }
+
+    // Statement ids already ticked for this assessed station
+    function getSelectedFeedbackStatements($result_detail_id) {
+
+        if ( ! $this->db->table_exists('result_detail_feedback_statements')) {
+            return array();
+        }
+
+        $this->db->select('statement_id');
+        $this->db->from('result_detail_feedback_statements');
+        $this->db->where('result_detail_id', $result_detail_id);
+        $rows = $this->db->get()->result();
+
+        $statement_ids = array();
+        foreach ($rows as $row) {
+            $statement_ids[] = (int) $row->statement_id;
+        }
+        return $statement_ids;
+    }
+
+    // Replace the whole selection of this assessed station in one go
+    function saveFeedbackStatements($result_detail_id, $statement_ids) {
+
+        if ( ! $this->db->table_exists('result_detail_feedback_statements')) {
+            return false;
+        }
+
+        $this->db->where('result_detail_id', $result_detail_id);
+        $this->db->delete('result_detail_feedback_statements');
+
+        $rows = array();
+        foreach (array_unique((array) $statement_ids) as $statement_id) {
+            $statement_id = (int) $statement_id;
+            if ($statement_id > 0) {
+                $rows[] = array(
+                    'result_detail_id' => (int) $result_detail_id,
+                    'statement_id'     => $statement_id,
+                    'created_at'       => date('Y-m-d H:i:s')
+                );
+            }
+        }
+
+        if ($rows) {
+            $this->db->insert_batch('result_detail_feedback_statements', $rows);
+        }
+        return true;
+    }
+
+    function getExamScenarios($exam_schedule_id) {
         $this->db->select('s.reference_number,s.name,s.id');
         $this->db->from('scenario_relations as sr');
         $this->db->join('scenarios as s', 's.id=sr.scenario_id', 'LEFT');            

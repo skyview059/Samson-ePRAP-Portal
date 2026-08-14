@@ -18,14 +18,16 @@ class Assess extends Admin_controller{
 
     
     public function search_student() {
-        $exam_schedule_id = urldecode_fk($this->input->get('exam_schedule_id', TRUE));
+        $exam_schedule_id = (int) $this->input->get('exam_schedule_id');
         $number_type = urldecode_fk($this->input->get('number_type', TRUE));
         $gmc        = urldecode_fk($this->input->get('gmc', TRUE));
-        $students   = $this->Assess_model->searchStudent($number_type, $gmc);
 
+        $students   = $this->Assess_model->searchStudent($number_type, $gmc);
         $student_id = ($students) ? $students->id : 0;
+        
         //Get current exam information by student and current user
         $exam_info = $this->Assess_model->getExamScheduleInfoByStudent($exam_schedule_id, $student_id);
+        $_sql_query = pp4dev($this->db->last_query());
 
         if ($exam_info) {
             
@@ -74,6 +76,7 @@ class Assess extends Admin_controller{
         
         $data = array(
             'students' => $students,
+            'sql_query' => $_sql_query,
             'exam' => $exam_info,
             'exam_schedule_id' => $exam_schedule_id,
             'number_type' => $number_type,
@@ -81,8 +84,7 @@ class Assess extends Admin_controller{
             'right_candidate' => set_value('right_candidate')
         );
         
-//        dd( $data );
-        
+        // dd( $data );        
         $this->viewAdminContent('assess/assess/search_student', $data);
     }
 
@@ -159,6 +161,8 @@ class Assess extends Admin_controller{
                 'state_the_role' => set_value('state_the_role', $result_data->state_the_role),
                 'name_preference' => set_value('name_preference', $result_data->name_preference),
                 'starts_station_well' => set_value('starts_station_well', $result_data->starts_station_well),
+                'welcomes_patient' => set_value('welcomes_patient', $result_data->welcomes_patient),
+                'starts_with_open_end' => set_value('starts_with_open_end', $result_data->starts_with_open_end),
                 'summery_std_scen' => Tools::getStudentNameByResultID( $result_detail_id )
             );
             $this->viewAdminContent('assess/assess/initial_approach', $data);
@@ -190,6 +194,8 @@ class Assess extends Admin_controller{
                 'state_the_role' => $this->input->post('state_the_role', TRUE),
                 'name_preference' => $this->input->post('name_preference', TRUE),
                 'starts_station_well' => $this->input->post('starts_station_well', TRUE),
+                'welcomes_patient' => $this->input->post('welcomes_patient', TRUE),
+                'starts_with_open_end' => $this->input->post('starts_with_open_end', TRUE),
                 'step' => 'Initial Approach'
             );
 
@@ -198,7 +204,6 @@ class Assess extends Admin_controller{
             redirect(site_url(Backend_URL . 'assess/face/' . $result_detail_id));
         }
     }
-
    
     public function face($result_detail_id) {
         
@@ -314,7 +319,15 @@ class Assess extends Admin_controller{
                 'listening' => set_value('listening', $result_details->listening),
                 'language' => set_value('language', $result_details->language),
                 'time' => set_value('time', $result_details->time),
-                'summery_std_scen' => Tools::getStudentNameByResultID( $result_detail_id )
+                'summery_std_scen' => Tools::getStudentNameByResultID( $result_detail_id ),
+
+                // SCA feedback statements (sca_feedback_domains / sca_feedback_statements)
+                'feedback_domains' => $this->Assess_model->getFeedbackDomains(),
+                'selected_statements' => $this->Assess_model->getSelectedFeedbackStatements($result_detail_id),
+
+                'technical_skills' => null,
+                'clinical_skills' => null,
+                'interpersonal_skills' => null
                 
             );
             $this->viewAdminContent('assess/assess/qualitative_feedback', $data);
@@ -359,6 +372,9 @@ class Assess extends Admin_controller{
             'time' => $time,
             'step' => 'Qualitative Feedback'
         );
+
+        $feedback_statements = $this->input->post('feedback_statements');
+        $this->Assess_model->saveFeedbackStatements($result_detail_id, is_array($feedback_statements) ? $feedback_statements : array());
 
         $this->Assess_model->updateResultDetails($result_detail_id, $data);
         $this->session->set_flashdata('msgs', 'Student Qualitative Feedback Added Successfully');
@@ -471,6 +487,8 @@ class Assess extends Admin_controller{
                 'state_the_role' => set_value('state_the_role', $result_details->state_the_role),
                 'name_preference' => set_value('name_preference', $result_details->name_preference),
                 'starts_station_well' => set_value('starts_station_well', $result_details->starts_station_well),
+                'welcomes_patient' => set_value('welcomes_patient', $result_details->welcomes_patient),
+                'starts_with_open_end' => set_value('starts_with_open_end', $result_details->starts_with_open_end),
                 'face' => set_value('face', $result_details->face),
                 'technical_skills' => set_value('technical_skills', $result_details->technical_skills),
                 'clinical_skills' => set_value('clinical_skills', $result_details->clinical_skills),
@@ -501,6 +519,7 @@ class Assess extends Admin_controller{
     public function review_action() {
         $this->_rules_review();
         $result_detail_id = (int) $this->input->post('result_detail_id');
+        // $result_detail_id = 705789;
         $result_details = $this->Assess_model->getResultDetailsById($result_detail_id);
         
         if(empty($result_details)){
@@ -554,7 +573,7 @@ class Assess extends Admin_controller{
 
             $review_update = $this->Assess_model->updateResultDetails($result_detail_id, $data);
             if($review_update){
-                $this->session->set_flashdata('msgs', 'Examiners Has Been Successfully Submited');
+                $this->session->set_flashdata('msgs', 'Examiners Has Been Successfully Submitted');
                 redirect(site_url(Backend_URL . 'assess/finished'));
             }else{
                 $this->session->set_flashdata('msgs', 'Exam Review could\'t be updated');
@@ -583,7 +602,7 @@ class Assess extends Admin_controller{
         $this->form_validation->set_rules('greet_the_patient', 'greet the patient', 'trim|required');
         $this->form_validation->set_rules('introduces_himself', 'introduces himself', 'trim|required');
         $this->form_validation->set_rules('state_the_role', 'state the role', 'trim|required');
-        $this->form_validation->set_rules('name_preference', 'checks patient’s name preference', 'trim|required');
+        $this->form_validation->set_rules('name_preference', 'checks patient\'s name preference', 'trim|required');
         $this->form_validation->set_rules('starts_station_well', 'starts station well', 'trim|required');
 
         $this->form_validation->set_rules('result_detail_id', 'result_detail_id', 'trim');
