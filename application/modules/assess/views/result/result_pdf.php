@@ -142,15 +142,21 @@
 
                         <!--  <h4 class="h4 text-center"><u>Quantitative Feedback</u></h4>-->                                                                                                                                                                                   
                         <fieldset>
-                            <legend>Quantitative Feedback</legend>                   
+                            <legend><?php echo $is_sca ? 'Domains Grades' : 'Quantitative Feedback'; ?></legend>
                             <table class="table table-condensed table-striped table-bordered">
                                 <thead>
                                     <tr>
                                         <th class="text-center" width='40'>S/L</th>
                                         <th>Scenario</th>
+                                        <?php if ($is_sca): ?>
+                                        <th class="text-center">Data gathering & diagnosis</th>
+                                        <th class="text-center">Clinical management & complexity</th>
+                                        <th class="text-center">Relating to others</th>
+                                        <?php else: ?>
                                         <th class="text-center">Data-gathering, technical and assessment skills</th>
                                         <th class="text-center">Clinical management Skills</th>
                                         <th class="text-center">Interpersonal Skills</th>
+                                        <?php endif; ?>
                                         <th class="text-center">Total Mark </th>
                                         <th class="text-center">Pass Score</th>
                                         <th class="text-center">Result</th>

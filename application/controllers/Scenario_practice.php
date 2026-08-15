@@ -212,10 +212,17 @@ class Scenario_practice extends Frontend_controller
         $this->load->helper('student/student');
         $result_details = $this->getResultDetailsById($practice_id);
         if ($result_details) {
+            $is_sca = ($result_details->exam_type == 'SCA');
+            if ($is_sca) {
+                $this->load->model('assess/Assess_model', 'Assess_model');
+            }
             $data = array(
                 'action'               => site_url('scenario-practice/review_action'),
                 'result_details'       => $result_details,
                 'practice_id'          => $practice_id,
+                'exam_type'            => $result_details->exam_type,
+                'feedback_domains'     => $is_sca ? $this->Assess_model->getFeedbackDomains() : [],
+                'selected_statements'  => $is_sca ? $this->getSelectedFeedbackStatementIds($practice_id) : [],
                 'face'                 => set_value('face', 'Smiley'),
                 'technical_skills'     => set_value('technical_skills', 0),
                 'clinical_skills'      => set_value('clinical_skills', 0),
@@ -244,30 +251,57 @@ class Scenario_practice extends Frontend_controller
     {
         ajaxAuthorized();
         $practice_id = $this->input->post('practice_id');
-        $data        = [
+        $practice    = $this->getResultDetailsById($practice_id);
+        $is_sca      = ($practice && $practice->exam_type == 'SCA');
+
+        $data = [
             'patient'              => $this->input->post('patient_name'),
             'greet_the_patient'    => $this->input->post('greet_the_patient'),
             'introduces_himself'   => $this->input->post('introduces_himself'),
             'state_the_role'       => $this->input->post('state_the_role'),
             'name_preference'      => $this->input->post('name_preference'),
-            'starts_station_well'  => $this->input->post('starts_station_well'),
             'face'                 => $this->input->post('face'),
             'technical_skills'     => $this->input->post('technical_skills'),
             'clinical_skills'      => $this->input->post('clinical_skills'),
             'interpersonal_skills' => $this->input->post('interpersonal_skills'),
-            'consultation'         => intval($this->input->post('consultation')),
-            'issues'               => intval($this->input->post('issues')),
-            'diagnosis'            => intval($this->input->post('diagnosis')),
-            'examination'          => intval($this->input->post('examination')),
-            'findings'             => intval($this->input->post('findings')),
-            'management'           => intval($this->input->post('management')),
-            'rapport'              => intval($this->input->post('rapport')),
-            'listening'            => intval($this->input->post('listening')),
-            'language'             => intval($this->input->post('language')),
-            'time'                 => intval($this->input->post('time')),
             'overall_judgment'     => $this->input->post('overall_judgment'),
             'examiner_comments'    => $this->input->post('comments'),
         ];
+
+        if ($is_sca) {
+            $data['welcomes_patient']     = $this->input->post('welcomes_patient');
+            $data['starts_with_open_end'] = $this->input->post('starts_with_open_end');
+
+            // Replace the ticked feedback statements of this practice in one go
+            $this->db->where('practice_id', $practice_id)->delete('practice_feedback_statements');
+            $feedback_statements = $this->input->post('feedback_statements');
+            $rows                = [];
+            foreach (array_unique((array) $feedback_statements) as $statement_id) {
+                $statement_id = (int) $statement_id;
+                if ($statement_id > 0) {
+                    $rows[] = [
+                        'practice_id'  => (int) $practice_id,
+                        'statement_id' => $statement_id,
+                        'created_at'   => date('Y-m-d H:i:s'),
+                    ];
+                }
+            }
+            if ($rows) {
+                $this->db->insert_batch('practice_feedback_statements', $rows);
+            }
+        } else {
+            $data['starts_station_well'] = $this->input->post('starts_station_well');
+            $data['consultation']        = intval($this->input->post('consultation'));
+            $data['issues']              = intval($this->input->post('issues'));
+            $data['diagnosis']           = intval($this->input->post('diagnosis'));
+            $data['examination']         = intval($this->input->post('examination'));
+            $data['findings']            = intval($this->input->post('findings'));
+            $data['management']          = intval($this->input->post('management'));
+            $data['rapport']             = intval($this->input->post('rapport'));
+            $data['listening']           = intval($this->input->post('listening'));
+            $data['language']            = intval($this->input->post('language'));
+            $data['time']                = intval($this->input->post('time'));
+        }
 
         $this->db->where('id', $practice_id)->update('scenario_topics_items_students', $data);
 
@@ -276,12 +310,47 @@ class Scenario_practice extends Frontend_controller
 
     private function getResultDetailsById($practice_id)
     {
-        $this->db->select('stis.*, sti.scenario_id, s.name as scenario_name');
+        $this->db->select('stis.*, sti.scenario_id, s.name as scenario_name, e.exam_type');
         $this->db->from('scenario_topics_items_students as stis');
         $this->db->join('scenario_topics_items as sti', 'sti.id = stis.scenario_topics_items_id', 'left');
         $this->db->join('scenarios as s', 's.id = sti.scenario_id', 'left');
+        $this->db->join('exams as e', 'e.id = sti.exam_id', 'left');
         $this->db->where('stis.id', $practice_id);
         return $this->db->get()->row();
+    }
+
+    // Statement ids ticked by the peer examiner for this practice (practice_feedback_statements)
+    private function getSelectedFeedbackStatementIds($practice_id)
+    {
+        $rows = $this->db->select('statement_id')
+            ->from('practice_feedback_statements')
+            ->where('practice_id', $practice_id)
+            ->get()->result();
+
+        $statement_ids = [];
+        foreach ($rows as $row) {
+            $statement_ids[] = (int) $row->statement_id;
+        }
+        return $statement_ids;
+    }
+
+    // Ticked statements with their domains, grouped as [domain_name][] = row (for the summary page)
+    private function getFeedbackStatementsGrouped($practice_id)
+    {
+        $this->db->select('d.name as domain_name, st.sl_no, st.subject');
+        $this->db->from('practice_feedback_statements as pfs');
+        $this->db->join('sca_feedback_statements as st', 'st.id = pfs.statement_id', 'inner');
+        $this->db->join('sca_feedback_domains as d', 'd.id = st.domain_id', 'inner');
+        $this->db->where('pfs.practice_id', $practice_id);
+        $this->db->order_by('d.sort_order', 'ASC');
+        $this->db->order_by('st.sl_no', 'ASC');
+        $rows = $this->db->get()->result();
+
+        $grouped = [];
+        foreach ($rows as $row) {
+            $grouped[$row->domain_name][] = $row;
+        }
+        return $grouped;
     }
 
     public function practiceSummaryDetails($practice_id)
@@ -291,7 +360,7 @@ class Scenario_practice extends Frontend_controller
         $pass_mark        = 3;
         $passing_criteria = 'You have passed %PassedStations% out of %PassStation% stations in %NameOfMockTest%. Your score is %YourScore%. The minimum pass mark required is %MinPassMarkRequired%.';
 
-        $this->db->select('stis.*, sti.scenario_id, s.name as scenario_name, s.exam_id, e.name as exam_name');
+        $this->db->select('stis.*, sti.scenario_id, s.name as scenario_name, s.exam_id, e.name as exam_name, e.exam_type');
         $this->db->select('CONCAT(st.title, " ", st.fname, " ", st.mname, " ", st.lname) as student_name');
         $this->db->where('stis.id', $practice_id);
         $this->db->join('scenario_topics_items as sti', 'sti.id = stis.scenario_topics_items_id', 'left');
@@ -329,7 +398,8 @@ class Scenario_practice extends Frontend_controller
             'results'              => $summaryData,
             's_id'                 => $summaryData->student_id,
             'es_id'                => $summaryData->exam_id,
-            'passing_criteria_str' => nl2br_fk($passing_criteria_str)
+            'passing_criteria_str' => nl2br_fk($passing_criteria_str),
+            'feedback_statements'  => ($summaryData->exam_type == 'SCA') ? $this->getFeedbackStatementsGrouped($practice_id) : [],
         ];
 
         $this->viewFrontContent('frontend/scenario_practice/item_details_summary', $data);
@@ -502,7 +572,7 @@ class Scenario_practice extends Frontend_controller
         $this->db->select('p.id, p.candidate_id, p.patient_id, p.examiner_id, p.scenario_topics_items_id, p.status');
         $this->db->select('p.exercise_time_json');
         $this->db->select('sti.scenario_id, sti.exam_id');
-        $this->db->select('e.name as exam_name, e.marking_criteria');
+        $this->db->select('e.name as exam_name, e.exam_type, e.marking_criteria');
         $this->db->select('s.name as scenario_name, s.presentation, s.candidate_instructions, s.patient_information, s.examiner_information');
         $this->db->select('s.setup, s.exam_findings, s.approach, s.explanation');
         $this->db->where('p.id', $practice_id);

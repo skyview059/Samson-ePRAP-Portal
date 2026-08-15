@@ -1,5 +1,6 @@
 <link rel="stylesheet" href="assets/lib/iCheck/flat/green.css">
 <script src="assets/lib/iCheck/icheck.min.js"></script>
+<?php $is_sca = (isset($exam_type) && $exam_type == 'SCA'); ?>
 
 <style>
     .cc-selector input {
@@ -177,6 +178,7 @@
                                                 </div>
                                             </div>
 
+                                            <?php if ( ! $is_sca): ?>
                                             <div class="form-group">
                                                 <label for="starts_station_well" class="col-sm-3 control-label">Starts
                                                     station well :</label>
@@ -185,6 +187,25 @@
                                                     <div class="clearfix"></div>
                                                 </div>
                                             </div>
+                                            <?php else: ?>
+                                            <div class="form-group">
+                                                <label for="welcomes_patient" class="col-sm-3 control-label">Welcomes
+                                                    the patient :</label>
+                                                <div class="col-sm-9" style="padding-top:8px;">
+                                                    <?php echo htmlRadio('welcomes_patient', 'Yes', array('Yes' => 'Yes', 'No' => 'No'), 'class="icheck-radio"'); ?>
+                                                    <div class="clearfix"></div>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="starts_with_open_end" class="col-sm-3 control-label">Starts
+                                                    with open-end question :</label>
+                                                <div class="col-sm-9" style="padding-top:8px;">
+                                                    <?php echo htmlRadio('starts_with_open_end', 'Yes', array('Yes' => 'Yes', 'No' => 'No'), 'class="icheck-radio"'); ?>
+                                                    <div class="clearfix"></div>
+                                                </div>
+                                            </div>
+                                            <?php endif; ?>
                                         </div>
                                     </div>
                                 </div>
@@ -243,7 +264,7 @@
                                     <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion"
                                        href="#collapseThree">
                                         <i class="more-less glyphicon glyphicon-plus"></i>
-                                        Quantitative Feedback
+                                        <?php echo $is_sca ? 'Domains Grades' : 'Quantitative Feedback'; ?>
                                     </a>
                                 </h4>
                             </div>
@@ -253,6 +274,47 @@
                                         <div class="col-md-12">
                                             <table class="table table-bordered">
                                                 <tbody>
+                                                <?php if ($is_sca): ?>
+                                                <tr>
+                                                    <th> Station</th>
+                                                    <th class="col-md-3">Data gathering & diagnosis</th>
+                                                    <th class="col-md-3">Clinical management & complexity</th>
+                                                    <th class="col-md-3">Relating to others</th>
+                                                    <th class="col-md-1 text-center">Total Mark</th>
+                                                </tr>
+
+                                                <tr>
+                                                    <td><?= $practice->scenario_name; ?></td>
+                                                    <td>
+                                                        <?php echo htmlRadio('technical_skills', 0, array(
+                                                            0=>'(0) Clear Fail',
+                                                            1=>'(1) Fail',
+                                                            2=>'(2) Pass',
+                                                            3=>'(3) Clear Pass'), 'class="icheck-radio sumTotal"', true); ?>
+                                                    </td>
+                                                    <td>
+                                                        <?php echo htmlRadio('clinical_skills', 0, array(
+                                                            0=>'<span class="text-red">(0) Clear Fail</span>',
+                                                            1=>'<span class="text-red">(1) Fail</span>',
+                                                            2=>'<span class="text-red">(2) Fail</span>',
+                                                            "2.5"=>'<span class="text-red">(2.5) Fail</span>',
+                                                            "3"=>'<span class="text-green">(3) Pass</span>',
+                                                            "3.5"=>'<span class="text-green">(3.5) Pass</span>',
+                                                            "4.5"=>'<span class="text-green">(4.5) Clear Pass</span>'
+                                                            ), 'class="icheck-radio sumTotal"', true); ?>
+                                                    </td>
+                                                    <td>
+                                                        <?php echo htmlRadio('interpersonal_skills', 0, array(
+                                                            0=>'(0) Clear Fail',
+                                                            1=>'(1) Fail',
+                                                            2=>'(2) Pass',
+                                                            3=>'(3) Clear Pass'
+                                                            ), 'class="icheck-radio sumTotal"', true); ?>
+                                                    </td>
+                                                    <td class="text-center"><span class="badge bg-yellow" id="total_mark">0</span>
+                                                    </td>
+                                                </tr>
+                                                <?php else: ?>
                                                 <tr>
                                                     <th> Station</th>
                                                     <th class="col-md-4">Data-gathering, technical and assessment
@@ -277,6 +339,7 @@
                                                     <td class="text-center"><span class="badge bg-yellow" id="total_mark">0</span>
                                                     </td>
                                                 </tr>
+                                                <?php endif; ?>
                                                 </tbody>
                                             </table>
                                         </div>
@@ -290,7 +353,7 @@
                                     <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion"
                                        href="#collapseFour">
                                         <i class="more-less glyphicon glyphicon-plus"></i>
-                                        Qualitative Feedback
+                                        <?php echo $is_sca ? 'Feedback Statements' : 'Qualitative Feedback'; ?>
                                     </a>
                                 </h4>
                             </div>
@@ -298,6 +361,11 @@
                                 <div class="box-body">
                                     <div class="row">
                                         <div class="col-md-12">
+                                            <?php if ($is_sca): ?>
+
+                                                <?php $this->load->view('assess/assess/partials/feedback_statements'); ?>
+
+                                            <?php else: ?>
                                             <table class="table table-bordered">
                                                 <tbody>
                                                 <tr>
@@ -402,6 +470,7 @@
 
                                                 </tbody>
                                             </table>
+                                            <?php endif; ?>
                                         </div>
                                     </div>
                                 </div>
@@ -427,13 +496,11 @@
                                                 <div class="col-sm-8" style="padding-top:8px;">
 
                                                     <?php
-                                                    echo htmlRadio('overall_judgment', '', array(
-                                                        'Fail'       => 'Fail',
-                                                        'Borderline' => 'Borderline',
-                                                        'Pass'       => 'Pass',
-                                                        'Very Good'  => 'Very Good',
-                                                        'Excellent'  => 'Excellent'
-                                                    ), 'class="icheck-radio"'); ?>
+                                                    // SCA and PLAB Part 2 use different judgment scales
+                                                    $judgment_options = $is_sca
+                                                        ? array('Pass' => 'Pass', 'Bare Pass' => 'Bare Pass', 'Bare Fail' => 'Bare Fail', 'Fail' => 'Fail')
+                                                        : array('Fail' => 'Fail', 'Borderline' => 'Borderline', 'Pass' => 'Pass', 'Very Good' => 'Very Good', 'Excellent' => 'Excellent');
+                                                    echo htmlRadio('overall_judgment', '', $judgment_options, 'class="icheck-radio"'); ?>
                                                 </div>
                                             </div>
                                         </div>

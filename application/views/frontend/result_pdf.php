@@ -39,6 +39,7 @@
         </style>
     </head>
     <body>
+        <?php $is_sca = (isset($results->exam_type) && $results->exam_type == 'SCA'); ?>
         <div id="container">
             <div id="body">
                 <div class="box-body">
@@ -84,14 +85,19 @@
                                                     <th class="text-center">Introduces himself </th>
                                                     <th class="text-center">State the role</th>
                                                     <th class="text-center">Checks patient’s name preference </th>
-                                                    <th class="text-center">Starts station well</th>                                
+                                                    <?php if ($is_sca): ?>
+                                                    <th class="text-center">Welcomes the patient</th>
+                                                    <th class="text-center">Starts with open-end question</th>
+                                                    <?php else: ?>
+                                                    <th class="text-center">Starts station well</th>
+                                                    <?php endif; ?>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                            <?php 
+                                            <?php
                                             $sl = 0;
                                             foreach ($results->details as $result) { ?>
-                                                <tr>                                
+                                                <tr>
                                                     <td><?= ++$sl; ?></td>
                                                     <td><?= $result->name; ?></td>
                                                     <td class="text-center"><?php echo $result->patient; ?></td>
@@ -99,7 +105,12 @@
                                                     <td class="text-center"><?php echo $result->introduces_himself; ?></td>
                                                     <td class="text-center"><?php echo $result->state_the_role; ?></td>
                                                     <td class="text-center"><?php echo $result->name_preference; ?></td>
+                                                    <?php if ($is_sca): ?>
+                                                    <td class="text-center"><?php echo $result->welcomes_patient; ?></td>
+                                                    <td class="text-center"><?php echo $result->starts_with_open_end; ?></td>
+                                                    <?php else: ?>
                                                     <td class="text-center"><?php echo $result->starts_station_well; ?></td>
+                                                    <?php endif; ?>
                                                 </tr>
                                             <?php } ?>
                                             </tbody>
@@ -134,15 +145,21 @@
 
                                     <!--  <h4 class="h4 text-center"><u>Quantitative Feedback</u></h4>-->                                                                                                                                                                                   
                                     <fieldset>
-                                        <legend>Quantitative Feedback</legend>                   
+                                        <legend><?php echo $is_sca ? 'Domains Grades' : 'Quantitative Feedback'; ?></legend>
                                         <table class="table table-condensed table-striped table-bordered">
                                             <thead>
                                                 <tr class="text-center">
                                                     <th width='40'>S/L</th>
                                                     <th>Scenario</th>
+                                                    <?php if ($is_sca): ?>
+                                                    <th class="text-center">Data gathering & diagnosis</th>
+                                                    <th class="text-center">Clinical management & complexity</th>
+                                                    <th class="text-center">Relating to others</th>
+                                                    <?php else: ?>
                                                     <th class="text-center">Data-gathering, technical and assessment skills</th>
                                                     <th class="text-center">Clinical management Skills</th>
                                                     <th class="text-center">Interpersonal Skills</th>
+                                                    <?php endif; ?>
                                                     <th class="text-center">Total Mark </th>
                                                     <th class="text-center">Pass Score</th>
                                                     <th class="text-center">Result</th>
@@ -190,10 +207,46 @@
 
                                     <!-- <h4 class="h4 text-center"><u>Qualitative Feedback</u></h4> -->                                
                                     <fieldset>
-                                        <legend>Qualitative Feedback</legend> 
+                                        <legend><?php echo $is_sca ? 'Feedback Statements' : 'Qualitative Feedback'; ?></legend>
+                                        <?php if ($is_sca): ?>
                                         <table class="table table-condensed table-striped table-bordered">
                                             <thead>
-                                                <tr>    
+                                                <tr>
+                                                    <th width='40'>S/L</th>
+                                                    <th width="200">Scenario</th>
+                                                    <th>Feedback statements</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <?php
+                                                $sl = 0;
+                                                foreach ($results->details as $result) {
+                                                    ?>
+                                                    <tr>
+                                                        <td><?= ++$sl; ?></td>
+                                                        <td><?= $result->name; ?></td>
+                                                        <td>
+                                                            <?php if ( ! empty($result->feedback_statements)) { ?>
+                                                                <?php foreach ($result->feedback_statements as $domain_name => $statements) { ?>
+                                                                    <strong style="font-weight:bold;"><?php echo html_escape($domain_name); ?></strong>
+                                                                    <ul style="margin:0 0 10px 0;">
+                                                                        <?php foreach ($statements as $statement) { ?>
+                                                                            <li><?php echo html_escape($statement->subject); ?></li>
+                                                                        <?php } ?>
+                                                                    </ul>
+                                                                <?php } ?>
+                                                            <?php } else { ?>
+                                                                No feedback statements selected.
+                                                            <?php } ?>
+                                                        </td>
+                                                    </tr>
+                                                <?php } ?>
+                                            </tbody>
+                                        </table>
+                                        <?php else: ?>
+                                        <table class="table table-condensed table-striped table-bordered">
+                                            <thead>
+                                                <tr>
                                                     <th width='40'>S/L</th>
                                                     <th>Scenario</th>
                                                     <th class="text-center">Consultation</th>
@@ -231,7 +284,8 @@
                                                 <?php } ?>
 
                                             </tbody>
-                                        </table>                                                
+                                        </table>
+                                        <?php endif; ?>
                                     </fieldset>
 
 
