@@ -24,9 +24,9 @@ class Admin_controller extends MX_Controller {
         $this->SiteTitle    = getSettingItem('SiteTitle');
         $this->CompanyRegNo = getSettingItem('CompanyRegistrationNo');
         
-        if($this->isActiveAccount() == false && $this->user_id){
-            redirect( base_url('auth/logout'), 'refresh' );   
-        }
+        // if($this->isActiveAccount() == false && $this->user_id){
+        //     redirect( base_url('auth/logout'), 'refresh' );   
+        // }
         if($this->user_id <= 0){
             redirect( site_url('admin/login'));
         }
@@ -36,6 +36,7 @@ class Admin_controller extends MX_Controller {
     }
 
     private function isActiveAccount(){
+        /* it's making app slower by 3 sec every request */
         $this->db->cache_on();
         $this->db->select('status, password');
         $this->db->where('id', $this->user_id );
@@ -67,11 +68,11 @@ class Admin_controller extends MX_Controller {
         } else {
             $this->load->view('backend/layout/header');
             $this->load->view('backend/layout/sidebar'); 
-            if( $this->check_access( $view ) ){                
+            // if( $this->check_access( $view ) ){                
                 $this->load->view($view, $data);    
-            } else {
-                $this->load->view('backend/restrict');    
-            }
+            // } else {
+                // $this->load->view('backend/restrict');    
+            // }
             $this->load->view('backend/layout/footer');
         }  				       
     }   
@@ -81,6 +82,7 @@ class Admin_controller extends MX_Controller {
         $this->db->cache_on();
         $this->db->select('id,name');
         $exams = $this->db->get('exams')->result();
+        $this->db->cache_off();
         
         $btn = [];
         foreach($exams as $exam ){

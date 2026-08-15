@@ -114,7 +114,15 @@
 
                 <!--  <h4 class="h4 text-center"><u>Quantitative Feedback</u></h4>-->                                                                                                                                                                                   
                 <fieldset>
-                    <legend>Quantitative Feedback</legend>                   
+
+                    <!--
+                     if(exam_type != 'SCA'){
+                        <legend>Quantitative Feedback</legend>   
+                    } 
+                    -->
+                    <legend>Domains Grades</legend>
+
+                           
                     <table class="table table-condensed table-striped table-bordered">
                         <thead>
                             <tr class="text-center">
@@ -170,7 +178,14 @@
 
                 <!-- <h4 class="h4 text-center"><u>Qualitative Feedback</u></h4> -->                                
                 <fieldset>
-                    <legend>Qualitative Feedback</legend> 
+                    <!--
+                     if(exam_type != 'SCA'){
+                        <legend>Qualitative Feedback</legend>
+                    } 
+                    -->
+                    
+                    <legend>Feedback statements</legend> 
+                    
                     <table class="table table-condensed table-striped table-bordered">
                         <thead>
                             <tr>    

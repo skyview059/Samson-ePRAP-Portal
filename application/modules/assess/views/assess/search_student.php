@@ -13,7 +13,7 @@
             <div class="panel-body">
 
                 <?php echo $sql_query; ?>                
-                <p>Matching: Assigned Assessor account +  Today's Exam Only. (Current Time: <?php echo date('dS, M Y h:i:s A'); ?>)</p>
+                <p>Matching: Assigned Assessor account + Unpublish Exam +  Today's Exam Only. (Current Time: <?php echo date('dS, M Y h:i:s A'); ?>)</p>
                 
                 <div class="col-md-12 text-center">
                 <form action="<?php echo site_url(Backend_URL . 'assess/search_student'); ?>" class="form-inline" method="GET">
