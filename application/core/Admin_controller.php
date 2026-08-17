@@ -68,11 +68,11 @@ class Admin_controller extends MX_Controller {
         } else {
             $this->load->view('backend/layout/header');
             $this->load->view('backend/layout/sidebar'); 
-            // if( $this->check_access( $view ) ){                
+            if( $this->check_access( $view ) ){                
                 $this->load->view($view, $data);    
-            // } else {
-                // $this->load->view('backend/restrict');    
-            // }
+            } else {
+                $this->load->view('backend/restrict');    
+            }
             $this->load->view('backend/layout/footer');
         }  				       
     }   
