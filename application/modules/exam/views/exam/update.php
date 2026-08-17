@@ -70,6 +70,22 @@
                         </div>
                     </div>
 
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Status <sup>*</sup></label>
+                        <div class="col-sm-10">
+                            <label class="radio-inline">
+                                <input type="radio" name="status" value="Unpublished"
+                                    <?php echo ($status != 'Published') ? 'checked' : ''; ?>/> 
+                                Draft
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="status" value="Published"
+                                    <?php echo ($status == 'Published') ? 'checked' : ''; ?>/> 
+                                Publish
+                            </label>                            
+                            <?php echo form_error('status') ?>
+                        </div>
+                    </div>
 
                     <!-- New Field -->
 

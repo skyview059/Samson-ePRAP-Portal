@@ -402,6 +402,7 @@ class Exam extends Admin_controller
                 'pass_station'     => set_value('pass_station', $row->pass_station),
                 'passing_criteria' => set_value('passing_criteria', $row->passing_criteria),
                 'zoom_link'        => set_value('zoom_link', $row->zoom_link),
+                'status'           => set_value('status', $row->status),
                 'created_at'       => set_value('created_at', $row->created_at),
                 'updated_at'       => set_value('updated_at', $row->updated_at),
             );
@@ -433,6 +434,7 @@ class Exam extends Admin_controller
                 'pass_station'     => $this->input->post('pass_station', TRUE),
                 'passing_criteria' => $this->input->post('passing_criteria', TRUE),
                 'zoom_link'        => $this->input->post('zoom_link', TRUE),
+                'status'           => $this->input->post('status', TRUE),
                 'updated_at'       => date('Y-m-d H:i:s'),
 
                 'student_limit'  => $this->input->post('student_limit'),

@@ -54,8 +54,7 @@
                                 </label>
                             </th>
                             <th width="80">Photo</th>
-                            <th>Name</th>
-                            <th>Email</th>
+                            <th>Name & Email</th>                            
                             <th>GMC-Exam-Date</th>
                             <th>Number</th>
                             <th>Phone</th>
@@ -71,8 +70,14 @@
                             <tr>
                                 <td><label><?= $options . ' ' . sprintf('%02d', ++$start); ?></label></td>
                                 <td><?php echo getPhoto_v3($student->photo, $student->gender, $student->fname, 60, 60); ?></td>
-                                <td><?php echo "{$student->fname} {$student->mname} {$student->lname}"; ?></td>
-                                <td> <?= $student->email ?> </td>
+                                <td><?php                                     
+                                        echo anchor(
+                                            site_url(Backend_URL . 'student/read/' . $student->id),
+                                            "{$student->fname} {$student->mname} {$student->lname}" . ' <i class="fa fa-fw fa-external-link"></i>',
+                                            'target="_blank"'
+                                        ); ?><br/>
+                                    <?= $student->email ?> 
+                                </td>                                
                                 <td><?php echo globalDateFormat($student->exam_date); ?></td>
                                 <td><?php echo "{$student->number_type}-{$student->gmc_number}"; ?></td>
                                 <td>
@@ -94,11 +99,7 @@
                                 </td>
                                 <td class="text-center hide_on_print">
                                     <?php
-                                    echo anchor(
-                                        site_url(Backend_URL . 'student/read/' . $student->id),
-                                        '<i class="fa fa-fw fa-external-link"></i> Preview',
-                                        'class="btn btn-xs btn-primary" target="_blank"'
-                                    );
+                                    
                                     if ($student->exam_status == 'Enrolled') {
                                         ?>
                                         <span class="btn  btn-xs btn-danger"
@@ -112,6 +113,15 @@
                                       Canceled
                                     </span>
                                     <?php } ?>
+
+
+                                    <?php 
+                                        echo anchor(
+                                            site_url(Backend_URL . 'student/login/' . $student->id), 
+                                            '<i class="fa fa-fw fa-gear"></i> Login', 
+                                            'class="btn btn-xs btn-info" target="_blank"'
+                                        ); 
+                                    ?>
                                 </td>
                             </tr>
                         <?php } ?>
