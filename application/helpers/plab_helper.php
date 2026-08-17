@@ -455,7 +455,7 @@ function refundAmount($price, $days_left)
 
 function timeToSec($time)
 {
-    $totalSeconds = $time * 60;
+    $totalSeconds = intval($time) * 60;
     $minutes      = str_pad(intval($totalSeconds / 60), 2, '0', STR_PAD_LEFT);
     $seconds      = str_pad(intval($totalSeconds % 60), 2, '0', STR_PAD_LEFT);
     return "{$minutes}:{$seconds}";

@@ -316,6 +316,15 @@
         </div>
 
     </div>
+
+    <!-- Close button for popup window (hidden unless opened as a popup) -->
+    <div class="row" id="closePopupRow" style="display: none;">
+        <div class="col-md-12 text-center" style="padding: 30px 0;">
+            <button type="button" class="btn btn-danger" onclick="closeScenarioPopup()">
+                <i class="fa fa-times"></i> Close Window
+            </button>
+        </div>
+    </div>
 </div>
 
 <!-- Change Time Modal -->
@@ -413,6 +422,18 @@
 </div>
 
 <script type="application/javascript">
+
+    // Show the close button only when this page was opened as a popup window,
+    // then let the visitor close it with the JS button (browser X icon also works).
+    document.addEventListener('DOMContentLoaded', function () {
+        if (window.opener && !window.opener.closed) {
+            document.getElementById('closePopupRow').style.display = 'block';
+        }
+    });
+
+    function closeScenarioPopup() {
+        window.close();
+    }
 
     $('#tabs').find('li:first-child').addClass('active');
     $('#tab-content').find('div.tab-pane:first-child').addClass('active');

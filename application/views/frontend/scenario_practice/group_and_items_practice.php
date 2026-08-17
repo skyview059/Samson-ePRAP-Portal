@@ -300,6 +300,10 @@
             return;
         }
 
+        // open the popup synchronously within the click gesture so the browser
+        // does not block it; the practice URL is set once the AJAX call returns
+        const popup = openScenarioPopup('about:blank');
+
         $.ajax({
             url       : '<?= site_url('scenario-practice/generate-practice-url'); ?>',
             type      : "POST",
@@ -318,13 +322,43 @@
                 toastr.clear();
                 if (response.status === 'success') {
                     toastr.success(response.message);
-                    window.location.href = response.url;
+                    if (popup) {
+                        popup.location.href = response.url;
+                        popup.focus();
+                    } else {
+                        // popup blocked, fall back to normal navigation
+                        window.location.href = response.url;
+                    }
                 } else {
                     toastr.error(response.message);
+                    if (popup) {
+                        popup.close();
+                    }
+                }
+            },
+            error     : function () {
+                toastr.clear();
+                toastr.error('Something went wrong, please try again');
+                if (popup) {
+                    popup.close();
                 }
             }
         });
     });
+
+    // open scenario item in a centered popup window so the visitor can close it
+    // without leaving this listing page
+    function openScenarioPopup(url) {
+        const width  = Math.round(window.screen.availWidth * 0.8);
+        const height = Math.round(window.screen.availHeight * 0.8);
+        const left   = (window.screen.availWidth - width) / 2;
+        const top    = (window.screen.availHeight - height) / 2;
+
+        const features = 'popup=yes,scrollbars=yes,resizable=yes' +
+            ',width=' + width + ',height=' + height + ',left=' + left + ',top=' + top;
+
+        return window.open(url, 'scenarioPracticeItem', features);
+    }
 
 
     // Start of the change time & role scripts

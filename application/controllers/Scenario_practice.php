@@ -603,7 +603,8 @@ class Scenario_practice extends Frontend_controller
             'feedback_time' => $timeData->feedbackTime ?? '0',
             'total_time'    => $timeData->totalTime ?? '0',
         ];
-        $this->viewFrontContent('frontend/scenario_practice/practice_details', $data_array);
+        // $this->viewFrontContent('frontend/scenario_practice/practice_details', $data_array);
+        $this->viewReadingMode('frontend/scenario_practice/practice_details', $data_array);
     }
 
     public function itemDetails($exam_id, $item_id)
