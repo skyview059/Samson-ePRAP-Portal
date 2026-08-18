@@ -48,12 +48,14 @@ class Admin_controller extends MX_Controller {
         return ($user && $user->status == 'Active' && password_verify($password, $user->password)) ? true : false;
     }
 
-    private function check_access( $string = 'dashboard'){
-        // $backend_uri = 'admin'; // prefix no need to touch        
-        $controller = empty($this->uri->segment(2)) ? $string : $this->uri->segment(2);       
-        $method     = empty($this->uri->segment(3)) ? '' : '/'.$this->uri->segment(3);        
-        $access_key = $controller . $method;        
+    private function check_access( string $access_key ){         
         return $this->acls->checkPermission($access_key, $this->role_id);
+    }
+    private function autoMatchAccessKey(){
+        // $backend_uri = 'admin'; // prefix no need to touch        
+        $controller = empty($this->uri->segment(2)) ? 'dashboard' : $this->uri->segment(2);       
+        $method     = empty($this->uri->segment(3)) ? '' : '/'.$this->uri->segment(3);        
+        return "{$controller}{$method}";        
     }
     
     private function set_admin_prefix( $string = '/'){
@@ -62,20 +64,24 @@ class Admin_controller extends MX_Controller {
         };
     }	         
 
-    public function viewAdminContent($view, $data = []){
+    public function viewAdminContent(string $view, $data = []){
         if( $this->input->is_ajax_request() ){
             $this->load->view($view, $data);        
         } else {
             $this->load->view('backend/layout/header');
-            $this->load->view('backend/layout/sidebar'); 
-            if( $this->check_access( $view ) ){                
+            $this->load->view('backend/layout/sidebar');             
+            
+            $pram_key = $this->autoMatchAccessKey();
+            if( $this->check_access( $pram_key ) ){                
                 $this->load->view($view, $data);    
-            } else {
-                $this->load->view('backend/restrict');    
+            } else {                
+                $this->load->view('backend/restrict', [
+                    'pram_key'=> $pram_key 
+                ]);    
             }
             $this->load->view('backend/layout/footer');
-        }  				       
-    }   
+        }
+    }
     
     protected function _get_course_names( $prefix = 'exam'){
         

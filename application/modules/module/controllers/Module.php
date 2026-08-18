@@ -40,15 +40,15 @@ class Module extends Admin_controller{
         $row = $this->Module_model->get_by_id($id);
         if ($row) {
             $data = array(
-		'id' => $row->id,
-		'added_date' => $row->added_date,
-		'order' => $row->order,
-		'type' => $row->type,
-		'name' => $row->name,
-		'folder' => $row->folder,
-		'description' => $row->description,
-		'status' => $row->status,
-	    );
+                'id' => $row->id,
+                'added_date' => $row->added_date,
+                'order' => $row->order,
+                'type' => $row->type,
+                'name' => $row->name,
+                'folder' => $row->folder,
+                'description' => $row->description,
+                'status' => $row->status,
+            );
             $this->viewAdminContent('module/module/view', $data);
         } else {
             $this->session->set_flashdata('message', 'Record Not Found');
@@ -60,11 +60,11 @@ class Module extends Admin_controller{
         $data = array(
             'button' 		=> 'Add',
             'action' 		=> site_url( Backend_URL . 'module/create_action'),
-            'id' 		=> set_value('id'),
+            'id' 		    => set_value('id'),
             'added_date' 	=> set_value('added_date'),
             'order' 		=> set_value('order'),
-            'type' 		=> set_value('type'),
-            'name' 		=> set_value('name'),
+            'type' 		    => set_value('type'),
+            'name' 		    => set_value('name'),
             'folder' 		=> set_value('folder'),
             'description' 	=> set_value('description'),
             'status' 		=> set_value('status'),

@@ -5,7 +5,8 @@
             <?php              
                 // General
                 echo add_main_menu('Dashboard', 'admin', 'dashboard', 'fa-dashboard');                
-                echo Modules::run('assess/_menu');
+                echo Modules::run('assess/_menu');                
+                echo add_main_menu('SCA Feedback', 'feedback', 'feedback', 'fa-commenting-o');       
                 
                 echo Modules::run('course/_menu');
                 echo add_main_menu('Promo Codes', 'admin/promocodes', 'promocodes', 'fa-gift');

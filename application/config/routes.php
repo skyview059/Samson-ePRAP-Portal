@@ -46,6 +46,7 @@ require_once(ModuleRoutePrefix . 'development_plan' . ModuleRouteSuffix);
 require_once(ModuleRoutePrefix . 'personal_dev_plan' . ModuleRouteSuffix);
 require_once(ModuleRoutePrefix . 'message' . ModuleRouteSuffix);
 require_once(ModuleRoutePrefix . 'assess' . ModuleRouteSuffix);
+require_once(ModuleRoutePrefix . 'feedback' . ModuleRouteSuffix);
 require_once(ModuleRoutePrefix . 'progression' . ModuleRouteSuffix);
 require_once(ModuleRoutePrefix . 'file' . ModuleRouteSuffix);
 require_once(ModuleRoutePrefix . 'doctor' . ModuleRouteSuffix);

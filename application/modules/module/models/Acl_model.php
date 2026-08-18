@@ -38,7 +38,7 @@ class Acl_model extends Fm_model {
         $count = $this->db->from('role_permissions')
                 ->join('acls', 'acls.id = role_permissions.acl_id', 'left')
                 ->where('role_id', (int) $role_id)
-                ->where('permission_key',$access_key)			
+                ->where('permission_key', $access_key)			
                 ->count_all_results();  
         $this->db->cache_off();
         return $count;    
