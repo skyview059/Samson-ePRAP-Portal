@@ -65,7 +65,8 @@
                         </thead>
                         <tbody>
                         <?php foreach ($students as $student) {
-                            $options = "<input name='students[]' value='{$student->id}' class='mark' type='checkbox'/>";
+                            $options    = "<input name='students[]' value='{$student->id}' class='mark' type='checkbox'/>";
+                            $exam_link  = "exam_schedule_id={$id}&number_type={$student->number_type}&gmc={$student->gmc_number}";
                             ?>
                             <tr>
                                 <td><label><?= $options . ' ' . sprintf('%02d', ++$start); ?></label></td>
@@ -114,7 +115,6 @@
                                     </span>
                                     <?php } ?>
 
-
                                     <?php 
                                         echo anchor(
                                             site_url(Backend_URL . 'student/login/' . $student->id), 
@@ -122,6 +122,13 @@
                                             'class="btn btn-xs btn-info" target="_blank"'
                                         ); 
                                     ?>
+                
+                                    <p style="margin-top: 5px;">
+                                        <a class="btn btn-primary btn-xs" href="<?= site_url(Backend_URL . 'assess/search_student?' . $exam_link ) ?>" target="_blank">
+                                            Open Exam View
+                                            <i class="fa fa-fw fa-external-link"></i>
+                                        </a>
+                                    </p>
                                 </td>
                             </tr>
                         <?php } ?>
