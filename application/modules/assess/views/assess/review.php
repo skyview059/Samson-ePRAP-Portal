@@ -199,6 +199,9 @@
 
                                             </div>
                                         </div>
+                                        <div class="text-right">
+                                            <button type="button" class="btn btn-info next-step" data-next="#collapseTwo">Next Step <i class="fa fa-arrow-circle-down"></i></button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -244,6 +247,9 @@
                                                     <?php echo form_error('face') ?>
                                                 </div>
                                             </div>
+                                        </div>
+                                        <div class="text-right">
+                                            <button type="button" class="btn btn-info next-step" data-next="#collapseThree">Next Step <i class="fa fa-arrow-circle-down"></i></button>
                                         </div>
                                     </div>
                                 </div>
@@ -334,6 +340,9 @@
                                                     </tbody>
                                                 </table>
                                             </div>
+                                        </div>
+                                        <div class="text-right">
+                                            <button type="button" class="btn btn-info next-step" data-next="#collapseFour">Next Step <i class="fa fa-arrow-circle-down"></i></button>
                                         </div>
                                     </div>
                                 </div>
@@ -462,6 +471,9 @@
                                             <?php endif; ?>
                                             </div>
                                         </div>
+                                        <div class="text-right">
+                                            <button type="button" class="btn btn-info next-step" data-next="#collapseFive">Next Step <i class="fa fa-arrow-circle-down"></i></button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -494,6 +506,9 @@
                                                     </div>
                                                 </div>
                                             </div>
+                                        </div>
+                                        <div class="text-right">
+                                            <button type="button" class="btn btn-info next-step" data-next="#collapseSix">Next Step <i class="fa fa-arrow-circle-down"></i></button>
                                         </div>
                                     </div>
                                 </div>
@@ -538,7 +553,25 @@
 </section>
 <script>
     $(document).ready(function (){
-        
+
+        //Next Step: close the current section and open the following one
+        $('.next-step').on('click', function (){
+            var next = $($(this).data('next'));
+            next.one('shown.bs.collapse', function (){
+                $('html, body').animate({scrollTop: $(this).closest('.panel').offset().top - 10}, 300);
+            });
+            $(this).closest('.panel-collapse').collapse('hide');
+            next.collapse('show');
+        });
+
+        //After a failed submit, open the first section that contains a validation error
+        var error_panel = $('#accordion .panel-collapse').has('span.text-danger').first();
+        if (error_panel.length && !error_panel.hasClass('in')) {
+            $('#accordion .panel-collapse.in').collapse('hide');
+            error_panel.collapse('show');
+        }
+
+
         $('input[type=radio][name=technical_skills], input[type=radio][name=clinical_skills], input[type=radio][name=interpersonal_skills]').on('ifChecked', function(event){
             var total_mark = 0;
             var t_skill_mark = $("input[name=technical_skills]:checked").val();

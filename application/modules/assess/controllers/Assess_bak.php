@@ -4,7 +4,7 @@
  * Date : 2020-06-11
  */
 
-class Assess extends Admin_controller{
+class Assess_bak extends Admin_controller{
     function __construct(){
         parent::__construct();
         $this->load->model('Assess_model');
@@ -146,10 +146,28 @@ class Assess extends Admin_controller{
             }
             
             $result_detail_id = ($result_details) ? $result_details->id : $result_detail_id;
-
-            //Steps 1-6 are skipped: the review page carries the full assessment form now
-            redirect(site_url(Backend_URL . 'assess/review/' . $result_detail_id));
-
+            
+            //Get Student Exam Details Data By result_detail_id
+            $result_data = $this->Assess_model->getResultDetailsById($result_detail_id);
+            
+            $data = array(
+                'button' => 'Update',
+                'action' => site_url(Backend_URL . 'assess/initial_approach_action'),
+                'exam_info' => $exam_info,
+                'exam_type' => $exam_info->exam_type,
+                'result_detail_id' => set_value('result_detail_id', $result_detail_id),
+                'patient_name' => set_value('patient_name', $result_data->patient),
+                'greet_the_patient' => set_value('greet_the_patient', $result_data->greet_the_patient),
+                'introduces_himself' => set_value('introduces_himself', $result_data->introduces_himself),
+                'state_the_role' => set_value('state_the_role', $result_data->state_the_role),
+                'name_preference' => set_value('name_preference', $result_data->name_preference),
+                'starts_station_well' => set_value('starts_station_well', $result_data->starts_station_well),
+                'welcomes_patient' => set_value('welcomes_patient', $result_data->welcomes_patient),
+                'starts_with_open_end' => set_value('starts_with_open_end', $result_data->starts_with_open_end),
+                'summery_std_scen' => Tools::getStudentNameByResultID( $result_detail_id )
+            );
+            $this->viewAdminContent('assess/assess/initial_approach', $data);
+            
         } else {
             
             $this->session->set_flashdata('msge', 'The exam you are trying to access doesn\'t exists!!');
@@ -511,7 +529,7 @@ class Assess extends Admin_controller{
             $this->viewAdminContent('assess/assess/review', $data);
         } else {
             $this->session->set_flashdata('msge', 'The exam you are trying to access doesn\'t exists!!');
-            redirect(site_url(Backend_URL . 'assess/search_student'));
+            redirect(site_url(Backend_URL . 'assess/review/' . $result_detail_id));
         }
         
         

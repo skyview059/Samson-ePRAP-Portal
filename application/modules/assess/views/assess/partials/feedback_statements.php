@@ -50,7 +50,7 @@
                     <?php echo html_escape($statement->subject); ?>
                 </label>
                 <?php if ( ! empty($statement->description)): ?>
-                    <a class="fb-notes-toggle" href="javascript:void(0);" data-target="#statement_notes_<?php echo $statement->id; ?>"><i class="fa fa-info-circle"></i> notes</a>
+                    <a class="fb-notes-toggle" href="javascript:void(0);" data-target="#statement_notes_<?php echo $statement->id; ?>"><i class="fa fa-chevron-down"></i></a>
                     <div class="fb-notes" id="statement_notes_<?php echo $statement->id; ?>">
                         <?php echo $statement->description; ?>
                     </div>
@@ -65,6 +65,7 @@
     $(document).ready(function () {
         // Educator notes of a feedback statement (sca_feedback_statements.description)
         $(document).on('click', '.fb-notes-toggle', function () {
+            $(this).find('i').toggleClass('fa-chevron-down fa-chevron-up');
             $($(this).data('target')).slideToggle(150);
         });
     });
