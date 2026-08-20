@@ -40,7 +40,7 @@
                                     ?>
                                     <tr>
                                         <td><?php echo ++$start; ?></td>
-                                        <td><?php echo $name->name; ?></td>
+                                        <td><?php echo "{$name->name}  <small class='text-light-blue'>({$name->exam_type})</small>"; ?></td>
                                         <td class="text-center">
                                             <a href="admin/centre?id=<?php echo $name->id; ?>">
                                                 <?php echo Tools::getCentres($name->id); ?>
@@ -113,7 +113,18 @@
                                 <input type="text" class="form-control" name="name" id="name" placeholder="Name" />
                             </div>
                             <div class="form-group">
-                                <button type="submit" class="btn btn-primary">Save New</button> 
+                                <label>Exam Type</label>
+                                <div>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="exam_type" value="PLAB Part 2" checked /> PLAB Part 2
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="exam_type" value="SCA" /> SCA
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-primary">Save New</button>
                                 <button type="reset" class="btn btn-default">Reset</button> 
                             </div>
                         <?php echo form_close(); ?>

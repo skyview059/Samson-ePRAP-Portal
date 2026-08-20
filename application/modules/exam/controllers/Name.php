@@ -42,7 +42,8 @@ class Name extends Admin_controller{
             'button' => 'Create',
             'action' => site_url( Backend_URL . 'exam/name/create_action'),
 	    'id' => set_value('id'),
-	    'name' => set_value('name')
+	    'name' => set_value('name'),
+	    'exam_type' => set_value('exam_type', 'PLAB Part 2')
 	);
         $this->viewAdminContent('exam/name/create', $data);
     }    
@@ -56,6 +57,7 @@ class Name extends Admin_controller{
         } else {
             $data = array(
 		'name' => $this->input->post('name',TRUE),
+		'exam_type' => $this->input->post('exam_type',TRUE),
 		'created_at' => date('Y-m-d H:i:s'),
 		'updated_at' => date('Y-m-d H:i:s'),
 	    );
@@ -74,7 +76,8 @@ class Name extends Admin_controller{
                 'button' => 'Update',
                 'action' => site_url( Backend_URL . 'exam/name/update_action'),
 		'id' => set_value('id', $row->id),
-		'name' => set_value('name', $row->name)
+		'name' => set_value('name', $row->name),
+		'exam_type' => set_value('exam_type', $row->exam_type)
 	    );
             $this->viewAdminContent('exam/name/update', $data);
         } else {
@@ -92,6 +95,7 @@ class Name extends Admin_controller{
         } else {
             $data = array(
 		'name' => $this->input->post('name',TRUE),
+		'exam_type' => $this->input->post('exam_type',TRUE),
 		'updated_at' => date('Y-m-d H:i:s'),
 	    );
 
@@ -116,6 +120,7 @@ class Name extends Admin_controller{
 
     public function _rules(){
 	$this->form_validation->set_rules('name', 'name', 'trim|required');
+	$this->form_validation->set_rules('exam_type', 'exam type', 'trim|required|in_list[PLAB Part 2,SCA]');
 
 	$this->form_validation->set_rules('id', 'id', 'trim');
 	$this->form_validation->set_error_delimiters('<span class="text-danger">', '</span>');

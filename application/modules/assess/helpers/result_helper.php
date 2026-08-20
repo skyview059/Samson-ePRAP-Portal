@@ -132,3 +132,78 @@ function getFace( $str = 'Smiley'){
     }
     return $img;
 }
+
+/* ------------------------------------------------------------------
+ * SCA result report helpers (used by assess/result/details_sca)
+ * ------------------------------------------------------------------ */
+
+/**
+ * SCA marking domains: result_details column => label + max score per station.
+ * Max values mirror the radio scales in assess/quantitative_feedback.php (SCA branch).
+ */
+function sca_domains()
+{
+    return array(
+        'technical_skills'     => array('label' => 'Data gathering & diagnosis',       'max' => 3),
+        'clinical_skills'      => array('label' => 'Clinical management & complexity', 'max' => 4.5),
+        'interpersonal_skills' => array('label' => 'Relating to others',               'max' => 3),
+    );
+}
+
+/**
+ * SCA grade buckets in display order, with the colours shared by charts and badges.
+ */
+function sca_grades()
+{
+    return array(
+        'CF' => array('label' => 'Clear fail', 'short' => 'CF', 'color' => '#c0392b'),
+        'F'  => array('label' => 'Fail',       'short' => 'F',  'color' => '#e0842b'),
+        'P'  => array('label' => 'Pass',       'short' => 'P',  'color' => '#a9a92e'),
+        'CP' => array('label' => 'Clear pass', 'short' => 'CP', 'color' => '#4caf50'),
+    );
+}
+
+/**
+ * Map a stored domain score onto a grade key (CF / F / P / CP).
+ * Clinical management uses a 0-4.5 scale where 1, 2, 2.5 are fails and 3, 3.5 are passes.
+ */
+function sca_grade_key($domain, $score)
+{
+    $score = (float) $score;
+    if ($domain == 'clinical_skills') {
+        if ($score <= 0)  return 'CF';
+        if ($score < 3)   return 'F';
+        if ($score < 4.5) return 'P';
+        return 'CP';
+    }
+    if ($score <= 0) return 'CF';
+    if ($score < 2)  return 'F';
+    if ($score < 3)  return 'P';
+    return 'CP';
+}
+
+/**
+ * Coloured dot + "P – Pass" style label for a grade key.
+ */
+function sca_grade_badge($grade_key)
+{
+    $grades = sca_grades();
+    $g = isset($grades[$grade_key]) ? $grades[$grade_key] : $grades['CF'];
+    return '<span class="sca-dot" style="background:' . $g['color'] . '"></span>'
+         . '<span class="sca-grade-text">' . $g['short'] . ' &ndash; ' . $g['label'] . '</span>';
+}
+
+/**
+ * Pill badge for the per-station overall judgment (Pass / Bare Pass / Bare Fail / Fail).
+ */
+function sca_judgment_badge($judgment)
+{
+    if (empty($judgment)) {
+        return '<span class="sca-pill sca-pill-muted">No judgment</span>';
+    }
+    $class = (stripos($judgment, 'fail') !== false) ? 'sca-pill-fail' : 'sca-pill-pass';
+    if (stripos($judgment, 'bare') !== false) {
+        $class .= ' sca-pill-bare';
+    }
+    return '<span class="sca-pill ' . $class . '">' . html_escape($judgment) . '</span>';
+}

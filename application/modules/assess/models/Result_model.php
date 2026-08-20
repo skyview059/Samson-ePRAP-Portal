@@ -84,7 +84,7 @@ class Result_model extends Fm_model {
             return array();
         }
 
-        $this->db->select('rdfs.result_detail_id, d.name as domain_name, st.sl_no, st.subject');
+        $this->db->select('rdfs.result_detail_id, st.id as statement_id, d.id as domain_id, d.name as domain_name, d.sort_order as domain_sort_order, st.sl_no, st.subject, st.description');
         $this->db->from('result_detail_feedback_statements as rdfs');
         $this->db->join('sca_feedback_statements as st', 'st.id=rdfs.statement_id', 'inner');
         $this->db->join('sca_feedback_domains as d', 'd.id=st.domain_id', 'inner');

@@ -25,9 +25,22 @@
                         <?php echo form_error('name') ?>
                     </div>
                 </div>
-                
+
                 <div class="form-group">
-                    <div class="col-sm-4 col-md-offset-2">   
+                    <label class="col-sm-2 control-label">Exam Type :</label>
+                    <div class="col-sm-4">
+                        <label class="radio-inline">
+                            <input type="radio" name="exam_type" value="PLAB Part 2" <?php echo ($exam_type == 'PLAB Part 2') ? 'checked' : ''; ?> /> PLAB Part 2
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" name="exam_type" value="SCA" <?php echo ($exam_type == 'SCA') ? 'checked' : ''; ?> /> SCA
+                        </label>
+                        <?php echo form_error('exam_type') ?>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-sm-4 col-md-offset-2">
                         <input type="hidden" name="id" value="<?php echo $id; ?>" /> 
                         <button type="submit" class="btn btn-primary"><?php echo $button ?></button> 
                         <a href="<?php echo site_url(Backend_URL . 'exam/name') ?>" class="btn btn-default">Cancel</a>

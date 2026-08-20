@@ -93,7 +93,7 @@ class Result extends Admin_controller {
     {
 
         $results = $this->Result_model->get_result($student_id,$sch_id);
-//        dd($results);
+    //    dd($results);
         
         $total_score = $total_pass_mark = $passed_station = 0;
         
@@ -125,9 +125,119 @@ class Result extends Admin_controller {
             's_id'              => $student_id,
             'es_id'             => $sch_id,
             'passing_criteria_str'    => nl2br_fk($passing_criteria_str)
-        ); 
-                
-        $this->viewAdminContent('assess/result/details', $data);
+        );
+
+        if($results->exam_type == 'SCA'){
+            $data['sca'] = $this->_sca_report($results);
+            $this->viewAdminContent('assess/result/details_sca', $data);
+        } else {
+            $this->viewAdminContent('assess/result/details_plab', $data);
+        }
+    }
+
+    /**
+     * Aggregates an SCA result into the three blocks the report page renders:
+     * per-domain grade distribution, feedback statements ranked by how often
+     * they were selected, and one entry per assessed case.
+     */
+    private function _sca_report($results)
+    {
+        $domains  = sca_domains();
+        $grades   = sca_grades();
+        $stations = count($results->details);
+
+        $domain_stats = array();
+        foreach ($domains as $key => $d) {
+            $domain_stats[$key] = array(
+                'label'  => $d['label'],
+                'score'  => 0,
+                'max'    => $d['max'] * $stations,
+                'counts' => array_fill_keys(array_keys($grades), 0),
+            );
+        }
+
+        $statements = array();   // statement_id => aggregate
+        $cases      = array();
+        $sl         = 0;
+
+        foreach ($results->details as $rd) {
+            $case_grades = array();
+            $total       = 0;
+            foreach ($domains as $key => $d) {
+                $score     = (float) $rd->$key;
+                $grade_key = sca_grade_key($key, $score);
+                $total    += $score;
+                $domain_stats[$key]['score'] += $score;
+                $domain_stats[$key]['counts'][$grade_key]++;
+                $case_grades[$key] = array(
+                    'label' => $d['label'],
+                    'score' => $score,
+                    'max'   => $d['max'],
+                    'grade' => $grade_key,
+                );
+            }
+
+            $case_statements = array();
+            if ( ! empty($rd->feedback_statements)) {
+                foreach ($rd->feedback_statements as $domain_name => $rows) {
+                    foreach ($rows as $row) {
+                        $case_statements[] = $row;
+                        if ( ! isset($statements[$row->statement_id])) {
+                            $statements[$row->statement_id] = array(
+                                'statement_id'      => $row->statement_id,
+                                'subject'           => $row->subject,
+                                'description'       => $row->description,
+                                'domain'            => $domain_name,
+                                'domain_sort_order' => (int) $row->domain_sort_order,
+                                'sl_no'             => (int) $row->sl_no,
+                                'count'             => 0,
+                                'cases'             => array(),
+                            );
+                        }
+                        $statements[$row->statement_id]['count']++;
+                        $statements[$row->statement_id]['cases'][] = $rd->name;
+                    }
+                }
+            }
+
+            $cases[] = (object) array(
+                'sl'                => ++$sl,
+                'id'                => $rd->id,
+                'name'              => $rd->name,
+                'grades'            => $case_grades,
+                'total'             => $total,
+                'pass_mark'         => (float) $rd->pass_mark,
+                'result'            => ($total >= $rd->pass_mark) ? 'Pass' : 'Fail',
+                'overall_judgment'  => $rd->overall_judgment,
+                'examiner_comments' => $rd->examiner_comments,
+                'statements'        => $case_statements,
+            );
+        }
+
+        // Most frequently selected first; ties keep the RCGP domain / statement order.
+        usort($statements, function ($a, $b) {
+            if ($a['count'] != $b['count']) {
+                return $b['count'] - $a['count'];
+            }
+            if ($a['domain_sort_order'] != $b['domain_sort_order']) {
+                return $a['domain_sort_order'] - $b['domain_sort_order'];
+            }
+            return $a['sl_no'] - $b['sl_no'];
+        });
+
+        $max_per_station = 0;
+        foreach ($domains as $d) {
+            $max_per_station += $d['max'];
+        }
+
+        return array(
+            'stations'   => $stations,
+            'max_score'  => $max_per_station * $stations,
+            'domains'    => $domain_stats,
+            'grades'     => $grades,
+            'statements' => $statements,
+            'cases'      => $cases,
+        );
     }
 
     public function generate()
