@@ -106,9 +106,7 @@ $stations  = (int) $sca['stations'];
 <div class="sca-report">
 
     <h1 class="sca-title">Exam Results</h1>
-    <div class="sca-back">
-        <a href="<?php echo site_url(Backend_URL . 'assess/result?id=' . $es_id) ?>">&larr; Results</a>
-    </div>
+    
 
     <!-- ================= Overall summary ================= -->
     <div class="sca-card">
@@ -124,18 +122,20 @@ $stations  = (int) $sca['stations'];
         <div class="sca-summary">
             <div>Total score: <strong><?php echo $fmt_score($total_score); ?></strong> out of <strong><?php echo $fmt_max($sca['max_score']); ?></strong></div>
             <div>Pass mark: <strong><?php echo $fmt_score($req_pass_mark); ?></strong></div>
-            <div>Stations passed: <strong><?php echo (int) $passed_station; ?></strong> of <strong><?php echo $stations; ?></strong> (minimum <?php echo (int) $results->pass_station; ?>)</div>
+            <!-- <div>Stations passed: <strong><?php // echo (int) $passed_station; ?></strong> of <strong><?php echo $stations; ?></strong> (minimum <?php echo (int) $results->pass_station; ?>)</div> -->
             <div>Result: <strong class="<?php echo ($pass_or_fail == 'Pass') ? 'sca-result-pass' : 'sca-result-fail'; ?>"><?php echo ($pass_or_fail == 'Pass') ? 'Passed' : 'Failed'; ?></strong></div>
         </div>
 
-        <?php if ( ! empty($passing_criteria_str)) { ?>
+        <!-- 
+        <?php /* if ( ! empty($passing_criteria_str)) { ?>
             <p class="sca-criteria"><?php echo $passing_criteria_str; ?></p>
-        <?php } ?>
+        <?php } */ ?> 
+        -->
 
         <ul class="sca-anchors">
-            <li><a href="#domain-grades">Domain Grades</a></li>
-            <li><a href="#feedback-statements">Feedback Statements</a></li>
-            <li><a href="#individual-feedback">Individual Feedback</a></li>
+            <li><a href="<?php echo current_url(); ?>#domain-grades">Domain Grades</a></li>
+            <li><a href="<?php echo current_url(); ?>#feedback-statements">Feedback Statements</a></li>
+            <li><a href="<?php echo current_url(); ?>#individual-feedback">Individual Feedback</a></li>
         </ul>
     </div>
 
@@ -206,7 +206,7 @@ $stations  = (int) $sca['stations'];
     <?php foreach ($sca['cases'] as $case) { ?>
         <div class="sca-card sca-case" id="result_details_id_<?php echo $case->id; ?>">
             <div class="sca-case-head">
-                <h3><?php echo sprintf('%02d', $case->sl); ?>. <?php echo html_escape($case->name); ?></h3>
+                <h3><?php echo html_escape($case->name); ?></h3>
                 <div class="sca-case-badges">
                     <span class="sca-pill <?php echo ($case->result == 'Pass') ? 'sca-pill-pass' : 'sca-pill-fail'; ?>"><?php echo $case->result; ?></span>
                     <?php echo sca_judgment_badge($case->overall_judgment); ?>
@@ -217,14 +217,14 @@ $stations  = (int) $sca['stations'];
                 <?php foreach ($case->grades as $g) { ?>
                     <div class="sca-g-domain"><?php echo $g['label']; ?></div>
                     <div class="sca-g-grade"><?php echo sca_grade_badge($g['grade']); ?></div>
-                    <div class="sca-g-score"><?php echo $fmt_score($g['score']); ?> / <?php echo $fmt_max($g['max']); ?></div>
+                    <div class="sca-g-score"><?php // echo $fmt_score($g['score']) . '/'.  $fmt_max($g['max']); ?></div>
                 <?php } ?>
             </div>
 
-            <div class="sca-marks">
+            <!-- <div class="sca-marks">
                 <div>Total mark: <strong><?php echo $fmt_score($case->total); ?></strong></div>
                 <div>Pass mark: <strong><?php echo $fmt_score($case->pass_mark); ?></strong></div>
-            </div>
+            </div> -->
 
             <?php if (empty($case->statements)) { ?>
                 <div class="sca-case-fb" style="cursor:default">
@@ -244,14 +244,14 @@ $stations  = (int) $sca['stations'];
             <?php } ?>
 
             <div class="sca-comments">
-                <strong>Examiner&rsquo;s comments</strong>
+                <strong >Examiner&rsquo;s comments</strong>
                 <?php echo ! empty($case->examiner_comments) ? nl2br_fk(html_escape($case->examiner_comments)) : '<span class="sca-empty">No comments.</span>'; ?>
             </div>
         </div>
     <?php } ?>
 
     <div class="sca-footer">
-        <a href="admin/assess/result/download/<?= "{$s_id}/{$es_id}"; ?>" class="btn btn-lg btn-info">
+        <a href="admin/assess/result/download/<?= "{$s_id}/{$es_id}"; ?>" class="btn btn-lg text-white btn-primary">
             <i class="fa fa-fw fa-download"></i>
             Download
         </a>
