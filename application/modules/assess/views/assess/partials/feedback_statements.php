@@ -12,7 +12,7 @@
 .fb-domain > h2 { font-size: 20px; margin-bottom: 10px; }
 .fb-standard { margin-bottom: 15px; }
 .fb-standard ul { padding-left: 18px; margin-bottom: 0; }
-.fb-statement-row { padding: 7px 0; border-bottom: 1px solid #f4f4f4; }
+.fb-statement-row { padding: 7px 0; font-size: 16px; border-bottom: 1px solid #f4f4f4; }
 .fb-statement-row:last-child { border-bottom: 0; }
 .fb-statement { font-weight: normal; margin: 0; cursor: pointer; }
 .fb-statement input[type="checkbox"] { margin-right: 8px; }
