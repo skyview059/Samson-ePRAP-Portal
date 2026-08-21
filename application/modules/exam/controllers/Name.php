@@ -25,6 +25,8 @@ class Name extends Admin_controller{
         $config['total_rows'] = $this->Name_model->total_rows();
         $names = $this->Name_model->get_limit_data($config['per_page'], $start);
 
+        // dd($names);
+
         $this->load->library('pagination');
         $this->pagination->initialize($config);
 

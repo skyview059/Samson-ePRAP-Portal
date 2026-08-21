@@ -11,12 +11,12 @@ class Tools {
     
     private static $ci;
 
-    function __construct()
+    public function __construct()
     {
         self::$ci =& get_instance();
     }
 
-    static public function getExam($selected = 0, $label = '--Select Exam--')
+    public static function getExam($selected = 0, $label = '--Select Exam--')
     {
         
         self::$ci->db->select('id,name');
@@ -30,7 +30,7 @@ class Tools {
         }
         return $options;
     }
-    static public function getExamName($exam_id = 0 )
+    public static function getExamName($exam_id = 0 )
     {        
         self::$ci->db->select('name');
         self::$ci->db->where('id', $exam_id );        
@@ -38,23 +38,23 @@ class Tools {
         return ($exam) ?  $exam->name : 'Unknown';
     }
     
-    static public function getCentres($id = 0)
+    public static function getCentres($id = 0)
     {              
         self::$ci->db->where('exam_id', $id);
         return self::$ci->db->count_all_results('exam_centres');
     }
-    static public function getSchedules($id = 0)
+    public static function getSchedules($id = 0)
     {              
         self::$ci->db->where('exam_id', $id);
         return self::$ci->db->count_all_results('exam_schedules');
     }
-    static public function getPractieSchedules($id = 0)
+    public static function getPractieSchedules($id = 0)
     {              
         self::$ci->db->where('practice_id', $id);
         return self::$ci->db->count_all_results('practice_schedules');
     }
     
-    static function fixPrimaryKey(){        
+    public static function fixPrimaryKey(){        
         self::$ci->db->query( 'SET @newid=0;' );
         self::$ci->db->query( 'UPDATE `personal_dev_plans` SET id=(@newid:=@newid+1) ORDER BY id;' );
         $row = self::$ci->db->select( 'id')->order_by('id','DESC')->get('personal_dev_plans')->row();
@@ -62,7 +62,7 @@ class Tools {
         self::$ci->db->query( "ALTER TABLE `personal_dev_plans` AUTO_INCREMENT = {$max};" );        
     }
     
-    static public function getStudentSingleScenarioExamStatus($es_id, $std_id, $scen_id )
+    public static function getStudentSingleScenarioExamStatus($es_id, $std_id, $scen_id )
     {
         $data['id'] = 0;
         $data['status'] = 'Pending';
@@ -81,7 +81,7 @@ class Tools {
         return (object) $data;
     }
     
-    static public function getStudentNameByResultID( $result_details_id )
+    public static function getStudentNameByResultID( $result_details_id )
     {
         
         self::$ci->db->select('std.fname,std.lname,scen.name as scenario');
@@ -98,7 +98,7 @@ class Tools {
         }
     }
     
-    static public function getStudentNameByID( $student_id )
+    public static function getStudentNameByID( $student_id )
     {        
         self::$ci->db->select('s.fname,s.lname');
         self::$ci->db->from('students as s');    
@@ -111,7 +111,7 @@ class Tools {
         }
     }
     
-    static public function getStudentResultSummery( $student_id,$es_id )
+    public static function getStudentResultSummery( $student_id,$es_id )
     {
         
         self::$ci->db->select('rd.pass_mark,rd.technical_skills as ts,rd.clinical_skills as cs,rd.interpersonal_skills as is');
@@ -144,7 +144,7 @@ class Tools {
         );
     }
     
-    static public function getAssessorByName( $id ){
+    public static function getAssessorByName( $id ){
         if(!$id){
             return '--';
         }
@@ -158,7 +158,7 @@ class Tools {
         }
     }
     
-    static public function getPassStationRequired( $id ){                  
+    public static function getPassStationRequired( $id ){                  
         self::$ci->db->select('pass_station');
         $exam = self::$ci->db->get_where('exam_schedules', ['id' => $id ])->row();
         if ($exam) {
@@ -168,7 +168,7 @@ class Tools {
         }
     }
     
-    static public function getAnnouncement( $type = 'GMC' ){                  
+    public static function getAnnouncement( $type = 'GMC' ){                  
         $content = getSettingItem('AnnouncementFor');
                 
         $json = json_decode( $content, true );
@@ -193,7 +193,7 @@ class Tools {
         return $output;
     }
 
-    static private function formatAnnouncement( $text ){
+    private static function formatAnnouncement( $text ){
         if(!empty($text)){                                    
             $html = '<div class="row"><div class="col-md-12 announcement">';
             $html .= '<i class="fa fa-bullhorn"></i> ';
@@ -203,7 +203,7 @@ class Tools {
         }
     }
     
-    static public function countStudent($type = 'GMC')
+    public static function countStudent($type = 'GMC')
     {             
         self::$ci->db->cache_on(); 
         self::$ci->db->where('number_type', $type );
@@ -212,7 +212,7 @@ class Tools {
         return ($qty) ? "({$qty})" : '';
     }
     
-    static public function lastStageOfProress( $id ){                  
+    public static function lastStageOfProress( $id ){                  
         self::$ci->db->select('p.title');        
         self::$ci->db->from('student_progressions as sp');
         self::$ci->db->join('progressions as p', 'p.id=sp.progression_id','LEFT');
@@ -240,7 +240,7 @@ class Tools {
         return $option;
     }
     
-    static public function status($selected = ''){
+    public static function status($selected = ''){
     
         $status = [
             'Suggested' => 'Suggested',
@@ -261,7 +261,7 @@ class Tools {
         return $row;
     }
 
-    static public function getJobFor($selected = ''){
+    public static function getJobFor($selected = ''){
         $status = [
             'Doctor' => 'Doctor',
             'Dentist' => 'Dentist',
@@ -276,7 +276,7 @@ class Tools {
         return $row;
     }
 
-    static public function getJobApplicationStatus($selected = ''){
+    public static function getJobApplicationStatus($selected = ''){
         $status = [
             'Pending' => 'Pending',
             'Suggested' => 'Suggested',
@@ -297,7 +297,7 @@ class Tools {
         return $row;
     }
     
-    static public function getStudentData( $id, $column ){                  
+    public static function getStudentData( $id, $column ){                  
            
         self::$ci->db->select($column);        
         self::$ci->db->from('students');        
@@ -312,7 +312,7 @@ class Tools {
         }
     }
     
-    static public function enrolledStudentByMockExam($id)
+    public static function enrolledStudentByMockExam($id)
     {              
 //        self::$ci->db->select('student_limit' );
 //        self::$ci->db->from('exam_schedules' );        
@@ -326,7 +326,7 @@ class Tools {
 //        return "{$qty} Seat(s) Booked out of {$exam_plan->student_limit} Seats";
     }
     
-    static public function isAlreadyEnrolled($es_id, $student_id )
+    public static function isAlreadyEnrolled($es_id, $student_id )
     {                                
         self::$ci->db->select('status');
         self::$ci->db->where('exam_schedule_id', $es_id );
@@ -340,7 +340,7 @@ class Tools {
     }
     
         
-    static public function statusWiseCount( $post_id ){                  
+    public static function statusWiseCount( $post_id ){                  
            
         self::$ci->db->select('status, count(id) as total');        
         self::$ci->db->from('recruitment_shortlists');        
@@ -356,7 +356,7 @@ class Tools {
         return $html;
     }
     
-    static public function sentMail($id = 0)
+    public static function sentMail($id = 0)
     {                 
         self::$ci->db->where('student_id', $id );
         self::$ci->db->where('parent_id', '0' );
@@ -364,19 +364,19 @@ class Tools {
     }
     
     
-    static public function countTableRows( $student_id, $tbl ){
+    public static function countTableRows( $student_id, $tbl ){
         self::$ci->db->where('student_id', $student_id );        
         if($tbl == 'student_exams'){ self::$ci->db->where('status', 'Enrolled'); }
         if($tbl == 'mails'){ self::$ci->db->where('receiver_id', 'Enrolled'); }        
         return self::$ci->db->count_all_results( $tbl );
     }
     
-    static public function countBlockedOrCancelled( $status ){
+    public static function countBlockedOrCancelled( $status ){
         self::$ci->db->where('status', $status );
         return self::$ci->db->count_all_results( 'student_exams' );
     }
     
-    static public function getWhatsappLinks( $link_for = 'Country'){
+    public static function getWhatsappLinks( $link_for = 'Country'){
         
         $student_id = (int) getLoginStudentData('student_id');
         self::$ci->db->select('wl.id, wl.title,link,created_on');       
@@ -420,13 +420,13 @@ class Tools {
         }
     }
     
-    static function waJoiningURL($url)
+    public static function waJoiningURL($url)
     {
         if (filter_var($url, FILTER_VALIDATE_URL)) {
             return "<a href='{$url}' class='btn btn-link no-padding' target='_blank'>Link <i class='fa fa-external-link'></i> </a>";
         }
     }
-    static function _link_for( $link_for ){
+    public static function _link_for( $link_for ){
         switch ($link_for){
             case 'Mock':
                 $rel_table = 'exam_schedules';
@@ -444,7 +444,7 @@ class Tools {
         return $rel_table;
     }
     
-    static function rel_table( $rel_table ){
+    public static function rel_table( $rel_table ){
         switch ($rel_table){
             case 'exam_schedules':
                 $rel_table = 'Mock';

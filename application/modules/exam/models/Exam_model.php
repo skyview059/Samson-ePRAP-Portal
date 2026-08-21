@@ -9,12 +9,12 @@ class Exam_model extends Fm_model
     public $id = 'id';
     public $order = 'ASC';
 
-    function __construct()
+    public function __construct()
     {
         parent::__construct();
     }
 
-    function get_by_id($id) {
+    public function get_by_id($id) {
         $this->db->select('e.*');        
         $this->db->select('cn.name as centre_name, cn.address as centre_address');        
         $this->db->select('c.name as course_name, c.id as exam_id');        
@@ -26,7 +26,7 @@ class Exam_model extends Fm_model
         return $this->db->get()->row();
     }
 
-    function total_rows($id, $q = NULL)
+    public function total_rows($id, $q = NULL)
     {
         $this->__search($id,$q);
         $this->db->from('exam_schedules as e');
@@ -34,8 +34,8 @@ class Exam_model extends Fm_model
     }
 
     // get data with limit and search
-    function get_limit_data($limit, $start = 0, $id=1,$tab='coming', $q = NULL)
-    {
+    public function get_limit_data($limit, $start = 0, $id=1,$tab='coming', $q = NULL)
+    {        
         $this->db->select('e.*,cn.name as centre');
         $this->db->select('c.name as category_name');
         $this->db->from('exam_schedules as e');
@@ -54,7 +54,7 @@ class Exam_model extends Fm_model
         return $this->db->get()->result();
     }
 
-    function __search($id,$tab,$q = NULL)
+    public function __search($id,$tab,$q = NULL)
     {       
         $this->db->where('e.exam_id', $id);
         $this->db->where('e.type', 'Offline');
@@ -121,7 +121,7 @@ class Exam_model extends Fm_model
     }
     
     
-    function marked($id)
+    public function marked($id)
     {
         $this->db->select('assessor_id');
         $this->db->where('scenario_rel_id', $id );
@@ -163,7 +163,7 @@ class Exam_model extends Fm_model
         return $this->db->get()->result();
     }
     
-    function qty( $tab = 'past', $exam_id = 1 )
+    public function qty( $tab = 'past', $exam_id = 1 )
     {        
                         
         if($tab =='coming'){

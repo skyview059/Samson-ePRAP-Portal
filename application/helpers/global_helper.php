@@ -1454,7 +1454,8 @@ function getDropDownPurposeOfRegistration($selected = '')
         'MRCS'               => 'MRCS',
         'Plab 1'             => 'Plab 1',
         'OET/IELTS'          => 'OET/IELTS',
-        'CSA Part-1(Online)' => 'CSA Part-1(Online)'
+        'CSA Part-1(Online)' => 'CSA Part-1(Online)',
+        'MRCGP SCA'          => 'MRCGP SCA',
     ];
     $row      = '';
     foreach ($purposes as $key => $purpose) {

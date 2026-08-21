@@ -30,3 +30,21 @@ Initial Approach = Opening consultation
 Required to release result;
 
 https://eprapportal.test/results/1233
+
+
+
+21th Aug, 2026
+---------------------
+We have way too many details:
+
+We just need 
+WhatsApp number and exam date, name, email, course - MRCGP SCA, that’s all , 
+
+the rest we need to remove please
+
+
+
+1. Student (Create + Update) Page field removing -------------------- Done 
+    -- I can not find the MRCGP SCA -> adding to dropdown option  --- Done 
+2. Setup new exam page - passing criteria removing ------------------ Done 
+3. 

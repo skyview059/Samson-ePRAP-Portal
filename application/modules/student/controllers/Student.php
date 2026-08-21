@@ -8,7 +8,7 @@ class Student extends Admin_controller
 {
     public $CI;
 
-    function __construct()
+    public function __construct()
     {
         parent::__construct();
         $this->load->model('Student_model');
@@ -342,7 +342,7 @@ class Student extends Admin_controller
             }
             $data = array(
                 'number_type'             => $this->input->post('number_type', TRUE),
-                'gmc_number'              => $this->input->post('gmc_number', TRUE),
+                'gmc_number'              => $this->input->post('gmc_number', TRUE) ?: null,
                 'title'                   => $this->input->post('title', TRUE),
                 'fname'                   => $this->input->post('fname', TRUE),
                 'mname'                   => $this->input->post('mname', TRUE),
@@ -353,16 +353,13 @@ class Student extends Admin_controller
                 'whatsapp_code'           => $this->input->post('whatsapp_code', TRUE),
                 'whatsapp'                => $this->input->post('whatsapp', TRUE),
                 'password'                => password_encription($password),
-                'ethnicity_id'            => $this->input->post('ethnicity_id', TRUE),
-                'occupation'              => $this->input->post('occupation', TRUE),
+                'ethnicity_id'            => 0, // column is NOT NULL; field removed from form
+                'country_id'              => 0, // column is NOT NULL; field removed from form
                 'purpose_of_registration' => $this->input->post('purpose_of_registration', TRUE),
-                'address_line1'           => $this->input->post('address_line1', TRUE),
-                'address_line2'           => $this->input->post('address_line2', TRUE),
-                'postcode'                => $this->input->post('postcode', TRUE),
-                'gender'                  => $this->input->post('gender', TRUE),
+                'gender'                  => $this->input->post('gender', TRUE) ?: null,
                 'photo'                   => $photo,
                 'exam_id'                 => $this->input->post('exam_id', TRUE),
-                'exam_centre_id'          => $this->input->post('exam_centre_id', TRUE),
+                'exam_centre_id'          => $this->input->post('exam_centre_id', TRUE) ?: null,
                 'exam_date'               => $this->input->post('exam_date', TRUE),
                 'note'                    => $this->input->post('note', TRUE),
                 'created_at'              => date('Y-m-d H:i:s'),
@@ -445,24 +442,17 @@ class Student extends Admin_controller
                 'gmc_number'              => $gmc_number,
                 'title'                   => $this->input->post('title', TRUE),
                 'fname'                   => $this->input->post('fname', TRUE),
-                'mname'                   => $this->input->post('mname', TRUE),
                 'lname'                   => $this->input->post('lname', TRUE),
                 'phone_code'              => $this->input->post('phone_code', TRUE),
                 'phone'                   => $this->input->post('phone', TRUE),
                 'whatsapp_code'           => $this->input->post('whatsapp_code', TRUE),
                 'whatsapp'                => $this->input->post('whatsapp', TRUE),
-                'ethnicity_id'            => $this->input->post('ethnicity_id', TRUE),
-                'occupation'              => $this->input->post('occupation', TRUE),
                 'purpose_of_registration' => $this->input->post('purpose_of_registration', TRUE),
-                'address_line1'           => $this->input->post('address_line1', TRUE),
-                'address_line2'           => $this->input->post('address_line2', TRUE),
-                'postcode'                => $this->input->post('postcode', TRUE),
-                'country_id'              => (int)$this->input->post('country_id'),
                 'present_country_id'      => (int)$this->input->post('present_country_id'),
-                'gender'                  => $this->input->post('gender', TRUE),
+                'gender'                  => $this->input->post('gender', TRUE) ?: null,
                 'status'                  => $this->input->post('status', TRUE),
                 'exam_id'                 => (int)$this->input->post('exam_id'),
-                'exam_centre_id'          => (int)$this->input->post('exam_centre_id'),
+                'exam_centre_id'          => (int)$this->input->post('exam_centre_id') ?: null,
                 'exam_date'               => $this->input->post('exam_date', TRUE),
                 'note'                    => $this->input->post('note', TRUE),
                 'updated_at'              => date('Y-m-d H:i:s')
@@ -674,32 +664,21 @@ class Student extends Admin_controller
         $this->form_validation->set_rules('gmc_number', 'GMC number', 'trim|callback_unique_student_number');
 
         $this->form_validation->set_rules('fname', 'fname', 'trim|required');
-        $this->form_validation->set_rules('mname', 'mname', 'trim');
         $this->form_validation->set_rules('lname', 'lname', 'trim|required');
 
-        $this->form_validation->set_rules('phone', 'phone', 'trim|required');
+        $this->form_validation->set_rules('phone', 'phone', 'trim');
         $this->form_validation->set_rules('password', 'password', 'trim');
-        $this->form_validation->set_rules('ethnicity_id', 'ethnicity', 'trim|required|is_natural_no_zero', [
-            'is_natural_no_zero' => 'Please select a ethnicity'
-        ]);
-        $this->form_validation->set_rules('country_id', 'country', 'trim|required|is_natural_no_zero', [
-            'is_natural_no_zero' => 'Please select a country'
-        ]);
-        $this->form_validation->set_rules('phone_code', 'phone code', 'trim|required|is_natural_no_zero', [
-            'is_natural_no_zero' => 'Please select phone code'
-        ]);
+        $this->form_validation->set_rules('phone_code', 'phone code', 'trim');
         $this->form_validation->set_rules('whatsapp_code', 'whatsapp code', 'trim|required|is_natural_no_zero', [
             'is_natural_no_zero' => 'Please select whatsapp phone code'
         ]);
         $this->form_validation->set_rules('whatsapp', 'whatsapp', 'trim|required');
-        $this->form_validation->set_rules('gender', 'gender', 'trim|required');
+        $this->form_validation->set_rules('gender', 'gender', 'trim');
         $this->form_validation->set_rules('photo', 'photo', 'trim');
         $this->form_validation->set_rules('exam_id', 'Exam', 'trim|required|is_natural_no_zero', [
             'is_natural_no_zero' => 'Please select a exam'
         ]);
-        $this->form_validation->set_rules('exam_centre_id', 'Exam Centre', 'trim|required|is_natural_no_zero', [
-            'is_natural_no_zero' => 'Please select a exam centre'
-        ]);
+        $this->form_validation->set_rules('exam_centre_id', 'Exam Centre', 'trim');
         $this->form_validation->set_rules('exam_date', 'Exam Date', 'trim|required');
         $this->form_validation->set_rules('id', 'id', 'trim');
         $this->form_validation->set_error_delimiters('<span class="text-danger">', '</span>');
@@ -707,7 +686,7 @@ class Student extends Admin_controller
 
     public function _rules_create()
     {
-        $this->form_validation->set_rules('gmc_number', 'GMC number', 'trim|required|min_length[7]|max_length[7]|callback_unique_student_number',
+        $this->form_validation->set_rules('gmc_number', 'GMC number', 'trim|min_length[7]|max_length[7]|callback_unique_student_number',
             [
                 'min_length' => 'This GMC number must be a 7 digit',
                 'max_length' => 'This GMC number must be a 7 digit',
@@ -717,27 +696,17 @@ class Student extends Admin_controller
         $this->form_validation->set_rules('fname', 'first name', 'trim|required');
         $this->form_validation->set_rules('mname', 'middle name', 'trim');
         $this->form_validation->set_rules('lname', 'last name', 'trim|required');
-        $this->form_validation->set_rules('phone', 'phone', 'trim|required');
-        $this->form_validation->set_rules('ethnicity_id', 'ethnicity', 'trim|required|is_natural_no_zero', [
-            'is_natural_no_zero' => 'Please select a ethnicity'
-        ]);
-        $this->form_validation->set_rules('phone_code', 'phone code', 'trim|required|is_natural_no_zero', [
-            'is_natural_no_zero' => 'Please select phone code'
-        ]);
+        $this->form_validation->set_rules('phone', 'phone', 'trim');
+        $this->form_validation->set_rules('phone_code', 'phone code', 'trim');
         $this->form_validation->set_rules('whatsapp_code', 'whatsapp code', 'trim|required|is_natural_no_zero', [
             'is_natural_no_zero' => 'Please select whatsapp phone code'
         ]);
         $this->form_validation->set_rules('whatsapp', 'whatsapp', 'trim|required');
-        $this->form_validation->set_rules('country_id', 'country', 'trim|required|is_natural_no_zero', [
-            'is_natural_no_zero' => 'Please select a country'
-        ]);
-        $this->form_validation->set_rules('gender', 'gender', 'trim|required');
+        $this->form_validation->set_rules('gender', 'gender', 'trim');
         $this->form_validation->set_rules('exam_id', 'Exam', 'trim|required|is_natural_no_zero', [
             'is_natural_no_zero' => 'Please select a exam'
         ]);
-        $this->form_validation->set_rules('exam_centre_id', 'Exam Centre', 'trim|required|is_natural_no_zero', [
-            'is_natural_no_zero' => 'Please select a exam centre'
-        ]);
+        $this->form_validation->set_rules('exam_centre_id', 'Exam Centre', 'trim');
         $this->form_validation->set_rules('exam_date', 'Exam Date', 'trim|required');
 
         $this->form_validation->set_rules('id', 'id', 'trim');
@@ -750,6 +719,9 @@ class Student extends Admin_controller
         $id          = $this->input->post('id');
         $number_type = $this->input->post('number_type');// get number type
         $gmc_number  = $this->input->post('gmc_number'); // get student name
+        if ($gmc_number === null || $gmc_number === '') {
+            return TRUE; // optional field; nothing to check
+        }
         $this->db->select('id');
         $this->db->from('students');
         $this->db->where('number_type', $number_type);

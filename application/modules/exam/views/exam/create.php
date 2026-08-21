@@ -123,12 +123,15 @@
                 <label for="passing_criteria" class="col-sm-2">Passing Criteria <sup>*</sup></label>
                 <div class="col-sm-8">
                     <textarea name="passing_criteria" id="passing_criteria" rows="10" 
-                              class="form-control">From August 2020, candidates must achieve or exceed both the pass mark and gain a pass in minimum of %PassStation% stations to pass the %NameOfMockTest% assessment.
-
+                              class="form-control"></textarea>  
+                              
+                    <!-- 
+                    From August 2020, candidates must achieve or exceed both the pass mark and gain a pass in minimum of %PassStation% stations to pass the %NameOfMockTest% assessment.
+                    
 You scored %YourScore% and passed %PassedStations% stations. 
 A minimum score of %MinPassMarkRequired% was required to pass.
 
-Your scores of each station.</textarea>                    
+Your scores of each station. -->
                 </div>
             </div>
 

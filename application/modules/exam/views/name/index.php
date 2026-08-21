@@ -26,38 +26,44 @@
                                 <tr>
                                     <th width="40">S/L</th>
                                     <th>Name</th>
+                                    <th width="80" class="text-center">Students</th>
                                     <th width="80" class="text-center">Centre</th>
                                     <th width="100" class="text-center">Exams</th>
-                                    <th width="120" class="text-center">Created on</th>
-                                    <th width="120" class="text-center">Updated on</th>
+                                    <!-- <th width="120" class="text-center">Created on</th> -->
+                                    <!-- <th width="120" class="text-center">Updated on</th> -->
                                     <th class="text-center" width="90">Action</th>
                                 </tr>
                             </thead>
 
                             <tbody>
-                                <?php foreach ($names as $name) { 
-                                    $scheduled = Tools::getSchedules($name->id);
-                                    ?>
+                                <?php foreach ($names as $name) {  ?>
                                     <tr>
                                         <td><?php echo ++$start; ?></td>
                                         <td><?php echo "{$name->name}  <small class='text-light-blue'>({$name->exam_type})</small>"; ?></td>
                                         <td class="text-center">
+                                            <a href="admin/student?eid=<?= $name->id; ?>">
+                                                <?php echo $name->student_qty; ?>
+                                                &nbsp;
+                                                <i class="fa fa-external-link-square"></i>
+                                            </a>                                            
+                                        </td>
+                                        <td class="text-center">
                                             <a href="admin/centre?id=<?php echo $name->id; ?>">
-                                                <?php echo Tools::getCentres($name->id); ?>
+                                                <?php echo $name->centre_qty; ?>
                                                 &nbsp;
                                                 <i class="fa fa-external-link-square"></i>
                                             </a>                                            
                                         </td>
                                         <td class="text-center">
                                             <a href="admin/exam?id=<?php echo $name->id; ?>">
-                                                <?php echo $scheduled; ?>
+                                                <?php echo $name->schedule_qty; ?>
                                                 &nbsp;
                                                 <i class="fa fa-external-link-square"></i>
                                             </a>
                                             
                                         </td>
-                                        <td class="text-center"><?php echo globalDateFormat($name->created_at); ?></td>
-                                        <td class="text-center"><?php echo globalDateFormat($name->updated_at); ?></td>
+                                        <!-- <td class="text-center"><?php echo globalDateFormat($name->created_at); ?></td> -->
+                                        <!-- <td class="text-center"><?php echo globalDateFormat($name->updated_at); ?></td> -->
                                         <td class="text-center">
                                             <?php
                                             echo anchor(
@@ -66,7 +72,7 @@
                                                     'class="btn btn-xs btn-default" title="Edit"'
                                                 );
                                             
-                                            if($scheduled){
+                                            if($name->schedule_qty){
                                                 echo '<span class="btn btn-xs btn-danger disabled"><i class="fa fa-fw fa-lock"></i></span>';
                                             } else {
                                                 echo anchor(
