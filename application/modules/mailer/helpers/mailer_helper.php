@@ -3,7 +3,7 @@
 function getByExam() {
     $ci =& get_instance();
     
-    $sql = 'SELECT count(*) as qty FROM `student_exams` as se 
+    $sql = 'SELECT count(*) as qty FROM `student_exam_enrollments` as se 
             INNER JOIN exam_schedules as es on es.id=se.exam_schedule_id
             WHERE es.exam_id = exams.id';
     

@@ -30,12 +30,12 @@ class Ajax extends Frontend_controller {
         
         if($status == 'Delete'){                  
             $this->db->where('id', $enroll_id );
-            $this->db->delete('student_exams');
+            $this->db->delete('student_exam_enrollments');
             echo ajaxRespond('OK','Deleted');            
         } else {        
             $this->db->set('status', $status );
             $this->db->where('id', $enroll_id );
-            $this->db->update('student_exams');
+            $this->db->update('student_exam_enrollments');
             echo ajaxRespond('OK','Updated');            
         }
     }
@@ -44,7 +44,7 @@ class Ajax extends Frontend_controller {
      
         $this->db->select('s.id,s.title,s.fname,s.lname,s.email');
         $this->db->select('e.name as exam_name');
-        $this->db->from('student_exams as se');
+        $this->db->from('student_exam_enrollments as se');
         $this->db->join('students as s','s.id=se.student_id','LEFT');
         $this->db->join('exam_schedules as es','es.id=se.exam_schedule_id','LEFT');
         $this->db->join('exams as e','es.exam_id=e.id','LEFT');

@@ -505,7 +505,7 @@ class Student extends Admin_controller
             $schedule_id = (int)$this->input->post('exam_schedule_id');
             // check already exist
             $this->db->where(['exam_schedule_id' => $schedule_id, 'student_id' => $id]);
-            $isBooked = $this->db->count_all_results('student_exams');
+            $isBooked = $this->db->count_all_results('student_exam_enrollments');
 
             if ($isBooked) {
                 $this->session->set_flashdata('msgw', 'He/She already booked for this Mock Exam');
@@ -520,7 +520,7 @@ class Student extends Admin_controller
                 'created_at'       => date('Y-m-d H:i:s'),
             );
 
-            $this->db->insert('student_exams', $data);
+            $this->db->insert('student_exam_enrollments', $data);
             $this->session->set_flashdata('msgs', 'Booked for Mock Exam Successfully');
             redirect(site_url(Backend_URL . 'student/exam/' . $id));
         }
@@ -541,7 +541,7 @@ class Student extends Admin_controller
         $this->db->select('es.datetime,es.label,se.status, se.id as enroll_id, se.created_at as enrolled_at');
         $this->db->select('es.id as es_id, gmc_exam_dates');
         $this->db->where('se.student_id', $id);
-        $this->db->from('student_exams as se');
+        $this->db->from('student_exam_enrollments as se');
         $this->db->join('exam_schedules as es', 'es.id = se.exam_schedule_id', 'LEFT');
         $this->db->join('exams as e', 'es.exam_id = e.id', 'LEFT');
         $this->db->join('exam_centres as c', 'c.id = es.exam_centre_id', 'LEFT');
@@ -786,7 +786,7 @@ class Student extends Admin_controller
 
         //Get already assigned student list
         $this->db->select('se.id, se.student_id, se.created_at as assign_at');
-        $this->db->from('student_exams as se');
+        $this->db->from('student_exam_enrollments as se');
         $this->db->where('se.exam_schedule_id', $exam_schedule_id);
         $assigned_students = $this->db->get()->result();
 
@@ -816,11 +816,11 @@ class Student extends Admin_controller
 
         $this->db->trans_start();
         if (!empty($delete_assigned_students)) {
-            $this->db->where_in('id', $delete_assigned_students)->delete('student_exams');
+            $this->db->where_in('id', $delete_assigned_students)->delete('student_exam_enrollments');
         }
 
         if (!empty($data)) {
-            $this->db->insert_batch('student_exams', $data);
+            $this->db->insert_batch('student_exam_enrollments', $data);
         }
 
         $this->db->trans_complete();

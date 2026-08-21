@@ -30,7 +30,7 @@ class Frontend_controller extends MX_Controller {
         
         $student = $this->db->select('student_id')
                         ->where('exam_schedule_id', $exam_id)
-                        ->get('student_exams')
+                        ->get('student_exam_enrollments')
                         ->row();
         
         return ($student) ? $student->student_id : null;

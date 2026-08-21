@@ -321,7 +321,7 @@ class Tools {
         
         self::$ci->db->where('exam_schedule_id', $id );
         self::$ci->db->where('status !=', 'Cancelled' );
-        return self::$ci->db->count_all_results('student_exams');
+        return self::$ci->db->count_all_results('student_exam_enrollments');
                         
 //        return "{$qty} Seat(s) Booked out of {$exam_plan->student_limit} Seats";
     }
@@ -331,7 +331,7 @@ class Tools {
         self::$ci->db->select('status');
         self::$ci->db->where('exam_schedule_id', $es_id );
         self::$ci->db->where('student_id', $student_id );
-        $enrolled = self::$ci->db->get('student_exams')->row();
+        $enrolled = self::$ci->db->get('student_exam_enrollments')->row();
         if($enrolled){
             return $enrolled->status;
         } else {
@@ -366,14 +366,14 @@ class Tools {
     
     public static function countTableRows( $student_id, $tbl ){
         self::$ci->db->where('student_id', $student_id );        
-        if($tbl == 'student_exams'){ self::$ci->db->where('status', 'Enrolled'); }
+        if($tbl == 'student_exam_enrollments'){ self::$ci->db->where('status', 'Enrolled'); }
         if($tbl == 'mails'){ self::$ci->db->where('receiver_id', 'Enrolled'); }        
         return self::$ci->db->count_all_results( $tbl );
     }
     
     public static function countBlockedOrCancelled( $status ){
         self::$ci->db->where('status', $status );
-        return self::$ci->db->count_all_results( 'student_exams' );
+        return self::$ci->db->count_all_results( 'student_exam_enrollments' );
     }
     
     public static function getWhatsappLinks( $link_for = 'Country'){
@@ -387,7 +387,7 @@ class Tools {
         self::$ci->db->join( 'whatsapp_links as wl', 'wl.id=wlr.wa_link_id', 'LEFT' ); 
         
         if($link_for == 'Mock'){
-            $sql = "SELECT exam_schedule_id FROM `student_exams` WHERE `student_id` = '{$student_id}' AND status = 'Enrolled'";
+            $sql = "SELECT exam_schedule_id FROM `student_exam_enrollments` WHERE `student_id` = '{$student_id}' AND status = 'Enrolled'";
             self::$ci->db->where_in('wlr.rel_id', $sql, FALSE );
         }
         

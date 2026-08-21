@@ -41,7 +41,7 @@ class Student_portal extends Frontend_controller
 
         $this->db->select("es.id, ({$sql}) as name, es.datetime");
         $this->db->select('ec.name as centre, ec.address');
-        $this->db->from('student_exams as se');
+        $this->db->from('student_exam_enrollments as se');
         $this->db->join('exam_schedules as es', 'es.id=se.exam_schedule_id', 'LEFT');
         $this->db->join('exam_centres as ec', 'ec.id=es.exam_centre_id', 'LEFT');
         $this->db->where('se.student_id', $this->student_id);
@@ -491,7 +491,7 @@ class Student_portal extends Frontend_controller
             'remarks'          => 'Enrolled by Student',
             'created_at'       => date('Y-m-d H:i:s')
         ];
-        $this->db->insert('student_exams', $data);
+        $this->db->insert('student_exam_enrollments', $data);
         echo ajaxRespond('OK', '<p class="ajax_notice">Request sent. Awaiting for confirmation.</p>');
     }
 

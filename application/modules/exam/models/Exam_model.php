@@ -80,7 +80,7 @@ class Exam_model extends Fm_model
 
     public function get_students($exam_schedule_id){
         $this->db->select('s.*,se.id as student_exam_id, se.created_at as assign_at, se.status as exam_status, se.remarks, r.id as attendance');        
-        $this->db->from('student_exams as se');
+        $this->db->from('student_exam_enrollments as se');
         $this->db->join('students as s', 's.id=se.student_id ', 'LEFT');
         $this->db->join('results as r', 'r.student_id=s.id and r.exam_schedule_id=se.exam_schedule_id', 'LEFT');
         $this->db->where('se.status', 'Enrolled');
@@ -136,7 +136,7 @@ class Exam_model extends Fm_model
     public function get_student_exam_by_id($student_exam_id){
         $this->db->select('s.*,se.id as student_exam_id, se.status, se.remarks, se.created_at as assign_at'); 
         $this->db->select('es.datetime, e.name as exam_name');
-        $this->db->from('student_exams as se');
+        $this->db->from('student_exam_enrollments as se');
         $this->db->join('students as s', 's.id=se.student_id ', 'LEFT');
         $this->db->join('exam_schedules as es', 'es.id=se.exam_schedule_id', 'LEFT');
         $this->db->join('exams as e', 'e.id=es.exam_id', 'LEFT');

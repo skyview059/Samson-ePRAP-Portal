@@ -606,7 +606,7 @@ class Exam extends Admin_controller
             'remarks' => $remarks,
         );
         $this->db->where('id', $id);
-        $this->db->update('student_exams', $updateData);
+        $this->db->update('student_exam_enrollments', $updateData);
         $this->db->trans_complete();
 
         echo ajaxRespond('OK', '<p class="ajax_success">Student Assign Exam Cancelled Successfully</p>');

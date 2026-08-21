@@ -35,7 +35,7 @@ function getTodayExamCanceledStudents(){
     $html = '';
     $students = $ci->db
             ->from('students as s')
-            ->join('student_exams as se', 'se.student_id=s.id', 'left')
+            ->join('student_exam_enrollments as se', 'se.student_id=s.id', 'left')
             ->join('exam_schedules as es', 'es.id=se.exam_schedule_id', 'left')
             ->join('exams as e', 'e.id=es.exam_id', 'left')
             ->join('exam_centres as ec', 'ec.id=es.exam_centre_id', 'left')

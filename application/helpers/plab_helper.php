@@ -172,7 +172,7 @@ function getStudentProcessBar()
     $stage      = $ci->db->where('student_id', $student_id)->count_all_results('student_progressions');
     $files      = $ci->db->where('student_id', $student_id)->count_all_results('files');
     $job_pro    = $ci->db->where('student_id', $student_id)->count_all_results('student_job_profile');
-    $mock       = $ci->db->where('student_id', $student_id)->where('status', 'Enrolled')->count_all_results('student_exams');
+    $mock       = $ci->db->where('student_id', $student_id)->where('status', 'Enrolled')->count_all_results('student_exam_enrollments');
 
     $html = '<div class="row">
                 <div class="col-md-12">

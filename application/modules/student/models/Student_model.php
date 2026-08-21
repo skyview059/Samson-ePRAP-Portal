@@ -92,7 +92,7 @@ class Student_model extends Fm_model
     {
         $this->db->select('student_id');
         $this->db->where('exam_schedule_id', $id );
-        $marks    = $this->db->get('student_exams')->result();
+        $marks    = $this->db->get('student_exam_enrollments')->result();
         $selected = [];
         foreach ($marks as $mark){
             $selected[] = $mark->student_id;
@@ -108,7 +108,7 @@ class Student_model extends Fm_model
         $recruitment_shortlists     = $this->db->where('student_id', $id )->count_all_results('recruitment_shortlists');
         $results                    = $this->db->where('student_id', $id )->count_all_results('results');
         $student_development        = $this->db->where('student_id', $id )->count_all_results('student_development');
-        $student_exams              = $this->db->where('student_id', $id )->count_all_results('student_exams');
+        $student_exams              = $this->db->where('student_id', $id )->count_all_results('student_exam_enrollments');
         $student_job_profile        = $this->db->where('student_id', $id )->count_all_results('student_job_profile');
         $student_job_specialty_rel  = $this->db->where('student_id', $id )->count_all_results('student_job_specialty_rel');
         $student_logs               = $this->db->where('student_id', $id )->count_all_results('student_logs');
@@ -125,7 +125,7 @@ class Student_model extends Fm_model
             'recruitment_shortlists' => $recruitment_shortlists,
             'results'               => $results,
             'student_development'   => $student_development,
-            'student_exams'         => $student_exams,
+            'student_exam_enrollments'         => $student_exams,
             'student_job_profile'   => $student_job_profile,
             'student_job_specialty_rel' => $student_job_specialty_rel,
             'student_logs'          => $student_logs,
@@ -167,7 +167,7 @@ class Student_model extends Fm_model
     }
     
     function getTotalBlockedlist( $status ){
-        return $this->db->where('status', $status )->count_all_results('student_exams');
+        return $this->db->where('status', $status )->count_all_results('student_exam_enrollments');
     }
     
     function getBlockedlist( $limit, $start, $status ){
@@ -175,7 +175,7 @@ class Student_model extends Fm_model
                 ->select('s.id as stu_id,se.id as enroll_id, s.number_type, s.photo, s.gender, s.gmc_number,s.title, CONCAT(s.fname," ", s.lname) as full_name,s.email, s.phone_code,s.phone,s.whatsapp_code,s.whatsapp, s.created_at')
                 ->select('es.label, e.name as exam_name, ec.name as centre_name, es.datetime')
                 ->select('se.status, se.remarks, es.created_at as enrolled_at')
-                ->from('student_exams as se')
+                ->from('student_exam_enrollments as se')
                 ->join('students as s', 'se.student_id=s.id', 'LEFT')
                 ->join('exam_schedules as es', 'es.id=se.exam_schedule_id', 'LEFT')
                 ->join('exams as e', 'e.id=es.exam_id', 'LEFT')

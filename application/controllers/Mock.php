@@ -52,7 +52,7 @@ class Mock extends Frontend_controller
         $this->db->where('se.student_id', $this->student_id);
         $this->db->where('es.type', 'Online');
 //        $this->db->where('es.status', 'Published');
-        $this->db->from('student_exams as se');
+        $this->db->from('student_exam_enrollments as se');
         $this->db->join('exam_schedules as es', 'es.id = se.exam_schedule_id', 'left');
         $this->db->join('exams as e', 'e.id = es.exam_id', 'left');
     }
@@ -128,7 +128,7 @@ class Mock extends Frontend_controller
         $this->db->from('scenario_relations as sr');
         $this->db->join('scenarios as s', 's.id = sr.scenario_id', 'left');
         $this->db->join('exam_schedules as es', 'es.id = sr.exam_schedule_id', 'left');
-        $this->db->join('student_exams as se', 'se.exam_schedule_id = sr.exam_schedule_id', 'left');
+        $this->db->join('student_exam_enrollments as se', 'se.exam_schedule_id = sr.exam_schedule_id', 'left');
     }
 
     private function practiceTotalExamTime($exam_schedule_id){

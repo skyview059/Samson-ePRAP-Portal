@@ -4,7 +4,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 function studentTabs($id, $active_tab)
 {
-    $exam = Tools::countTableRows( $id,'student_exams' );
+    $exam = Tools::countTableRows( $id,'student_exam_enrollments' );
     $dev = Tools::countTableRows( $id,'student_development' );
     $pdev = Tools::countTableRows( $id,'personal_dev_plans' );
     $stage = Tools::countTableRows( $id,'student_progressions' );

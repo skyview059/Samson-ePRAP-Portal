@@ -51,7 +51,7 @@ class Assess_model extends Fm_model{
         $this->db->select('es.id, se.student_id, es.exam_id, e.name as exam_name, e.exam_type, es.datetime, ec.name as center_name, ec.address as center_address');
         $this->db->select('ets.total_questions, ets.scenario_ids');
         $this->db->from('exam_schedules as es');
-        $this->db->join('student_exams as se', 'se.exam_schedule_id=es.id and se.student_id="'.$student_id.'" and se.status="Enrolled"', 'inner');
+        $this->db->join('student_exam_enrollments as se', 'se.exam_schedule_id=es.id and se.student_id="'.$student_id.'" and se.status="Enrolled"', 'inner');
         $this->db->join("($exam_to_scenario_sql) as ets", 'ets.exam_schedule_id=es.id', 'inner');
         $this->db->join('exams as e', 'e.id=es.exam_id', 'left');
         $this->db->join('exam_centres as ec', 'ec.id=es.exam_centre_id', 'left');
@@ -129,7 +129,7 @@ class Assess_model extends Fm_model{
         
         $students = $this->db
             ->from('students as s')
-            ->join('student_exams as se', 'se.student_id=s.id', 'left')
+            ->join('student_exam_enrollments as se', 'se.student_id=s.id', 'left')
             ->join('exam_schedules as es', 'es.id=se.exam_schedule_id', 'left')
             ->join('exams as e', 'e.id=es.exam_id', 'left')
             ->join('exam_centres as ec', 'ec.id=es.exam_centre_id', 'left')

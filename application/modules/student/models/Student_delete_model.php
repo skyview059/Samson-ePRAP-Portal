@@ -23,7 +23,7 @@ class Student_delete_model extends Fm_model
         $this->db->delete('personal_dev_plans', ['student_id' => $student_id]);
         $this->db->delete('recruitment_shortlists', ['student_id' => $student_id]);
         $this->db->delete('student_development', ['student_id' => $student_id]);
-        $this->db->delete('student_exams', ['student_id' => $student_id]);
+        $this->db->delete('student_exam_enrollments', ['student_id' => $student_id]);
         $this->db->delete('student_job_profile', ['student_id' => $student_id]);
         $this->db->delete('student_job_specialty_rel', ['student_id' => $student_id]);
         $this->db->delete('student_logs', ['student_id' => $student_id]);
@@ -68,7 +68,7 @@ class Student_delete_model extends Fm_model
         $recruitment_shortlists     = $this->db->where('student_id', $id )->count_all_results('recruitment_shortlists');
         $results                    = $this->db->where('student_id', $id )->count_all_results('results');
         $student_development        = $this->db->where('student_id', $id )->count_all_results('student_development');
-        $student_exams              = $this->db->where('student_id', $id )->count_all_results('student_exams');
+        $student_exams              = $this->db->where('student_id', $id )->count_all_results('student_exam_enrollments');
         $student_job_profile        = $this->db->where('student_id', $id )->count_all_results('student_job_profile');
         $student_job_specialty_rel  = $this->db->where('student_id', $id )->count_all_results('student_job_specialty_rel');
         $student_logs               = $this->db->where('student_id', $id )->count_all_results('student_logs');
@@ -85,7 +85,7 @@ class Student_delete_model extends Fm_model
             'recruitment_shortlists' => $recruitment_shortlists,
             'results'               => $results,
             'student_development'   => $student_development,
-            'student_exams'         => $student_exams,
+            'student_exam_enrollments'         => $student_exams,
             'student_job_profile'   => $student_job_profile,
             'student_job_specialty_rel' => $student_job_specialty_rel,
             'student_logs'          => $student_logs,

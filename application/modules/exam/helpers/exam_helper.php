@@ -33,7 +33,7 @@ function countExamScenario($exam_schedule_id = 0) {
 function countExamStudent($exam_schedule_id = 0) {
     $ci = & get_instance();
     $ci->db->where('status','Enrolled');
-    return$ci->db->where('exam_schedule_id', $exam_schedule_id)->count_all_results('student_exams');
+    return$ci->db->where('exam_schedule_id', $exam_schedule_id)->count_all_results('student_exam_enrollments');
 }
 
 function getExamName($id = 0) {

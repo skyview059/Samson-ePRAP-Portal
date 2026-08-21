@@ -27,3 +27,29 @@ CREATE TABLE IF NOT EXISTS `attachments` (
   `uploaded_at` datetime NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB;
+
+
+
+-- Rename student_exams -> student_exam_enrollments (code updated in SCA/Upgrade branch)
+RENAME TABLE `student_exams` TO `student_exam_enrollments`;
+
+
+
+
+--- 22nd Aug, 2026 ---
+
+RENAME TABLE `student_exam` TO `student_exam_enrollments`;
+RENAME TABLE `student_exams` TO `student_exam_enrollments`;
+
+
+CREATE TABLE `student_interested_exams` (
+  `id` INT NOT NULL AUTO_INCREMENT, 
+  `student_id` INT NOT NULL, 
+  `exam_id` INT NOT NULL, 
+  PRIMARY KEY (`id`), 
+  INDEX (`student_id`), 
+  INDEX (`exam_id`)
+) ENGINE = InnoDB;
+
+
+
