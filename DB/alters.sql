@@ -53,3 +53,11 @@ CREATE TABLE `student_interested_exams` (
 
 
 
+
+
+-- student_interested_exams: prevent duplicate (student, exam) pairs on re-save
+ALTER TABLE `student_interested_exams` ADD UNIQUE KEY `uq_student_exam` (`student_id`, `exam_id`);
+
+-- student_interested_exams: back-fill from the legacy 1:1 students.exam_id column
+INSERT IGNORE INTO `student_interested_exams` (`student_id`, `exam_id`)
+SELECT `id`, `exam_id` FROM `students` WHERE `exam_id` > 0;

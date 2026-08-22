@@ -38,6 +38,7 @@
                             <th>First Name</th>
                             <th>Last Name</th>
                             <th>Email</th>
+                            <th width="160">Exams</th>
                             <th width="145">Phone</th>
                             <th width="150">ID-Number</th>
                             <th width="160">Register At</th>
@@ -83,6 +84,7 @@
                                         </div>
                                     </div>
                                 </td>
+                                <td><?php echo $student->exam_names ?: '<span class="text-muted">—</span>'; ?></td>
                                 <td>
                                     &nbsp;&nbsp;<i
                                             class="fa fa-mobile-phone"></i> <?php echo "+{$student->phone_code}{$student->phone}"; ?>

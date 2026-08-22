@@ -53,7 +53,7 @@
                         </td>
                         <td><a href="<?= $link; ?>"><?= $student->fname; ?> <?= $student->lname; ?></a>
                         </td>
-                        <td><?= $student->exam_name; ?></td>
+                        <td><?= $student->exam_names ?: '—'; ?></td>
                         <td><?= $student->exam_centre_name; ?></td>
                         <td><?= globalDateFormat($student->exam_date); ?></td>
                         <td class="text-center">

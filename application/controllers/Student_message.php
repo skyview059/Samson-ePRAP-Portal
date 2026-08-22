@@ -62,6 +62,10 @@ class Student_message extends Frontend_controller
     {
         $this->db->select('s.id, s.title, s.fname, s.mname, s.lname, s.gmc_number, s.email, s.photo, s.gender');
         $this->db->select('e.name as exam_name, s.exam_date');
+        $this->db->select('(SELECT GROUP_CONCAT(e2.name ORDER BY e2.name SEPARATOR ", ")
+                            FROM student_interested_exams sie2
+                            JOIN exams e2 ON e2.id = sie2.exam_id
+                            WHERE sie2.student_id = s.id) AS exam_names', false);
         $this->db->select('ec.name as exam_centre_name');
         $this->db->where('s.status', 'Active');
         $this->db->from('students as s');
@@ -80,7 +84,9 @@ class Student_message extends Frontend_controller
             $this->db->group_end();
         }
         if($exam_id > 0) {
-            $this->db->where('s.exam_id', $exam_id);
+            // Match on ANY interested exam (student_interested_exams), not just students.exam_id
+            $this->db->where("EXISTS (SELECT 1 FROM student_interested_exams sie
+                              WHERE sie.student_id = s.id AND sie.exam_id = " . (int)$exam_id . ")", null, false);
         }
     }
 

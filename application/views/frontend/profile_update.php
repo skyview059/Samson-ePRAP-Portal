@@ -151,7 +151,7 @@
                         <label for="email" class="col-sm-4 control-label">Exam Name / Purpose of Registration <sup>*</sup></label>
                         <div class="col-sm-8">
                             <input type="text" class="form-control" placeholder="Exam Name"
-                                   value="<?php echo $exam_name; ?>" readonly/>
+                                   value="<?php echo $exam_names; ?>" readonly/>
                         </div>
                     </div>
                     <div class="form-group">

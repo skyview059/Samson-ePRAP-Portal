@@ -21,7 +21,7 @@
     padding: 25px;
     text-align: center;">
                                 <p style="font-size: 15pt;">
-                                    Exam: <b class="text-bold"><?= $exam_name; ?></b>,
+                                    Exams: <b class="text-bold"><?= $exam_names ?: '—'; ?></b>,
                                     Centre: <b class="text-bold"><?= $exam_centre; ?></b> &
                                     Date: <b class="text-bold"><?= $exam_date; ?></b>
                                 </p>

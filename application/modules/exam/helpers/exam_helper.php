@@ -122,6 +122,24 @@ function getExamNameDropDown($selected = 0, $label = '-- Select Exam Name --')
     return $options;
 }
 
+/**
+ * Options for the "Interested Exams" multi-select (student_interested_exams).
+ * @param int[] $selected  exam ids already chosen
+ */
+function getExamNameMultiDropDown(array $selected = [])
+{
+    $ci       = &get_instance();
+    $exams    = $ci->db->select('id, name')->order_by('name')->get('exams')->result();
+    $selected = array_map('intval', $selected);
+
+    $options = '';
+    foreach ($exams as $exam) {
+        $sel      = in_array((int)$exam->id, $selected, true) ? ' selected="selected"' : '';
+        $options .= '<option value="' . $exam->id . '"' . $sel . '>' . $exam->name . '</option>';
+    }
+    return $options;
+}
+
 function ExamCourseDroDown($selected = 0, $label = '-- Select Exam --') {
     $ci = & get_instance();
     $categories = $ci->db->select('id, name')->get('exams')->result();

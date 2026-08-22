@@ -85,6 +85,7 @@ class Student extends Admin_controller
                 'gender'                  => $row->gender,
                 'photo'                   => $row->photo,
                 'exam_name'               => $row->exam_name,
+                'exam_names'              => $this->Student_model->getInterestedExamNames($id),
                 'exam_centre'             => $row->exam_centre,
                 'exam_date'               => globalDateFormat($row->exam_date),
                 'created_at'              => $row->created_at,
@@ -318,7 +319,7 @@ class Student extends Admin_controller
             'postcode'                => set_value('postcode'),
             'gender'                  => set_value('gender', 'Male'),
             'photo'                   => set_value('photo'),
-            'exam_id'                 => set_value('exam_id', $id),
+            'exam_ids'                => $this->input->post('exam_ids') ?: ($id ? [$id] : []),
             'exam_centre_id'          => set_value('exam_centre_id'),
             'exam_date'               => set_value('exam_date'),
             'note'                    => set_value('note'),
@@ -335,6 +336,7 @@ class Student extends Admin_controller
             $this->create();
         } else {
             $password = rand(11111111, 99999999);
+            $exam_ids = array_values(array_unique(array_filter(array_map('intval', (array)$this->input->post('exam_ids')))));
             if ($_FILES['photo']['name']) {
                 $photo = uploadPhoto($_FILES['photo'], 'uploads/student/' . date('Y/m/'), base64_encode(time()));
             } else {
@@ -358,7 +360,7 @@ class Student extends Admin_controller
                 'purpose_of_registration' => $this->input->post('purpose_of_registration', TRUE),
                 'gender'                  => $this->input->post('gender', TRUE) ?: null,
                 'photo'                   => $photo,
-                'exam_id'                 => $this->input->post('exam_id', TRUE),
+                'exam_id'                 => $exam_ids[0] ?? null, // legacy 1:1 column, synced to first interested exam
                 'exam_centre_id'          => $this->input->post('exam_centre_id', TRUE) ?: null,
                 'exam_date'               => $this->input->post('exam_date', TRUE),
                 'note'                    => $this->input->post('note', TRUE),
@@ -367,6 +369,7 @@ class Student extends Admin_controller
             );
             $this->Student_model->insert($data);
             $student_id = $this->db->insert_id();
+            $this->Student_model->saveInterestedExams($student_id, $exam_ids);
 
             $mail_data = [
                 'id'        => $student_id,
@@ -412,7 +415,7 @@ class Student extends Admin_controller
                 'gender'                  => set_value('gender', $row->gender),
                 'status'                  => set_value('status', $row->status),
                 'photo'                   => set_value('photo', $row->photo),
-                'exam_id'                 => set_value('exam_id', $row->exam_id),
+                'exam_ids'                => $this->input->post('exam_ids') ?: $this->Student_model->getInterestedExamIds($id),
                 'exam_centre_id'          => set_value('exam_centre_id', $row->exam_centre_id),
                 'exam_date'               => set_value('exam_date', $row->exam_date),
                 'note'                    => set_value('note', $row->note)
@@ -436,6 +439,7 @@ class Student extends Admin_controller
             if (empty($gmc_number)) {
                 $gmc_number = null;
             }
+            $exam_ids = array_values(array_unique(array_filter(array_map('intval', (array)$this->input->post('exam_ids')))));
 
             $data = array(
                 'number_type'             => $this->input->post('number_type', TRUE),
@@ -451,7 +455,7 @@ class Student extends Admin_controller
                 'present_country_id'      => (int)$this->input->post('present_country_id'),
                 'gender'                  => $this->input->post('gender', TRUE) ?: null,
                 'status'                  => $this->input->post('status', TRUE),
-                'exam_id'                 => (int)$this->input->post('exam_id'),
+                'exam_id'                 => $exam_ids[0] ?? null, // legacy 1:1 column, synced to first interested exam
                 'exam_centre_id'          => (int)$this->input->post('exam_centre_id') ?: null,
                 'exam_date'               => $this->input->post('exam_date', TRUE),
                 'note'                    => $this->input->post('note', TRUE),
@@ -464,6 +468,7 @@ class Student extends Admin_controller
             }
 
             $this->Student_model->update($id, $data);
+            $this->Student_model->saveInterestedExams($id, $exam_ids);
             $this->session->set_flashdata('msgs', 'Students updated successfully');
             redirect(site_url(Backend_URL . 'student/update/' . $id));
         }
@@ -675,9 +680,7 @@ class Student extends Admin_controller
         $this->form_validation->set_rules('whatsapp', 'whatsapp', 'trim|required');
         $this->form_validation->set_rules('gender', 'gender', 'trim');
         $this->form_validation->set_rules('photo', 'photo', 'trim');
-        $this->form_validation->set_rules('exam_id', 'Exam', 'trim|required|is_natural_no_zero', [
-            'is_natural_no_zero' => 'Please select a exam'
-        ]);
+        $this->form_validation->set_rules('exam_ids[]', 'Interested Exams', 'callback_valid_exam_id');
         $this->form_validation->set_rules('exam_centre_id', 'Exam Centre', 'trim');
         $this->form_validation->set_rules('exam_date', 'Exam Date', 'trim|required');
         $this->form_validation->set_rules('id', 'id', 'trim');
@@ -703,14 +706,28 @@ class Student extends Admin_controller
         ]);
         $this->form_validation->set_rules('whatsapp', 'whatsapp', 'trim|required');
         $this->form_validation->set_rules('gender', 'gender', 'trim');
-        $this->form_validation->set_rules('exam_id', 'Exam', 'trim|required|is_natural_no_zero', [
-            'is_natural_no_zero' => 'Please select a exam'
-        ]);
+        $this->form_validation->set_rules('exam_ids[]', 'Interested Exams', 'callback_valid_exam_id');
         $this->form_validation->set_rules('exam_centre_id', 'Exam Centre', 'trim');
         $this->form_validation->set_rules('exam_date', 'Exam Date', 'trim|required');
 
         $this->form_validation->set_rules('id', 'id', 'trim');
         $this->form_validation->set_error_delimiters('<span class="text-danger">', '</span>');
+    }
+
+    /**
+     * form_validation callback for exam_ids[] (runs once per selected value).
+     * Field is optional; when a value is present it must be an existing exam id.
+     */
+    public function valid_exam_id($exam_id)
+    {
+        if ($exam_id === null || $exam_id === '' || $exam_id === []) {
+            return TRUE;
+        }
+        $exists = $this->db->where('id', (int)$exam_id)->count_all_results('exams') > 0;
+        if (!$exists) {
+            $this->form_validation->set_message('valid_exam_id', 'One or more selected exams are invalid.');
+        }
+        return $exists;
     }
 
     public function unique_student_number()

@@ -51,12 +51,13 @@
                 </div>
                
                 <div class="form-group">
-                    <label for="exam_id" class="col-sm-2 control-label">Examination type:</label>
+                    <label for="exam_ids" class="col-sm-2 control-label">Interested Exams</label>
                     <div class="col-sm-6">
-                        <select name="exam_id" class="form-control select2" id="exam_id">
-                            <?php echo getExamNameDropDown($exam_id); ?>
+                        <select name="exam_ids[]" class="form-control select2" id="exam_ids" multiple="multiple"
+                                data-placeholder="-- Select Exams --" style="width:100%">
+                            <?php echo getExamNameMultiDropDown($exam_ids); ?>
                         </select>
-                        <?php echo form_error('exam_id') ?>
+                        <?php echo form_error('exam_ids[]') ?>
                     </div>
                 </div>
                 <div class="form-group">

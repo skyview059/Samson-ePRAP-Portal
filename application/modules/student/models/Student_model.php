@@ -25,6 +25,10 @@ class Student_model extends Fm_model
     function get_limit_data($limit, $start, $type,$status,$teacher_id, $exam_id,$centre_id,$exam_date, $q, $country_origin_id, $present_country_id)
     {
         $this->db->select('students.*');
+        $this->db->select('(SELECT GROUP_CONCAT(e2.name ORDER BY e2.name SEPARATOR ", ")
+                            FROM student_interested_exams sie2
+                            JOIN exams e2 ON e2.id = sie2.exam_id
+                            WHERE sie2.student_id = students.id) AS exam_names', false);
         $this->db->order_by($this->id, $this->order);
         $this->__search($type,$status,$teacher_id,$exam_id,$centre_id,$exam_date,$q, $country_origin_id, $present_country_id);
         $this->db->limit($limit, $start);
@@ -40,7 +44,11 @@ class Student_model extends Fm_model
             $this->db->where('status !=', 'Archive');
         }
         
-        if($exam_id) { $this->db->where('exam_id', $exam_id); }
+        if($exam_id) {
+            // Match on ANY interested exam (student_interested_exams), not just students.exam_id
+            $this->db->where("EXISTS (SELECT 1 FROM student_interested_exams sie
+                              WHERE sie.student_id = students.id AND sie.exam_id = " . (int)$exam_id . ")", null, false);
+        }
         if($country_origin_id) { $this->db->where('country_id', $country_origin_id); }
         if($present_country_id) { $this->db->where('present_country_id', $present_country_id); }
         if($centre_id) { $this->db->where('exam_centre_id', $centre_id); }
@@ -79,13 +87,58 @@ class Student_model extends Fm_model
         return $this->db->get()->row();
     }
 
+    /** Active students interested in the given exam (any of their interested exams). */
     function get($exam_id)
     {
-        $this->db->select('id, number_type, gmc_number as gmc, CONCAT(fname, " ", mname, " ", lname) as full_name');
-        $this->db->from('students');        
-        $this->db->where('exam_id',$exam_id);
-        $this->db->where('status', 'Active');
+        $this->db->select('s.id, s.number_type, s.gmc_number as gmc, CONCAT(s.fname, " ", s.mname, " ", s.lname) as full_name');
+        $this->db->from('students as s');
+        $this->db->join('student_interested_exams as sie', 'sie.student_id = s.id', 'INNER');
+        $this->db->where('sie.exam_id', (int)$exam_id);
+        $this->db->where('s.status', 'Active');
+        $this->db->group_by('s.id');
         return $this->db->get()->result();
+    }
+
+    /** @return int[] exam ids from student_interested_exams, oldest first */
+    function getInterestedExamIds($student_id)
+    {
+        $rows = $this->db->select('exam_id')
+            ->where('student_id', (int)$student_id)
+            ->order_by('id', 'ASC')
+            ->get('student_interested_exams')->result();
+        return array_map(fn($r) => (int)$r->exam_id, $rows);
+    }
+
+    /** Comma-joined exam names, e.g. "MRCGP SCA, PLAB/UKMLA Part 2" */
+    function getInterestedExamNames($student_id)
+    {
+        $row = $this->db->select('GROUP_CONCAT(e.name ORDER BY e.name SEPARATOR ", ") AS names', false)
+            ->from('student_interested_exams AS sie')
+            ->join('exams AS e', 'e.id = sie.exam_id', 'LEFT')
+            ->where('sie.student_id', (int)$student_id)
+            ->get()->row();
+        return $row ? (string)$row->names : '';
+    }
+
+    /**
+     * Replace the student's interested-exam set.
+     * @param  int[] $exam_ids
+     * @return int|null first exam id (for the students.exam_id sync) or null when empty
+     */
+    function saveInterestedExams($student_id, array $exam_ids)
+    {
+        $student_id = (int)$student_id;
+        $exam_ids   = array_values(array_unique(array_filter(array_map('intval', $exam_ids))));
+
+        $this->db->trans_start();
+        $this->db->delete('student_interested_exams', ['student_id' => $student_id]);
+        if ($exam_ids) {
+            $batch = array_map(fn($eid) => ['student_id' => $student_id, 'exam_id' => $eid], $exam_ids);
+            $this->db->insert_batch('student_interested_exams', $batch);
+        }
+        $this->db->trans_complete();
+
+        return $exam_ids[0] ?? null;
     }
     
     function marked($id)

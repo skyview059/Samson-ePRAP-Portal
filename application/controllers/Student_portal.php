@@ -173,6 +173,10 @@ class Student_portal extends Frontend_controller
     public function profile()
     {
         $this->db->select('s.*, e.name as exam_name, ec.name as exam_centre, et.name as ethnicity_name, c.name as country_name');
+        $this->db->select('(SELECT GROUP_CONCAT(e2.name ORDER BY e2.name SEPARATOR ", ")
+                            FROM student_interested_exams sie2
+                            JOIN exams e2 ON e2.id = sie2.exam_id
+                            WHERE sie2.student_id = s.id) AS exam_names', false);
         $this->db->select('pc.name as present_country_name, sc.questions as secret_question_1_name');
         $this->db->select('sc2.questions as secret_question_2_name');
         $this->db->join('exams as e', 'e.id=s.exam_id', 'LEFT');
@@ -191,6 +195,10 @@ class Student_portal extends Frontend_controller
     public function profile_update()
     {
         $this->db->select('s.*, e.name as exam_name, ec.name as exam_centre');
+        $this->db->select('(SELECT GROUP_CONCAT(e2.name ORDER BY e2.name SEPARATOR ", ")
+                            FROM student_interested_exams sie2
+                            JOIN exams e2 ON e2.id = sie2.exam_id
+                            WHERE sie2.student_id = s.id) AS exam_names', false);
         $this->db->join('exams as e', 'e.id=s.exam_id', 'LEFT');
         $this->db->join('exam_centres as ec', 'ec.id=s.exam_centre_id', 'LEFT');
         $stu = $this->db->get_where('students as s', ['s.id' => $this->student_id])->row();
@@ -201,6 +209,7 @@ class Student_portal extends Frontend_controller
             'number_type'             => $stu->number_type,
             'gmc_number'              => $stu->gmc_number,
             'exam_name'               => $stu->exam_name,
+            'exam_names'              => $stu->exam_names,
             'exam_centre'             => $stu->exam_centre,
             'exam_date'               => $stu->exam_date,
             'title'                   => set_value('title', $stu->title),
@@ -498,10 +507,14 @@ class Student_portal extends Frontend_controller
     public function exams()
     {
         $exam_date = Tools::getStudentData($this->student_id, 'exam_date');
-        $exam_id   = Tools::getStudentData($this->student_id, 'exam_id');
+        // All interested exams (student_interested_exams), not just the legacy students.exam_id
+        $exam_ids  = array_map('intval', array_column(
+            $this->db->select('exam_id')->where('student_id', $this->student_id)->get('student_interested_exams')->result_array(),
+            'exam_id'
+        ));
         $data      = [
 //            'enrolled_exams'      => $this->upComingExam(),
-'available_mock_exam' => ($exam_id && $exam_date) ? $this->availableMockExamForMe($exam_id, $exam_date) : [],
+'available_mock_exam' => ($exam_ids && $exam_date) ? $this->availableMockExamForMe($exam_ids, $exam_date) : [],
 'sql'                 => $this->db->last_query()
         ];
         $this->viewMemberContent('exams', $data);
@@ -509,8 +522,11 @@ class Student_portal extends Frontend_controller
 
 
     /* Depend on Student Exam Date */
-    private function availableMockExamForMe($exam_id, $exam_date)
+    private function availableMockExamForMe(array $exam_ids, $exam_date)
     {
+        if (!$exam_ids) {
+            return [];
+        }
         $this->db->select('name');
         $this->db->where('id', 'es.exam_id', false, false);
         $sql = $this->db->get_compiled_select('exams');
@@ -521,7 +537,7 @@ class Student_portal extends Frontend_controller
         $this->db->from('exam_schedules as es');
         $this->db->join('exam_centres as ec', 'ec.id=es.exam_centre_id', 'LEFT');
         $this->db->where('es.datetime >=', date('Y-m-d 00:00:00'));
-        $this->db->where('es.exam_id', $exam_id);
+        $this->db->where_in('es.exam_id', $exam_ids);
         $this->db->where('es.exam_status', 'Active');
         $this->db->like('es.gmc_exam_dates', $exam_date);
         return $this->db->get()->result();
