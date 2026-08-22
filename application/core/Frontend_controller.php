@@ -96,7 +96,7 @@ class Frontend_controller extends MX_Controller {
         if($student){
             //Get password from student data
             $password = getLoginStudentData('password');            
-            return (password_verify($password, $student->password)) ? true : false;
+            return (!empty($password) && password_verify($password, $student->password)) ? true : false;
         }
         return false;
         
