@@ -61,3 +61,7 @@ ALTER TABLE `student_interested_exams` ADD UNIQUE KEY `uq_student_exam` (`studen
 -- student_interested_exams: back-fill from the legacy 1:1 students.exam_id column
 INSERT IGNORE INTO `student_interested_exams` (`student_id`, `exam_id`)
 SELECT `id`, `exam_id` FROM `students` WHERE `exam_id` > 0;
+
+-- Booking modal (exam/student page): server-side search by exam + keyword
+ALTER TABLE `student_interested_exams` ADD INDEX `idx_sie_exam_student` (`exam_id`, `student_id`);
+ALTER TABLE `student_exam_enrollments` ADD INDEX `idx_see_schedule_student` (`exam_schedule_id`, `student_id`);

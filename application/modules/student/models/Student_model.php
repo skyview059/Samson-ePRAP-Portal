@@ -152,7 +152,69 @@ class Student_model extends Fm_model
         }
         return $selected;
     }
-    
+
+    /**
+     * Server-side search for the "Book Student for Exam" modal.
+     *
+     * @param  int[]  $exam_ids          match students interested in ANY of these exams (student_interested_exams)
+     * @param  int    $exam_schedule_id  only used to flag rows already enrolled in this schedule
+     * @param  string $q                 keyword: name, email, student id, GMC number
+     * @return array  ['total' => int, 'rows' => object[]]
+     */
+    function searchForExam(array $exam_ids, $exam_schedule_id, $q = '', $page = 1, $limit = 25)
+    {
+        $exam_ids = array_values(array_unique(array_filter(array_map('intval', $exam_ids))));
+        if (!$exam_ids) {
+            return ['total' => 0, 'rows' => []];
+        }
+
+        $build = function () use ($exam_ids, $q) {
+            $this->db->from('students AS s');
+            $this->db->where('s.status', 'Active');
+            // EXISTS instead of JOIN so a student interested in several selected exams appears once
+            $this->db->where(
+                'EXISTS (SELECT 1 FROM student_interested_exams sie
+                         WHERE sie.student_id = s.id AND sie.exam_id IN (' . implode(',', $exam_ids) . '))',
+                null,
+                false
+            );
+            if ($q !== '') {
+                $this->db->group_start();
+                $this->db->like('s.fname', $q);
+                $this->db->or_like('s.mname', $q);
+                $this->db->or_like('s.lname', $q);
+                $this->db->or_like("CONCAT(s.fname, ' ', s.lname)", $q);
+                $this->db->or_like('s.email', $q);
+                $this->db->or_like('s.gmc_number', $q);
+                if (ctype_digit($q)) {
+                    $this->db->or_where('s.id', (int)$q);
+                }
+                $this->db->group_end();
+            }
+        };
+
+        $build();
+        $total = (int)$this->db->count_all_results();
+
+        $build();
+        $this->db->select(
+            "s.id, s.number_type, s.gmc_number AS gmc, s.email,
+             TRIM(CONCAT_WS(' ', s.fname, s.mname, s.lname)) AS full_name,
+             (see.id IS NOT NULL) AS booked",
+            false
+        );
+        $this->db->join(
+            'student_exam_enrollments AS see',
+            'see.student_id = s.id AND see.exam_schedule_id = ' . (int)$exam_schedule_id,
+            'LEFT'
+        );
+        $this->db->order_by('s.fname', 'ASC');
+        $this->db->order_by('s.id', 'ASC');
+        $this->db->limit((int)$limit, max(0, ((int)$page - 1) * (int)$limit));
+
+        return ['total' => $total, 'rows' => $this->db->get()->result()];
+    }
+
     function coutn_all_links($id)
     {
         $files                      = $this->db->where('student_id', $id )->count_all_results('files');

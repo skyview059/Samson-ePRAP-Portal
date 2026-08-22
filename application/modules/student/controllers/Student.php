@@ -789,6 +789,83 @@ class Student extends Admin_controller
         $this->load->view('student/student/get', $data);
     }
 
+    /**
+     * JSON search for the exam/student booking modal (Alpine.js).
+     * POST: exam_ids[], exam_schedule_id, q, page
+     */
+    public function search_for_exam()
+    {
+        ajaxAuthorized();
+
+        $exam_ids         = (array)$this->input->post('exam_ids');
+        $exam_schedule_id = (int)$this->input->post('exam_schedule_id');
+        $q                = trim((string)$this->input->post('q', TRUE));
+        $page             = max(1, (int)$this->input->post('page'));
+        $limit            = 25;
+
+        $res = $this->Student_model->searchForExam($exam_ids, $exam_schedule_id, $q, $page, $limit);
+
+        $this->output->set_content_type('application/json');
+        echo json_encode([
+            'Status' => 'OK',
+            'total'  => $res['total'],
+            'page'   => $page,
+            'limit'  => $limit,
+            'rows'   => $res['rows'],
+        ]);
+    }
+
+    /**
+     * Additive booking: enrol the posted students into the schedule.
+     * Never deletes — un-booking is done from the exam/student page "Cancel" button.
+     * POST: exam_schedule_id, student_ids[]
+     */
+    public function book_for_exam()
+    {
+        ajaxAuthorized();
+
+        $exam_schedule_id = (int)$this->input->post('exam_schedule_id');
+        $students         = array_values(array_unique(array_filter(
+            array_map('intval', (array)$this->input->post('student_ids'))
+        )));
+
+        if (!$exam_schedule_id || empty($students)) {
+            echo ajaxRespond('Fail', 'Nothing to save — please select at least one student.');
+            return;
+        }
+
+        $already = array_map(
+            fn($r) => (int)$r->student_id,
+            $this->db->select('student_id')
+                ->where('exam_schedule_id', $exam_schedule_id)
+                ->where_in('student_id', $students)
+                ->get('student_exam_enrollments')->result()
+        );
+
+        $name = getLoginUserData('name');
+        $now  = date('Y-m-d H:i:s');
+        $rows = [];
+        foreach (array_diff($students, $already) as $student_id) {
+            $rows[] = [
+                'exam_schedule_id' => $exam_schedule_id,
+                'student_id'       => $student_id,
+                'status'           => 'Enrolled',
+                'remarks'          => "Booked by {$name} from Exam/Student page",
+                'created_at'       => $now,
+            ];
+        }
+
+        if (!empty($rows)) {
+            $this->db->insert_batch('student_exam_enrollments', $rows);
+        }
+
+        $msg = count($rows) . ' student(s) booked successfully';
+        if (!empty($already)) {
+            $msg .= ', ' . count($already) . ' already booked';
+        }
+        echo ajaxRespond('OK', $msg);
+    }
+
     public function save()
     {
         ajaxAuthorized();

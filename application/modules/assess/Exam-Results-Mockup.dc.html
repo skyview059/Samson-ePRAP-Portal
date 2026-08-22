@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+  body{margin:0;background:#eae6e2;font-family:Georgia,'Times New Roman',serif}
+  a{color:#b83a63}
+  a:hover{color:#8f2c4d}
+</style>
+</helmet>
+<div style="max-width:1200px;margin:0 auto;background:#eae6e2;border-top:3px solid #d94f6e;padding:32px 24px 80px;font-family:'Segoe UI',Helvetica,Arial,sans-serif;color:#333">
+
+  <h1 style="text-align:center;font-family:Georgia,serif;font-weight:400;color:#4a4a4a;font-size:34px;margin:8px 0 12px">Exam Results</h1>
+  <div style="text-align:center;margin-bottom:28px">
+    <a href="#" style="text-decoration:none;color:#c94a68;font-size:15px;display:inline-flex;align-items:center;gap:6px">← Exams</a>
+  </div>
+
+  <div style="background:#fff;border-radius:2px;box-shadow:0 1px 2px rgba(0,0,0,0.06);padding:32px;margin-bottom:24px">
+    <h2 style="color:#c94a68;font-weight:600;font-size:20px;margin:0 0 20px">Overall Summary of Results</h2>
+    <div style="background:#e7edf5;padding:16px 20px;display:flex;gap:40px;font-size:15px;margin-bottom:20px">
+      <div>Total score: <strong>{{ totalScore }}</strong> out of <strong>{{ maxScore }}</strong></div>
+      <div>Pass mark: <strong>{{ passMark }}</strong></div>
+      <div>Result: <strong style="color:#c0392b">{{ result }}</strong></div>
+    </div>
+    <ul style="margin:0;padding-left:20px;line-height:1.9">
+      <li><a href="#domain-grades" style="text-decoration:none">Domain Grades</a></li>
+      <li><a href="#feedback-statements" style="text-decoration:none">Feedback Statements</a></li>
+      <li><a href="#individual-feedback" style="text-decoration:none">Individual Feedback</a></li>
+    </ul>
+  </div>
+
+  <div id="domain-grades" style="background:#fff;border-radius:2px;box-shadow:0 1px 2px rgba(0,0,0,0.06);padding:32px;margin-bottom:24px">
+    <h2 style="color:#c94a68;font-weight:600;font-size:20px;margin:0 0 16px">Domain grades</h2>
+    <p style="font-size:14px;line-height:1.6;color:#444;margin:0 0 24px">The graphs detail the number of times each grade was selected per marking domain over the 12 cases. Hovering over the column will reveal the number of times each grade was selected.</p>
+
+    <sc-for list="{{ domains }}" as="domain" hint-placeholder-count="3">
+      <div style="display:grid;grid-template-columns:260px 1fr;background:#eef2f8;margin-bottom:14px;padding:24px">
+        <div>
+          <div style="font-weight:600;font-size:15px;margin-bottom:8px">{{ domain.name }}</div>
+          <div style="font-size:14px;color:#444">Score: <strong>{{ domain.score }}</strong> out of <strong>{{ domain.max }}</strong></div>
+        </div>
+        <div style="display:flex;align-items:flex-end;height:120px;border-bottom:2px solid #333;position:relative;padding:0 20px">
+          <sc-for list="{{ domain.bars }}" as="bar" hint-placeholder-count="4">
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:6px">
+              <div style="width:26px;height:{{ bar.height }}px;background:{{ bar.color }}"></div>
+            </div>
+          </sc-for>
+        </div>
+        <div></div>
+        <div style="display:flex;padding:0 20px;margin-top:6px">
+          <sc-for list="{{ domain.bars }}" as="bar" hint-placeholder-count="4">
+            <div style="flex:1;text-align:center;font-size:12px;color:#777">{{ bar.label }}</div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+
+  <div id="feedback-statements" style="background:#fff;border-radius:2px;box-shadow:0 1px 2px rgba(0,0,0,0.06);padding:32px;margin-bottom:24px">
+    <h2 style="color:#c94a68;font-weight:600;font-size:20px;margin:0 0 16px">Feedback statements selected in your examination</h2>
+    <p style="font-size:14px;line-height:1.6;color:#444;margin:0 0 24px">For any failing domain, the examiners will have selected up to 4 relevant feedback statements. The feedback statements here correspond to the number of times each statement was chosen with those selected most frequently appearing first. Very occasionally a feedback statement will have also been provided for a domain where you passed. Find out further information on the feedback statements, their links to the relevant marking domains and developmental suggestions on the <a href="#">RCGP SCA feedback statement web page</a>.</p>
+
+    <sc-for list="{{ feedbackStatements }}" as="fb" hint-placeholder-count="1">
+      <div style="background:#eef2f8;margin-bottom:14px">
+        <div onClick="{{ fb.toggle }}" style="display:flex;align-items:center;gap:16px;padding:18px 24px;cursor:pointer">
+          <div style="background:#e0622b;color:#fff;border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0">x{{ fb.count }}</div>
+          <div style="flex:1;font-size:15px;color:#333">{{ fb.statement }}</div>
+          <div style="font-size:14px;color:#666">{{ fb.chevron }}</div>
+        </div>
+        <sc-if value="{{ fb.open }}" hint-placeholder-val="{{ true }}">
+          <div style="padding:0 24px 22px 74px;font-size:14px;line-height:1.7;color:#444">
+            <sc-for list="{{ fb.details }}" as="line" hint-placeholder-count="2">
+              <p style="margin:0 0 10px">{{ line }}</p>
+            </sc-for>
+            <p style="margin:14px 0 0">Capability area: <strong>{{ fb.capability }}</strong></p>
+          </div>
+        </sc-if>
+      </div>
+    </sc-for>
+  </div>
+
+  <div id="individual-feedback" style="background:#fff;border-radius:2px;box-shadow:0 1px 2px rgba(0,0,0,0.06);padding:32px;margin-bottom:24px">
+    <h2 style="color:#c94a68;font-weight:600;font-size:20px;margin:0 0 16px">Individual Feedback</h2>
+    <p style="font-size:14px;line-height:1.6;color:#444;margin:0">The 12 cases taken in your SCA are detailed below. These include a short description of the consultation, the individual grades you received per marking domain and any feedback statements selected by the examiner.</p>
+  </div>
+
+  <sc-for list="{{ cases }}" as="c" hint-placeholder-count="1">
+    <div style="background:#fff;border-radius:2px;box-shadow:0 1px 2px rgba(0,0,0,0.06);padding:32px;margin-bottom:24px">
+      <h3 style="font-size:16px;font-weight:600;color:#333;margin:0 0 20px">{{ c.title }}</h3>
+      <div style="display:grid;grid-template-columns:max-content max-content;justify-content:end;row-gap:10px;column-gap:12px;margin-bottom:26px">
+        <sc-for list="{{ c.grades }}" as="g" hint-placeholder-count="3">
+          <div style="font-size:14px;font-weight:600;color:#333;text-align:right">{{ g.domain }}</div>
+          <div style="font-size:14px;color:#666;display:flex;align-items:center;gap:8px"><span style="width:10px;height:10px;border-radius:50%;background:{{ g.color }};display:inline-block"></span>{{ g.grade }}</div>
+        </sc-for>
+      </div>
+      <sc-for list="{{ c.feedback }}" as="f" hint-placeholder-count="4">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 0;border-top:1px solid #eee">
+          <div style="font-size:14px;color:#333">{{ f }}</div>
+          <div style="color:#c94a68;font-size:12px">▼</div>
+        </div>
+      </sc-for>
+    </div>
+  </sc-for>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = {
+    open: { 0: true }
+  };
+
+  domainsData = [
+    { name: 'Data gathering & diagnosis', score: '19.0', max: '36', bars: [
+      { label: 'Clear fail', height: 2, color: '#c0392b' },
+      { label: 'Fail', height: 60, color: '#e0842b' },
+      { label: 'Pass', height: 95, color: '#a9a92e' },
+      { label: 'Clear pass', height: 2, color: '#c9c9c9' },
+    ]},
+    { name: 'Clinical management & complexity', score: '22.5', max: '54', bars: [
+      { label: 'Clear fail', height: 14, color: '#c0392b' },
+      { label: 'Fail', height: 100, color: '#e0842b' },
+      { label: 'Pass', height: 55, color: '#a9a92e' },
+      { label: 'Clear pass', height: 2, color: '#c9c9c9' },
+    ]},
+    { name: 'Relating to others', score: '11.0', max: '36', bars: [
+      { label: 'Clear fail', height: 14, color: '#c0392b' },
+      { label: 'Fail', height: 100, color: '#e0842b' },
+      { label: 'Pass', height: 2, color: '#c9c9c9' },
+      { label: 'Clear pass', height: 2, color: '#c9c9c9' },
+    ]},
+  ];
+
+  feedbackData = [
+    {
+      statement: "Explanations were inadequately shared or adapted for the person's needs.",
+      count: 6,
+      capability: 'Communication and consultation skills',
+      details: [
+        'The examiners felt that your explanations were unclear or insufficient for patient understanding.',
+        "Explanations should be relevant and understandable to patients and carers, using clear language that is both appropriate and accessible. People living with disability may need special consideration.",
+        "For example, 'There is a small lesion on your film' contains jargon that may have little meaning to your patient. Or 'You have some proteins causing joint pain as your body is fighting itself' may not be useful to a Rheumatology Nurse Specialist. A hearing-impaired person may benefit from visual aids or written explanations. A child of eleven may need an adaptation of the explanation given to their adult carer/parent.",
+        'Try to employ communication techniques and materials that may adapt explanations to the needs of the person and/or carer. Consider what do they need to know and how can I explain it in a way that is accessible and helpful for them? Then how might I check they understand?',
+      ],
+    },
+  ];
+
+  casesData = [
+    {
+      title: 'Telephone/Video consultation with a teenage female regarding contraception',
+      grades: [
+        { domain: 'Data gathering skills', grade: 'P – pass', color: '#4caf50' },
+        { domain: 'Clinical management skills', grade: 'F – fail', color: '#e0a02b' },
+        { domain: 'Interpersonal skills', grade: 'F – fail', color: '#e0a02b' },
+      ],
+      feedback: [
+        'The management plan relating to prescribing of medication was inappropriate or not reflective of current practice',
+        'Uncertainty, including that experienced by the patient, was managed ineffectively',
+        'Communication skills, including the non-verbal, responding to cues and/or active listening were insufficiently demonstrated.',
+        "The person's agenda, health beliefs and/or preferences were insufficiently explored",
+      ],
+    },
+  ];
+
+  toggleFb(i) {
+    this.setState(s => ({ open: { ...s.open, [i]: !s.open[i] } }));
+  }
+
+  renderVals() {
+    const domains = this.domainsData;
+    const feedbackStatements = this.feedbackData.map((fb, i) => ({
+      ...fb,
+      open: !!this.state.open[i],
+      chevron: this.state.open[i] ? '▲' : '▼',
+      toggle: () => this.toggleFb(i),
+    }));
+    return {
+      totalScore: '52.5',
+      maxScore: '126',
+      passMark: '76.0',
+      result: 'Failed',
+      domains,
+      feedbackStatements,
+      cases: this.casesData,
+    };
+  }
+}
+
+</script>
+</body>
+</html>

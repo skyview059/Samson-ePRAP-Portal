@@ -48,3 +48,31 @@ the rest we need to remove please
     -- I can not find the MRCGP SCA -> adding to dropdown option  --- Done 
 2. Setup new exam page - passing criteria removing ------------------ Done 
 3. 
+
+
+
+furtado.ns@gmail.com
+
+('chinemeconfy@gmail.com',
+'nanoosh_al-ahdal55@hotmail.com',
+'matthewambore2022@gmail.com',
+'ogbonia.philip@gmail.com',
+'pedro.okoh95@gmail.com',
+'mau.elendu@gmail.com',
+'rimahfouz@gmail.com',
+'adaobiazom@gmail.com')
+
+
+
+Claude, i have a student select option here. which work in page search based. Now need make it upgrade. So that user can search by keyword and select exam_id as well. 
+
+
+
+SELECT id,fname,lname,email,exam_id FROM `students` WHERE `email` IN ( 'furtado.ns@gmail.com', 'chinemeconfy@gmail.com',
+'nanoosh_al-ahdal55@hotmail.com',
+'matthewambore2022@gmail.com',
+'ogbonia.philip@gmail.com',
+'pedro.okoh95@gmail.com',
+'mau.elendu@gmail.com',
+'rimahfouz@gmail.com',
+'adaobiazom@gmail.com' );

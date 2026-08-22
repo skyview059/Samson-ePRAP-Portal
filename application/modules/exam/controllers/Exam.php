@@ -68,6 +68,10 @@ class Exam extends Admin_controller
                 'centre_name'    => $row->centre_name,
                 'centre_address' => $row->centre_address,
                 'students'       => $this->Exam_model->get_students($id),
+                'exams'          => $this->db->select('id, name, exam_type')
+                                             ->where('status', 'Active')
+                                             ->order_by('name', 'ASC')
+                                             ->get('exams')->result(),
                 'start'          => 0
             );
             $this->viewAdminContent('exam/exam/student', $data);
