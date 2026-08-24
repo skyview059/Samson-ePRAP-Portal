@@ -68,7 +68,7 @@
                                     <tbody>
                                         <?php foreach ($students as $s){ 
                                             
-                                            $link = "admin/assess/search_student?exam_schedule_id={$exam_schedule_id}&number_type={$s->number_type}&gmc={$s->gmc_number}";
+                                            $link = "admin/assess/search_student?exam_schedule_id={$exam_schedule_id}&student_id={$s->id}";
                                             $modify = "admin/assess/review_assement?es_id={$exam_schedule_id}&sid={$s->id}";
                                             ?>
                                         <tr>

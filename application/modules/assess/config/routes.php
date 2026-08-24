@@ -18,6 +18,7 @@ $route['admin/assess/preparation/details/(:num)']   = 'assess/preparation/detail
 
 $route['admin/assess']                  = 'assess';
 $route['admin/assess/search_student']   = 'assess/search_student';
+$route['admin/assess/student_scenarios']   = 'assess/student_scenarios';
 $route['admin/assess/initial_approach/(:num)'] = 'assess/initial_approach/$1';
 $route['admin/assess/initial_approach_action'] = 'assess/initial_approach_action';
 $route['admin/assess/face/(:num)'] = 'assess/face/$1';

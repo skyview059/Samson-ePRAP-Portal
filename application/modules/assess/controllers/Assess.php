@@ -19,73 +19,119 @@ class Assess extends Admin_controller{
     
     public function search_student() {
         $exam_schedule_id = (int) $this->input->get('exam_schedule_id');
-        $number_type = urldecode_fk($this->input->get('number_type', TRUE));
-        $gmc        = urldecode_fk($this->input->get('gmc', TRUE));
+        $student_id  = (int) $this->input->get('student_id');
+        // $number_type = urldecode_fk($this->input->get('number_type', TRUE));
+        // $gmc         = urldecode_fk($this->input->get('gmc', TRUE));
+        $_sql_query = '';
 
-        $students   = $this->Assess_model->searchStudent($number_type, $gmc);
-        $student_id = ($students) ? $students->id : 0;
-        
-        //Get current exam information by student and current user
-        $exam_info = $this->Assess_model->getExamScheduleInfoByStudent($exam_schedule_id, $student_id);
-        $_sql_query = pp4dev($this->db->last_query());
+        //Step 1: Today's exam schedules assigned to this assessor
+        $exam_schedules = getTodayExamScheduleListByTeacher();
+        $_sql_query     = pp4dev($this->db->last_query());
 
-        if ($exam_info) {
-            
-            //Exam scenario status set
-            if(!empty($exam_info->scenarios)){
-                foreach ($exam_info->scenarios as $key => $scenario) {
-                    //If duplicate check exam by student_id, exam_schedule_id, assessor_id & scenario_id
-                    $result = $this->Assess_model->getDuplicateCheckExamResultData($student_id, $exam_info->id, $scenario->id);
-                   
-                    if($result){
-//                        echo $result_details->assessor_id.'='.$this->user_id.'<br/>';
-//                        dd($result_details->assessor_id);
-                        
-                        if($this->role_id == 2 ){
-                            $scenario->status = $result->step;
-                        } else {
-                            $scenario->status = ($result->assessor_id != $this->user_id) ? 'not_assessor' : $result->step;                            
-                        }      
-                        $scenario->assessor = Tools::getAssessorByName($result->assessor_id);
-                        
-                    } else{
-                        $scenario->status = 'initial_start';                        
-                        $scenario->assessor = '--';
-                    } 
-                    
-                }
-            }
-        
-            
-            //Set cookie data for student exam
-            $cookie_data = json_encode([
-                'student_id' => $student_id,
-                'gmc_number' => $students->gmc_number,
-                'exam_schedule_id' => $exam_info->id
-            ]);
-
-            $cookie = [
-                'name' => 'exam_data',
-                'value' => base64_encode($cookie_data),
-                'expire' => 86500,
-                'secure' => false
-            ];
-
-            $this->input->set_cookie($cookie);
+        //Step 3: Selected student by id (legacy number_type + gmc links still supported)
+        if ($student_id) {
+            $students = $this->Assess_model->getStudentById($student_id);
+        } else {
+            $students = NULL;
         }
+        $student_id = ($students) ? $students->id : 0;
+
+        //Step 2: Enrolled students of the clicked exam schedule
+        $enrolled_students = ($exam_schedule_id && !$students)
+            ? $this->Assess_model->getStudentListByExam($exam_schedule_id)
+            : array();
+
+        //Get current exam information by student and current user
+        $exam_info  = NULL;
         
+        if ($students) {
+            $exam_info = $this->_prepareStudentExamInfo($exam_schedule_id, $students);            
+        }
+
         $data = array(
+            'exam_schedules' => $exam_schedules,
+            'enrolled_students' => $enrolled_students,
             'students' => $students,
             'sql_query' => $_sql_query,
             'exam' => $exam_info,
             'exam_schedule_id' => $exam_schedule_id,
-            'number_type' => $number_type,
-            'gmc' => $gmc,
+            'student_id' => $student_id,
             'right_candidate' => set_value('right_candidate')
         );
-        
-        // dd( $data );        
+
+        // dd( $data );
         $this->viewAdminContent('assess/assess/search_student', $data);
+    }
+
+    /**
+     * Ajax: render the scenario list of an exam schedule for one student.
+     * Loaded into the modal on the search_student page.
+     */
+    public function student_scenarios() {
+        $exam_schedule_id = (int) $this->input->get('exam_schedule_id');
+        $student_id       = (int) $this->input->get('student_id');
+
+        $students  = $this->Assess_model->getStudentById($student_id);
+        $exam_info = ($students) ? $this->_prepareStudentExamInfo($exam_schedule_id, $students) : NULL;
+
+        $data = array(
+            'students' => $students,
+            'exam' => $exam_info,
+        );
+
+        $this->load->view('assess/assess/partials/student_scenarios', $data);
+    }
+
+    /**
+     * Load exam schedule info for a student, resolve each scenario's status
+     * for the current assessor and set the exam_data cookie
+     * (the cookie is required later by initial_approach()).
+     */
+    private function _prepareStudentExamInfo($exam_schedule_id, $students) {
+        $student_id = $students->id;
+        $exam_info = $this->Assess_model->getExamScheduleInfoByStudent($exam_schedule_id, $student_id);
+
+        if (!$exam_info) {
+            return NULL;
+        }
+
+        //Exam scenario status set
+        if (!empty($exam_info->scenarios)) {
+            foreach ($exam_info->scenarios as $scenario) {
+                //If duplicate check exam by student_id, exam_schedule_id, assessor_id & scenario_id
+                $result = $this->Assess_model->getDuplicateCheckExamResultData($student_id, $exam_info->id, $scenario->id);
+
+                if ($result) {
+                    if ($this->role_id == 2) {
+                        $scenario->status = $result->step;
+                    } else {
+                        $scenario->status = ($result->assessor_id != $this->user_id) ? 'not_assessor' : $result->step;
+                    }
+                    $scenario->assessor = Tools::getAssessorByName($result->assessor_id);
+                } else {
+                    $scenario->status = 'initial_start';
+                    $scenario->assessor = '--';
+                }
+            }
+        }
+
+        //Set cookie data for student exam
+        $cookie_data = json_encode([
+            'student_id' => $student_id,
+            'gmc_number' => $students->gmc_number,
+            'exam_schedule_id' => $exam_info->id
+        ]);
+
+        $cookie = [
+            'name' => 'exam_data',
+            'value' => base64_encode($cookie_data),
+            'expire' => 86500,
+            'secure' => false
+        ];
+
+        $this->input->set_cookie($cookie);
+
+        return $exam_info;
     }
 
     public function initial_approach($scenario_id) {

@@ -37,7 +37,14 @@ class Assess_model extends Fm_model{
         $this->db->where('gmc_number', $gmc);
         return $this->db->get('students')->row();
     }
-    
+
+    //Get single student by primary id
+    function getStudentById($student_id)
+    {
+        $this->db->where('id', $student_id);
+        return $this->db->get('students')->row();
+    }
+
     //Get exam information by student and current user id
     function getExamScheduleInfoByStudent($exam_schedule_id, $student_id) {
        
@@ -133,7 +140,7 @@ class Assess_model extends Fm_model{
             ->join('exam_schedules as es', 'es.id=se.exam_schedule_id', 'left')
             ->join('exams as e', 'e.id=es.exam_id', 'left')
             ->join('exam_centres as ec', 'ec.id=es.exam_centre_id', 'left')
-            ->select('s.id, s.photo, s.number_type, s.gmc_number,CONCAT(s.fname," ",s.lname) AS full_name,s.email, s.phone, s.created_at')
+            ->select('s.id, s.photo, CONCAT(s.title," ", s.fname," ",s.lname) AS full_name,s.email, s.phone, s.created_at')
             ->select('se.status, se.remarks, e.name as exam_name, ec.name as centre_name, DATE_FORMAT(es.datetime, "%Y-%m-%d") as date')
             ->where('se.exam_schedule_id', $exam_schedule_id)
             ->where('se.status', 'Enrolled')

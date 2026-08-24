@@ -17,7 +17,8 @@ function assessTabs($id, $active_tab) {
 	return $html;
 }
 
-function getTodayExamScheduleDropDownByTeacher($selected = 0, $admin = false )
+//Today's exam schedule rows assigned to the logged in assessor
+function getTodayExamScheduleListByTeacher($admin = false)
 {
     $ci = &get_instance();
     $ci->db->select('sr.exam_schedule_id, es.datetime, es.exam_id, e.name,c.name as centre');
@@ -26,21 +27,26 @@ function getTodayExamScheduleDropDownByTeacher($selected = 0, $admin = false )
     $ci->db->join('exam_schedules as es', 'es.id=sr.exam_schedule_id', 'left');
     $ci->db->join('exams as e', 'e.id=es.exam_id', 'left');
     $ci->db->join('exam_centres as c', 'c.id=es.exam_centre_id', 'left');
-    
+
     if($admin == false ){
         $ci->db->where('sta.assessor_id', getLoginUserData('user_id'));
         $ci->db->where('DATE(es.datetime)', date('Y-m-d') );
     }
     $ci->db->where('es.exam_status', 'Active');
-    $ci->db->where('es.status', 'Unpublished');    
+    $ci->db->where('es.status', 'Unpublished');
     $ci->db->group_by('sr.exam_schedule_id');
     $ci->db->order_by('c.id', 'ASC');
-    
-    $schedules = $ci->db->get()->result();
+
+    return $ci->db->get()->result();
+}
+
+function getTodayExamScheduleDropDownByTeacher($selected = 0, $admin = false )
+{
+    $schedules = getTodayExamScheduleListByTeacher($admin);
     $options = '';
     if(!$schedules){
         return '<option value="0">-No Exam Found!-</option>';
-    }    
+    }
     
     foreach ($schedules as $s ) {
         $time = globalDateTimeFormat($s->datetime);

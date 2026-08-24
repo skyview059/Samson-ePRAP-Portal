@@ -494,3 +494,9 @@ function getPackageScenarioTypeName($type, $exam_id = 0)
             return 'N/A';
     }
 }
+
+
+function studentID($id)
+{
+    return 'S-' . str_pad($id, 5, '0', STR_PAD_LEFT);
+}
