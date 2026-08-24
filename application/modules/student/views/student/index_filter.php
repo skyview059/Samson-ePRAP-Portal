@@ -5,7 +5,7 @@
         <div class="input-group">
             <span class="input-group-addon">Student of Teacher</span>
             <select class="form-control" name="tid">
-            <?php echo getDropDownUserList($tid); ?>
+            <?php echo $_getDropDownUserList; ?>
             </select>
         </div>
     </div>
@@ -13,7 +13,7 @@
         <div class="input-group">
             <span class="input-group-addon">Exam</span>
             <select class="form-control" name="eid" id="exam_id">
-            <?php echo getExamNameDropDownForFrontend($exam_id); ?>
+            <?php echo $_getExamNameDropDown4fd; ?>
             </select>
         </div>
     </div>
@@ -21,11 +21,11 @@
         <div class="input-group">
             <span class="input-group-addon">Centre</span>
             <select class="form-control" name="cid" id="exam_centre_id">
-                <?php echo getExamCentreDroDownByExam($exam_id, $centre_id); ?>                
+                <?php echo $_getExamCentreDroDownByExam; ?>                
             </select>
         </div>
     </div>
-    <div class="col-md-2">
+    <div class="col-md-4">
         <div class="input-group">
             <span class="input-group-addon">                    
                 <i class="fa fa-calendar"></i> Exam Date
@@ -38,19 +38,19 @@
         </div>
     </div>
 
-    <div class="col-md-2">
+    <!-- <div class="col-md-2">
         <div class="input-group">
             <span class="input-group-addon">Type</span>
             <select class="form-control" name="type">
-                <?php echo selectOptions($type,[
+                <?php /* echo selectOptions($type,[
                     '' => '--All--',
                     'GMC' => 'GMC',
                     'GDC' => 'GDC',
                     'NMC' => 'NMC',
-                ]); ?>
+                ]); */ ?>
             </select>
         </div>
-    </div>
+    </div> -->
 </div>
 <div class="row">
 
@@ -58,7 +58,7 @@
         <div class="input-group">
             <span class="input-group-addon">Country of Origin</span>
             <select name="ocid" class="form-control select2" id="ocid">
-                <?php echo getDropDownCountries($ocid, 'Any Country'); ?>
+                <?php echo $_ocid; ?>
             </select>
         </div>
     </div>
@@ -67,7 +67,7 @@
         <div class="input-group">
             <span class="input-group-addon">Current Location</span>
             <select name="pcid" class="form-control select2" id="pcid">
-                <?php echo getDropDownCountries($pcid, 'Any Country'); ?>
+                <?php echo $_pcid; ?>
             </select>
         </div>
     </div>

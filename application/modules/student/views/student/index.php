@@ -39,8 +39,8 @@
                             <th>Last Name</th>
                             <th>Email</th>
                             <th width="160">Exams</th>
-                            <th width="145">Phone</th>
-                            <th width="150">ID-Number</th>
+                            <th width="145">WhatsApp</th>
+                            <th width="150" class="text-center">StudentID</th>
                             <th width="160">Register At</th>
                             <th class="text-center" width="80">Status</th>
                             <th class="text-center" width="160">Action</th>
@@ -86,12 +86,10 @@
                                 </td>
                                 <td><?php echo $student->exam_names ?: '<span class="text-muted">—</span>'; ?></td>
                                 <td>
-                                    &nbsp;&nbsp;<i
-                                            class="fa fa-mobile-phone"></i> <?php echo "+{$student->phone_code}{$student->phone}"; ?>
-                                    <br/>
-                                    <i class="fa fa-whatsapp"></i> <?php echo "+{$student->whatsapp_code}{$student->whatsapp}"; ?>
+                                    <?php echo getWhatsAppChatLink($student->whatsapp_code, $student->whatsapp); ?><br/>
+                                    &nbsp;&nbsp;<i class="fa fa-mobile-phone"></i> <?php echo "+{$student->phone_code}{$student->phone}"; ?>
                                 </td>
-                                <td><?php echo "{$student->number_type}-{$student->gmc_number}"; ?></td>
+                                <td class="text-center"><?php echo studentID($student->id); ?></td>
                                 <td><?php echo globalDateTimeFormat($student->created_at); ?></td>
                                 <td class="text-center">
                                     <?php echo studentStatus($student->status, $student->id); ?>
@@ -112,7 +110,7 @@
                         <div class="input-group">
                             <span class="input-group-addon">Select Teacher for Assign Student:</span>
                             <select class="form-control" name="teacher_id">
-                                <?php echo getDropDownUserList($tid); ?>
+                                <?php echo $_getDropDownUserList; ?>
                             </select>
                             <span class="input-group-btn">
                                 <input class="btn btn-primary" type="submit" value="Assign">                            

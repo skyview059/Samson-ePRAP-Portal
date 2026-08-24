@@ -52,8 +52,13 @@ class Student extends Admin_controller
             'centre_id'  => $centre_id,
             'exam_date'  => $exam_date,
             'tid'        => $teacher_id,
-            'ocid'       => $country_origin_id,
-            'pcid'       => $present_country_id,
+            // 'ocid'       => $country_origin_id,
+            // 'pcid'       => $present_country_id,
+            '_getDropDownUserList'       => getDropDownUserList($teacher_id),
+            '_getExamNameDropDown4fd'    => getExamNameDropDownForFrontend($exam_id),
+            '_getExamCentreDroDownByExam'=> getExamCentreDroDownByExam($exam_id, $centre_id),
+            '_ocid' => getDropDownCountries($country_origin_id, 'Any Country'),
+            '_pcid' => getDropDownCountries($present_country_id, 'Any Country'),
         );
         $this->viewAdminContent('student/student/index', $data);
     }

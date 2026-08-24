@@ -6,7 +6,7 @@
 
 class Online_mock extends Admin_controller
 {
-    function __construct()
+    public function __construct()
     {
         parent::__construct();
         $this->load->model('Online_mock_model');
