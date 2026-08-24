@@ -30,15 +30,7 @@ CREATE TABLE IF NOT EXISTS `attachments` (
 
 
 
--- Rename student_exams -> student_exam_enrollments (code updated in SCA/Upgrade branch)
-RENAME TABLE `student_exams` TO `student_exam_enrollments`;
-
-
-
-
 --- 22nd Aug, 2026 ---
-
-RENAME TABLE `student_exam` TO `student_exam_enrollments`;
 RENAME TABLE `student_exams` TO `student_exam_enrollments`;
 
 
@@ -51,10 +43,6 @@ CREATE TABLE `student_interested_exams` (
   INDEX (`exam_id`)
 ) ENGINE = InnoDB;
 
-
-
-
-
 -- student_interested_exams: prevent duplicate (student, exam) pairs on re-save
 ALTER TABLE `student_interested_exams` ADD UNIQUE KEY `uq_student_exam` (`student_id`, `exam_id`);
 
@@ -65,3 +53,4 @@ SELECT `id`, `exam_id` FROM `students` WHERE `exam_id` > 0;
 -- Booking modal (exam/student page): server-side search by exam + keyword
 ALTER TABLE `student_interested_exams` ADD INDEX `idx_sie_exam_student` (`exam_id`, `student_id`);
 ALTER TABLE `student_exam_enrollments` ADD INDEX `idx_see_schedule_student` (`exam_schedule_id`, `student_id`);
+--- 22nd Aug, 2026 Sync 2 Server on 24th Aug 2026 6:05pm ---
