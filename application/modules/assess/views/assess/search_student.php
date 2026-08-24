@@ -28,7 +28,7 @@
                         ?>
                         <a href="<?php echo $schedule_url; ?>" class="list-group-item <?php echo $active; ?>">
                             <i class="fa fa-fw fa-calendar"></i>
-                            <strong><?php echo $schedule->centre; ?></strong> &raquo; <?php echo $schedule->name; ?>
+                            <strong><?php echo $schedule->centre; ?></strong> &raquo; <?php echo $schedule->name; ?> &raquo; (<?php echo $schedule->label; ?>)
                             <span class="pull-right">
                                 <?php echo globalDateTimeFormat($schedule->datetime); ?>
                                 &nbsp;<i class="fa fa-angle-double-right"></i>

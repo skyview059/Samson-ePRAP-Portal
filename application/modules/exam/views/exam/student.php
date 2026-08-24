@@ -55,7 +55,7 @@
                             </th>
                             <th width="80">Photo</th>
                             <th>Name & Email</th>                            
-                            <th>GMC-Exam-Date</th>
+                            <th>StudentID</th>
                             <th>Number</th>
                             <th>Phone</th>
                             <th>Booked At</th>
@@ -80,7 +80,7 @@
                                     <?= $student->email ?> 
                                 </td>                                
                                 <td><?php echo globalDateFormat($student->exam_date); ?></td>
-                                <td><?php echo "{$student->number_type}-{$student->gmc_number}"; ?></td>
+                                <td><?php echo studentID($student->id); ?></td>
                                 <td>
                                     <a href="tel:<?php echo "+{$student->phone_code}{$student->phone}"; ?>">
                                         <i class="fa fa-mobile-phone"></i> <?php echo "+{$student->phone_code}{$student->phone}"; ?>

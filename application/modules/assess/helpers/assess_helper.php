@@ -21,7 +21,7 @@ function assessTabs($id, $active_tab) {
 function getTodayExamScheduleListByTeacher($admin = false)
 {
     $ci = &get_instance();
-    $ci->db->select('sr.exam_schedule_id, es.datetime, es.exam_id, e.name,c.name as centre');
+    $ci->db->select('sr.exam_schedule_id, es.datetime, es.exam_id, es.label, e.name,c.name as centre');
     $ci->db->from('scenario_relations as sr');
     $ci->db->join('scenario_to_assessors as sta', 'sta.scenario_rel_id=sr.id', 'left');
     $ci->db->join('exam_schedules as es', 'es.id=sr.exam_schedule_id', 'left');

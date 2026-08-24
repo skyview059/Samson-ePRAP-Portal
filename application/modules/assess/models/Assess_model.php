@@ -55,7 +55,7 @@ class Assess_model extends Fm_model{
         $this->db->group_by('sr.exam_schedule_id');
         $exam_to_scenario_sql = $this->db->get_compiled_select();
         
-        $this->db->select('es.id, se.student_id, es.exam_id, e.name as exam_name, e.exam_type, es.datetime, ec.name as center_name, ec.address as center_address');
+        $this->db->select('es.id, se.student_id, es.exam_id, es.label, e.name as exam_name, e.exam_type, es.datetime, ec.name as center_name, ec.address as center_address');
         $this->db->select('ets.total_questions, ets.scenario_ids');
         $this->db->from('exam_schedules as es');
         $this->db->join('student_exam_enrollments as se', 'se.exam_schedule_id=es.id and se.student_id="'.$student_id.'" and se.status="Enrolled"', 'inner');
