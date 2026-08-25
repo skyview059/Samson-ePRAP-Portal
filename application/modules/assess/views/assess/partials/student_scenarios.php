@@ -59,8 +59,8 @@
 <?php } else if ($students) { ?>
 
     <div class="callout callout-info" style="margin-bottom: 0;">
-        <h4>Not Found!</h4>
-        <p>No Exam Found for <?php echo $students->number_type . ' ' . $students->gmc_number; ?>.</p>
+        <p>As a Assessor you are not assigned to any scenarios for this exam.</p>
+        <p>No scenarios found for <?php echo $students->id; ?>.</p>             
     </div>
 
 <?php } else { ?>

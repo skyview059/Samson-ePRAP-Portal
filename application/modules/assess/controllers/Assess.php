@@ -87,7 +87,7 @@ class Assess extends Admin_controller{
             'exam' => $exam_info,
         );
 
-        $this->load->view('assess/assess/partials/student_scenarios', $data);
+    $this->load->view('assess/assess/partials/student_scenarios', $data);
     }
 
     /**
