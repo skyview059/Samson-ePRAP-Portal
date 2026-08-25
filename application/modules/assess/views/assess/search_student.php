@@ -192,6 +192,7 @@
                                             <th>Full Name</th>                                            
                                             <th>Email</th>
                                             <th>StudentID</th>
+                                            <th class="text-center">Completed</th>
                                             <th width="120" class="text-center">Action</th>
                                         </tr>
                                     </thead>
@@ -207,6 +208,12 @@
                                                 <td><?php echo $s->full_name; ?></td>
                                                 <td><?php echo $s->email; ?></td>
                                                 <td><?php echo studentID($s->id); ?></td>
+                                                <td class="text-center">
+                                                    <?php $done = (int) $s->scenarios_done; ?>
+                                                    <span class="label <?php echo ($total_scenarios && $done >= $total_scenarios) ? 'label-success' : ($done ? 'label-warning' : 'label-default'); ?>">
+                                                        <?php echo $done . '/' . (int) $total_scenarios; ?>
+                                                    </span>
+                                                </td>
                                                 <td class="text-center">
                                                     <button type="button" class="btn btn-primary btn-xs btn-scenarios"
                                                         data-url="<?php echo $scenario_url; ?>"

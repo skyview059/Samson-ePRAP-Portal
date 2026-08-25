@@ -142,6 +142,12 @@ class Assess_model extends Fm_model{
             ->join('exam_centres as ec', 'ec.id=es.exam_centre_id', 'left')
             ->select('s.id, s.photo, CONCAT(s.title," ", s.fname," ",s.lname) AS full_name,s.email, s.phone, s.created_at')
             ->select('se.status, se.remarks, e.name as exam_name, ec.name as centre_name, DATE_FORMAT(es.datetime, "%Y-%m-%d") as date')
+            //Distinct scenarios of this schedule the student already has a result_details row for
+            ->select('(SELECT COUNT(DISTINCT rd.scenario_id)
+                        FROM result_details AS rd
+                        JOIN results AS r ON r.id = rd.result_id
+                        JOIN scenario_relations AS sr ON sr.scenario_id = rd.scenario_id AND sr.exam_schedule_id = r.exam_schedule_id
+                        WHERE r.student_id = s.id AND r.exam_schedule_id = se.exam_schedule_id) AS scenarios_done', FALSE)
             ->where('se.exam_schedule_id', $exam_schedule_id)
             ->where('se.status', 'Enrolled')
             ->order_by('s.gmc_number', 'ASC')
@@ -233,6 +239,13 @@ class Assess_model extends Fm_model{
             $this->db->insert_batch('result_detail_feedback_statements', $rows);
         }
         return true;
+    }
+
+    /**
+     * Number of scenarios attached to an exam schedule (scenario_relations rows).
+     */
+    function getExamScenarioCount($exam_schedule_id) {
+        return (int) $this->db->where('exam_schedule_id', $exam_schedule_id)->count_all_results('scenario_relations');
     }
 
     function getExamScenarios($exam_schedule_id) {

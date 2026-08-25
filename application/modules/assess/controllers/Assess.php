@@ -41,6 +41,9 @@ class Assess extends Admin_controller{
             ? $this->Assess_model->getStudentListByExam($exam_schedule_id)
             : array();
 
+        //Total scenarios of the schedule — shown as "done/total" per enrolled student
+        $total_scenarios = $exam_schedule_id ? $this->Assess_model->getExamScenarioCount($exam_schedule_id) : 0;
+
         //Get current exam information by student and current user
         $exam_info  = NULL;
 
@@ -58,6 +61,7 @@ class Assess extends Admin_controller{
         $data = array(
             'exam_schedules' => $exam_schedules,
             'enrolled_students' => $enrolled_students,
+            'total_scenarios' => $total_scenarios,
             'students' => $students,
             'sql_query' => $_sql_query,
             'exam' => $exam_info,
