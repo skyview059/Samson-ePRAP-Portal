@@ -33,8 +33,8 @@
                                     <td class="text-center no-padding"><?=  getPhoto_v3( $std->photo, $std->gender, $std->full_name, 65, 65 ); ?></td>
                                     <td><?=  $std->title .' '. $std->full_name; ?></td>
                                     <td><a href="<?= base_url('admin/student/read/'.$std->stu_id); ?>"><?= $std->email; ?></a></td>
-                                    <td><?= '+'. $std->phone; ?></td>
-                                    <td><?= "{$std->number_type} {$std->gmc_number}"; ?></td>
+                                    <td><?= '+'. $std->whatsapp; ?></td>
+                                    <td><?= studentID($std->id); ?></td>
                                     <td><?= $std->exam_name .'<br/>'. $std->label; ?></td>
                                     <td><?= $std->centre_name; ?> </td>
                                     <td><?= globalDateTimeFormat($std->datetime) . ' ['. dayLeftOfExam($std->datetime) . "]"; ?>

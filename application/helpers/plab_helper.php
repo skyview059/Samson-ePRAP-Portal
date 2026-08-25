@@ -501,7 +501,19 @@ function studentID($id)
     return 'S-' . str_pad($id, 5, '0', STR_PAD_LEFT);
 }
 
+//WhatsApp chat link (wa.me) when a number exists
+function getWhatsAppChatLink($code, $number)
+{
+    if (trim((string) $number) == '') {
+        return '<span class="text-muted"><i class="fa fa-whatsapp"></i> &mdash;</span>';
+    }
 
+    $display = "+{$code}{$number}";
+    $digits  = preg_replace('/\D/', '', $code . $number);
+
+    return '<a href="https://wa.me/' . $digits . '" target="_blank" title="Open WhatsApp Chat">'
+         . '<i class="fa fa-whatsapp"></i> ' . $display . '</a>';
+}
 
 function getDropDownStudentList($id = 0)
 {

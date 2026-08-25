@@ -6,7 +6,7 @@ function getRecentStudents($limit = 10){
     $ci =& get_instance();
     $html = '';
     $students = $ci->db
-            ->select('id,number_type,gmc_number,CONCAT(fname," ",lname) AS full_name, photo, gender, email,phone_code, phone,created_at')
+            ->select('id,CONCAT(fname," ",lname) AS full_name, photo, gender, email,whatsapp_code, whatsapp,created_at')
             ->limit($limit)
             ->order_by('id', 'DESC')
             ->get('students')->result();
@@ -19,11 +19,12 @@ function getRecentStudents($limit = 10){
     }
     
     foreach ($students as $std) {
+      $whatsapp_link = getWhatsAppChatLink($std->whatsapp_code, $std->whatsapp);
       $html .= '<tr>';
         $html .= '<td>'. getPhoto_v3( $std->photo, $std->gender, $std->full_name, 65, 65 ).'</td>';
         $html .= '<td>'. $std->full_name.' <br/> <a href="'.base_url('admin/student/read/'.$std->id).'">'. $std->email .'</a></td>';        
-        $html .= "<td>+{$std->phone_code}{$std->phone}</td>";
-        $html .= "<td>{$std->number_type}-{$std->gmc_number}</td>";
+        $html .= "<td>{$whatsapp_link}</td>";
+        $html .= "<td>". studentID($std->id). "</td>";
         $html .= "<td>". globalDateFormat($std->created_at) . "</td>";
       $html .= '</tr>';
     }         
