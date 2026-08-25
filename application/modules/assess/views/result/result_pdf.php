@@ -81,9 +81,13 @@
                                         <th class="text-center">Greet the patient </th>
                                         <th class="text-center">Introduces himself </th>
                                         <th class="text-center">State the role</th>
-                                        <th class="text-center">Checks patient’s name preference </th>
+                                        <th class="text-center">Checks patient's name preference </th>
                                         <?php if ($is_sca): ?>
-                                        <th class="text-center">Welcomes the patient</th>
+                                        <th class="text-center">
+                                            <?php 
+                                                echo ( ! $is_sca) ? 'Welcomes the patient :' : 'Thank you for reaching out/calling in:';
+                                            ?>
+                                        </th>
                                         <th class="text-center">Starts with open-end question</th>
                                         <?php else: ?>
                                         <th class="text-center">Starts station well</th>

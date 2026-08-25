@@ -21,8 +21,8 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="pull-left">
-                        <button class="btn btn-primary pull-right hide_on_print"
-                                onclick="linkStudent(<?php echo "{$id},{$exam_id}"; ?>);">
+                        <button type="button" class="btn btn-primary pull-right hide_on_print"
+                                onclick="linkStudent();">
                             <i class="fa fa-hospital-o"></i>
                             Book Student for Exam
                         </button>
@@ -137,36 +137,13 @@
         </form>
     </div>
 </section>
-<div class="modal fade" id="scenario_popup" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <form method="POST" id="scenarios">
-                <input type="hidden" name="id" value="<?php echo $id; ?>"/>
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title">Book Student for Mock Exam</h4>
-                </div>
 
-                <div class="modal-body">
-                    <div class="js_respond"></div>
-                    <div class="scenarios_box" style="height:550px; overflow-y:scroll; padding-right: 10px;"></div>
-                </div>
-                <div class="modal-footer" style="text-align:center;">
-                    <button type="button" class="btn btn-default" id="close_scenario_modal" data-dismiss="modal">
-                        <span aria-hidden="true">&times;</span>
-                        Close
-                    </button>
-                    <button onclick="save_marked_student();" type="button" class="btn btn-success">
-                        <i class="fa fa-save"></i>
-                        Save Changes
-                    </button>                    
-                </div>
-            </form>
-
-
-        </div>
-    </div>
-</div>
+<!-- Book Student for Exam — shared modal + Alpine component (defines linkStudent() / bookingModal()) -->
+<?php $this->load->view('student/student/book_for_exam_modal', [
+    'schedule_id' => $id,
+    'exam_id'     => $exam_id,
+    'source'      => 'Online Mock/Student page',
+]); ?>
 
 <div class="modal fade" id="change_status" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog" role="document">
@@ -230,47 +207,6 @@
         return false;
     }
     
-    function linkStudent(id,exam_id) {
-
-        $('.js_update_respond').empty();
-        $('#scenario_popup').modal({
-            show: 'false',
-            backdrop: 'static'
-        });
-
-        $.ajax({
-            url: "admin/student/get?id=" + id,
-            type: "POST",
-            dataType: "html",
-            data: {id: id, exam_id: exam_id},
-            beforeSend: function () {
-                $('.scenarios_box').html('<p class="ajax_processing">Loading...</p>');
-            },
-            success: function (msg) {
-                $('.scenarios_box').html(msg);                
-            }
-        });
-    }
-    
-    
-    function save_marked_student(){
-        var FormData = $('#scenarios').serialize();
-        $.ajax({
-            url: "admin/student/save",
-            type: "POST",
-            dataType: "json",
-            data: FormData,
-            beforeSend: function () {
-                $('.js_respond').html('<p class="ajax_processing">Please Wait...</p>');
-            },
-            success: function (respond) {
-                $('.js_respond').html(respond.Msg);                
-                if(respond.Status === 'OK'){
-                    setTimeout( function(){ location.reload(); }, 2000);
-                }
-            }
-        });
-    }
     
     function studentStatusChange(student_exam_id) {
 

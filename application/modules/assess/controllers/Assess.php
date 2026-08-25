@@ -43,9 +43,16 @@ class Assess extends Admin_controller{
 
         //Get current exam information by student and current user
         $exam_info  = NULL;
-        
+
         if ($students) {
-            $exam_info = $this->_prepareStudentExamInfo($exam_schedule_id, $students);            
+            $exam_info = $this->_prepareStudentExamInfo($exam_schedule_id, $students);
+        }
+
+        //Exam (exams.id) of the selected schedule — pre-selects the filter of the "Book Student for Exam" modal
+        $schedule_exam_id = 0;
+        if ($exam_schedule_id) {
+            $schedule = $this->db->select('exam_id')->where('id', $exam_schedule_id)->get('exam_schedules')->row();
+            $schedule_exam_id = $schedule ? (int) $schedule->exam_id : 0;
         }
 
         $data = array(
@@ -55,6 +62,7 @@ class Assess extends Admin_controller{
             'sql_query' => $_sql_query,
             'exam' => $exam_info,
             'exam_schedule_id' => $exam_schedule_id,
+            'schedule_exam_id' => $schedule_exam_id,
             'student_id' => $student_id,
             'right_candidate' => set_value('right_candidate')
         );

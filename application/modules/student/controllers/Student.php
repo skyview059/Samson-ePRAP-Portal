@@ -810,6 +810,11 @@ class Student extends Admin_controller
 
         $res = $this->Student_model->searchForExam($exam_ids, $exam_schedule_id, $q, $page, $limit);
 
+        // Same formatted id (S-00012) as everywhere else in the admin
+        foreach ($res['rows'] as $row) {
+            $row->student_id = studentID($row->id);
+        }
+
         $this->output->set_content_type('application/json');
         echo json_encode([
             'Status' => 'OK',
@@ -823,13 +828,15 @@ class Student extends Admin_controller
     /**
      * Additive booking: enrol the posted students into the schedule.
      * Never deletes — un-booking is done from the exam/student page "Cancel" button.
-     * POST: exam_schedule_id, student_ids[]
+     * POST: exam_schedule_id, student_ids[], source (optional label of the calling page, kept in remarks)
      */
     public function book_for_exam()
     {
         ajaxAuthorized();
 
         $exam_schedule_id = (int)$this->input->post('exam_schedule_id');
+        $source           = trim((string)$this->input->post('source', TRUE));
+        $source           = ($source !== '') ? mb_substr($source, 0, 60) : 'Exam/Student page';
         $students         = array_values(array_unique(array_filter(
             array_map('intval', (array)$this->input->post('student_ids'))
         )));
@@ -855,7 +862,7 @@ class Student extends Admin_controller
                 'exam_schedule_id' => $exam_schedule_id,
                 'student_id'       => $student_id,
                 'status'           => 'Enrolled',
-                'remarks'          => "Booked by {$name} from Exam/Student page",
+                'remarks'          => "Booked by {$name} from {$source}",
                 'created_at'       => $now,
             ];
         }

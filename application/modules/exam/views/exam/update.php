@@ -71,17 +71,17 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="col-sm-2 control-label">Status <sup>*</sup></label>
+                        <label class="col-sm-2 control-label">Is Result Published <sup>*</sup></label>
                         <div class="col-sm-10">
                             <label class="radio-inline">
                                 <input type="radio" name="status" value="Unpublished"
                                     <?php echo ($status != 'Published') ? 'checked' : ''; ?>/> 
-                                Draft
+                                    No (Unpublished & Under Examination)
                             </label>
                             <label class="radio-inline">
                                 <input type="radio" name="status" value="Published"
                                     <?php echo ($status == 'Published') ? 'checked' : ''; ?>/> 
-                                Publish
+                                    Yes (Published & Visible to Students)
                             </label>                            
                             <?php echo form_error('status') ?>
                         </div>

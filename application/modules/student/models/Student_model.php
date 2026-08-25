@@ -186,8 +186,9 @@ class Student_model extends Fm_model
                 $this->db->or_like("CONCAT(s.fname, ' ', s.lname)", $q);
                 $this->db->or_like('s.email', $q);
                 $this->db->or_like('s.gmc_number', $q);
-                if (ctype_digit($q)) {
-                    $this->db->or_where('s.id', (int)$q);
+                // Accept the raw id (12) or the formatted one shown in the UI (S-00012, see studentID())
+                if (preg_match('/^(?:S-?)?0*(\d+)$/i', $q, $m)) {
+                    $this->db->or_where('s.id', (int)$m[1]);
                 }
                 $this->db->group_end();
             }

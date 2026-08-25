@@ -1377,6 +1377,19 @@ function getExamCentreDropDownForFrontend($selected = 0, $centre_country_id = 0)
     return $options;
 }
 
+/**
+ * Active exams used as the filter list of the shared "Book Student for Exam" modal
+ * (student/student/book_for_exam_modal partial).
+ */
+function getBookableExams()
+{
+    $ci = &get_instance();
+    return $ci->db->select('id, name, exam_type')
+                  ->where('status', 'Active')
+                  ->order_by('name', 'ASC')
+                  ->get('exams')->result();
+}
+
 function getExamNameDropDownForFrontend($selected = 0, $lavel = '-- Select Exam Name --')
 {
     $ci    = &get_instance();

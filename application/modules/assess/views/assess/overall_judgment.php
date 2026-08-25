@@ -24,9 +24,10 @@
                             <div class="col-sm-10">
 
                             <?php
+                            //clear pass and clear fail
                                 // SCA and PLAB Part 2 use different judgment scales (result_details.overall_judgment enum holds the union)
                                 $judgment_options = ($exam_type == 'SCA')
-                                    ? array('Pass', 'Bare Pass', 'Bare Fail', 'Fail')
+                                    ? array('Pass', 'Bare Pass', 'Clear Pass', 'Bare Fail', 'Fail', 'Clear Fail')
                                     : array('Fail', 'Borderline', 'Pass', 'Very Good', 'Excellent');
                             ?>
                             <?php foreach ($judgment_options as $option): ?>

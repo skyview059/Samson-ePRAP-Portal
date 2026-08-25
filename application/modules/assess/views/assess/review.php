@@ -177,8 +177,12 @@
                                                     </div>
                                                 </div>
                                                 <?php else: ?>
-                                                <div class="form-group">
-                                                    <label for="welcomes_patient" class="col-sm-4 control-label">Welcomes the patient :</label>
+                                                <div class="form-group">                                                    
+                                                    <label for="welcomes_patient" class="col-sm-4 control-label">
+                                                        <?php 
+                                                            echo ( ! $is_sca) ? 'Welcomes the patient :' : 'Thank you for reaching out/calling in:';
+                                                        ?>                                                        
+                                                    </label>
                                                     <div class="col-sm-8" style="padding-top:8px;">
                                                         <?php echo htmlRadio('welcomes_patient', $welcomes_patient, array('Yes' => 'Yes', 'No' => 'No'), 'class="icheck-radio"'); ?>
                                                         <div class="clearfix"></div>
@@ -518,7 +522,7 @@
                                     <h4 class="box-title">
                                         <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseSix">
                                             <i class="more-less glyphicon glyphicon-plus"></i>
-                                            Examiner’s comments
+                                            Examiner's comments
                                         </a>
                                     </h4>
                                 </div>

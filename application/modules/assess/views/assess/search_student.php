@@ -172,7 +172,15 @@
         <div class="row">
             <div class="col-md-12">
                 <div class="panel panel-default">
-                    <div class="panel-heading">Enrolled Students</div>
+                    <div class="panel-heading">
+                        Enrolled Students
+                    
+                        <!-- <a class="btn btn-default btn-sm pull-right" style="margin-top: -5px;"
+                        href="<?= site_url(Backend_URL . 'exam/student/' . $exam_schedule_id); ?>"> 
+                            Enrol Student 
+                        </a> -->
+                    
+                    </div>
                     <div class="panel-body">
                         <?php if ($enrolled_students) { ?>
                             <div class="table-responsive">
@@ -212,11 +220,25 @@
                                 </table>
                             </div>
                             <span class="btn btn-primary">Total Students: <?php echo count($enrolled_students); ?></span>
+
+                            <button type="button" class="btn btn-primary pull-right hide_on_print"
+                                    onclick="linkStudent();">
+                                <i class="fa fa-hospital-o"></i>
+                                Book Student for Exam
+                            </button>
+                            
                         <?php } else { ?>
-                            <div class="callout callout-info" style="margin-bottom: 0;">
+                            <div class="callout callout-info">
                                 <h4>Not Found!</h4>
                                 <p>No Student Enrolled for This Exam Schedule.</p>
                             </div>
+
+                            <button type="button" class="btn btn-primary pull-right hide_on_print"
+                                    onclick="linkStudent();">
+                                <i class="fa fa-hospital-o"></i>
+                                Book Student for Exam
+                            </button>
+                            <div class="clearfix"></div>
                         <?php } ?>
                     </div>
                 </div>
@@ -272,3 +294,12 @@
     });
 
 </script>
+
+<?php if ($exam_schedule_id && !$students) { ?>
+    <!-- Book Student for Exam — shared modal + Alpine component (defines linkStudent() / bookingModal()) -->
+    <?php $this->load->view('student/student/book_for_exam_modal', [
+        'schedule_id' => $exam_schedule_id,
+        'exam_id'     => $schedule_exam_id,
+        'source'      => 'Assessment page',
+    ]); ?>
+<?php } ?>
