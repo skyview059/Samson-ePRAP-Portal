@@ -99,9 +99,6 @@ $download_link = site_url('results/download/' . $results->exam_schedule_id);
     }
 </style>
 
-<div class="page-title">
-    <h3>Result</h3>
-</div>
 
 <section class="content">
 <div class="sca-report">
@@ -200,11 +197,7 @@ $download_link = site_url('results/download/' . $results->exam_schedule_id);
     <?php foreach ($sca['cases'] as $case) { ?>
         <div class="sca-card sca-case" id="result_details_id_<?php echo $case->id; ?>">
             <div class="sca-case-head">
-                <h3><?php echo html_escape($case->name); ?></h3>
-                <div class="sca-case-badges">
-                    <span class="sca-pill <?php echo ($case->result == 'Pass') ? 'sca-pill-pass' : 'sca-pill-fail'; ?>"><?php echo $case->result; ?></span>
-                    <?php echo sca_judgment_badge($case->overall_judgment); ?>
-                </div>
+                <h3><?php echo html_escape($case->name); ?></h3>                
             </div>
 
             <div class="sca-grades">

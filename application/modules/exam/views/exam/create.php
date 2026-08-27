@@ -121,16 +121,17 @@
             </div>
             <div class="form-group">
                 <label for="passing_criteria" class="col-sm-2 control-label">
-                    Pass Mark
-                    <sup>*</sup>
+                    Pass Mark                    
                 </label>
-                <div class="col-sm-2">
+                <div class="col-sm-4">
                     <div class="input-group">                                
-                        <input type="text" name="pass_mark" id="pass_mark" 
+                        <input type="text" onkeypress="return DigitOnly(event);" name="pass_mark" id="pass_mark" 
                                 class="form-control" placeholder="12.5" value="<?= $pass_mark; ?>">
-                        <span class="input-group-addon">Eg. 10,12.5 etc</span>
+                        <span class="input-group-addon">Eg. 10,12.5 etc, (Max 999.99)</span>
                     </div>
+                    <p class="help-text text-red text-bold">Keep empty to auto generate Pass Mark based on scenarios</p>
                 </div>
+                
             </div>
             <div class="form-group">
                 <label for="passing_criteria" class="col-sm-2">Passing Criteria <sup>*</sup></label>

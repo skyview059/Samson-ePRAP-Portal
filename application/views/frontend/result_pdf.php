@@ -50,7 +50,10 @@
                                 <table class="table" style="margin:0;">
                                     <tr>
                                         <td width="250"><h1 style="margin:0;padding: 0;">Results</h1></td>
-                                        <td align="right"><img alt="Samson Courses" src="<?php echo site_url('assets/admin/dist/img/logo.png'); ?>"/></td>
+                                        <td align="right">
+                                            <!-- <img alt="Samson Courses" src="<?php //echo site_url('assets/admin/dist/img/logo.png'); ?>"/> -->
+                                            <img alt="ePRAP" src="<?php echo site_url('assets/theme/images/logo.png'); ?>"/>
+                                        </td>
                                     </tr>
                                 </table>
                                 
