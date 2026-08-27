@@ -39,7 +39,7 @@ class Result_model extends Fm_model {
 
     function get_result($student_id,$es_id)
     {
-        $this->db->select('r.*,e.name as exam_name, e.exam_type, ec.name as center_name, es.datetime, es.pass_station, es.passing_criteria, s.number_type, s.gmc_number, s.fname, s.mname, s.lname, s.email, s.phone');
+        $this->db->select('r.*,e.name as exam_name, e.exam_type, ec.name as center_name, es.datetime, es.pass_station, es.pass_mark as schedule_pass_mark, es.passing_criteria, s.number_type, s.gmc_number, s.fname, s.mname, s.lname, s.email, s.phone');
         $this->db->from('results as r');
         $this->db->join('students as s', 's.id=r.student_id', 'left');
         $this->db->join('exam_schedules as es', 'es.id=r.exam_schedule_id', 'left');

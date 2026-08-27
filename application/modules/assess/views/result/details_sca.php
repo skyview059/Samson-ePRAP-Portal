@@ -124,7 +124,8 @@ $stations  = (int) $sca['stations'];
 
         <div class="sca-summary">
             <div>Total score: <strong><?php echo $fmt_score($total_score); ?></strong> out of <strong><?php echo $fmt_max($sca['max_score']); ?></strong></div>
-            <div>Pass mark: <strong><?php echo $fmt_score($req_pass_mark); ?></strong></div>
+            <!-- <div>Pass mark: <strong><?php // echo $fmt_score($req_pass_mark); ?></strong></div> -->
+            <div>Pass mark: <strong><?php echo $fmt_score($exam_pass_mark); ?></strong><?php if ($pass_mark_is_manual) { ?> <small class="text-muted" title="Set manually on the Exam form (exam_schedules.pass_mark)">(manual)</small><?php } ?></div>
             <!-- <div>Stations passed: <strong><?php // echo (int) $passed_station; ?></strong> of <strong><?php echo $stations; ?></strong> (minimum <?php echo (int) $results->pass_station; ?>)</div> -->
             <div>Result: <strong class="<?php echo ($pass_or_fail == 'Pass') ? 'sca-result-pass' : 'sca-result-fail'; ?>"><?php echo ($pass_or_fail == 'Pass') ? 'Passed' : 'Failed'; ?></strong></div>
         </div>

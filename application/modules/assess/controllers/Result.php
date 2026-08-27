@@ -129,6 +129,18 @@ class Result extends Admin_controller {
         );
 
         if($results->exam_type == 'SCA'){
+            // Manual pass-mark control: exam_schedules.pass_mark (set on the Exam create/update form)
+            // overrides the computed one ($total_pass_mark = sum of per-station borderline pass marks).
+            // When it is blank/0 the previous computed logic above is used unchanged.
+            $manual_pass_mark = $results->schedule_pass_mark ?? null;
+            $is_manual        = ($manual_pass_mark !== null && $manual_pass_mark !== '' && (float)$manual_pass_mark > 0);
+            $exam_pass_mark   = $is_manual ? (float)$manual_pass_mark : $total_pass_mark;
+
+            $data['exam_pass_mark']      = $exam_pass_mark;
+            $data['pass_mark_is_manual'] = $is_manual;
+            // Result must agree with the pass mark shown; station-count rule kept as before
+            $data['pass_or_fail']        = ($total_score >= $exam_pass_mark && $passed_station >= $min_station) ? 'Pass' : 'Fail';
+
             $data['sca'] = $this->_sca_report($results);
             $this->viewAdminContent('assess/result/details_sca', $data);
         } else {
