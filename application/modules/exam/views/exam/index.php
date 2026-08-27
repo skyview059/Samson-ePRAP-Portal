@@ -107,7 +107,7 @@
                                     } else {
                                         echo anchor(site_url(Backend_URL . 'exam/publish/' . $exam->id), 
                                                 '<i class="fa fa-check-square-o"></i> Release ', 
-                                                'class="btn btn-xs btn-warning confirmation" title="Relese Result" onclick="return confirm(\'Confrim Relese Result\')"');
+                                                'class="btn btn-xs btn-warning confirmation" title="Release Result" onclick="return confirm(\'Confrim Relese Result\')"');
                                     }
                                 } else {
                                     echo 'N/A (Exam Not Finished)';

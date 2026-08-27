@@ -130,7 +130,7 @@ class Result_model extends Fm_model {
     function get_exam_info_by_scenario($exam_schedule_id, $scenario_id)
     {
 
-        $this->db->select('r.*, rd.scenario_id, rd.coefficient_mark, rd.pass_mark, e.name as exam_name, es.datetime, s.reference_number, s.name as scenario_name');
+        $this->db->select('r.*, rd.scenario_id, rd.coefficient_mark, rd.pass_mark, e.name as exam_name, e.exam_type, es.datetime, s.reference_number, s.name as scenario_name');
         $this->db->from('results as r');
         $this->db->join('result_details as rd', 'r.id=rd.result_id', 'left');
         $this->db->join('scenarios as s', 's.id=rd.scenario_id', 'left');

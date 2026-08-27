@@ -29,11 +29,17 @@
                                 <tr>
                                     <th width="40" class="text-center">SL</th>
                                     <th>Student Name</th>
+                                    <?php if (isset($exam_scenario->exam_type) && $exam_scenario->exam_type == 'SCA'): ?>
+                                    <th class="text-center">Data gathering and diagnosis</th>
+                                    <th class="text-center">Clinical management and medical complexity</th>
+                                    <th class="text-center">Relating to others</th>
+                                    <?php else: ?>
                                     <th class="text-center">Data Gathering Technical and Assessment Skills </th>
                                     <th class="text-center">Clinical Management Skills </th>
                                     <th class="text-center">Interpersonal Skills </th>
+                                    <?php endif; ?>
                                     <th class="text-center">Your Score</th>
-                                    <th class="text-center hidden">Examiner’s Judgment</th>
+                                    <th class="text-center hidden">Examiner's Judgment</th>
                                     <th class="text-center">Pass Mark</th>
                                     <th class="text-center">Results</th>
                                     <th class="text-center">Assessor</th>
@@ -208,4 +214,4 @@
         });
         return false;
     });
-</script>
+</script>
