@@ -1,24 +1,27 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
- 
+
 /* Author: Khairul Azam
  * Date : 12 Jun 2020 @03:13 pm
  */
 
-class Name extends Admin_controller{
-    function __construct(){
+class Name extends Admin_controller
+{
+    function __construct()
+    {
         parent::__construct();
-        $this->load->model('Name_model');        
+        $this->load->model('Name_model');
         $this->load->library('form_validation');
     }
 
-    public function index(){
-        
+    public function index()
+    {
+
         $start = intval($this->input->get('start'));
-        
-        
-        $config['base_url'] = build_pagination_url( Backend_URL . 'exam/name/', 'start');
-        $config['first_url'] = build_pagination_url( Backend_URL . 'exam/name/', 'start');
-        
+
+
+        $config['base_url'] = build_pagination_url(Backend_URL . 'exam/name/', 'start');
+        $config['first_url'] = build_pagination_url(Backend_URL . 'exam/name/', 'start');
+
 
         $config['per_page'] = 25;
         $config['page_query_string'] = TRUE;
@@ -39,95 +42,105 @@ class Name extends Admin_controller{
         $this->viewAdminContent('exam/name/index', $data);
     }
 
-    public function create(){
+    public function create()
+    {
         $data = array(
             'button' => 'Create',
-            'action' => site_url( Backend_URL . 'exam/name/create_action'),
-	    'id' => set_value('id'),
-	    'name' => set_value('name'),
-	    'exam_type' => set_value('exam_type', 'PLAB Part 2')
-	);
+            'action' => site_url(Backend_URL . 'exam/name/create_action'),
+            'id' => set_value('id'),
+            'name' => set_value('name'),
+            'exam_type' => set_value('exam_type', 'PLAB Part 2'),
+            'status' => set_value('status', 'Active')
+        );
         $this->viewAdminContent('exam/name/create', $data);
-    }    
+    }
 
 
-    public function create_action(){
+    public function create_action()
+    {
         $this->_rules();
 
         if ($this->form_validation->run() == FALSE) {
             $this->create();
         } else {
             $data = array(
-		'name' => $this->input->post('name',TRUE),
-		'exam_type' => $this->input->post('exam_type',TRUE),
-		'created_at' => date('Y-m-d H:i:s'),
-		'updated_at' => date('Y-m-d H:i:s'),
-	    );
+                'name' => $this->input->post('name', TRUE),
+                'exam_type' => $this->input->post('exam_type', TRUE),
+                'status' => $this->input->post('status', TRUE),
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s'),
+            );
 
             $this->Name_model->insert($data);
             $this->session->set_flashdata('message', '<p class="ajax_success">Name Added Successfully</p>');
-            redirect(site_url( Backend_URL. 'exam/name'));
+            redirect(site_url(Backend_URL . 'exam/name'));
         }
     }
-    
-    public function update($id){
+
+    public function update($id)
+    {
         $row = $this->Name_model->get_by_id($id);
 
         if ($row) {
             $data = array(
                 'button' => 'Update',
-                'action' => site_url( Backend_URL . 'exam/name/update_action'),
-		'id' => set_value('id', $row->id),
-		'name' => set_value('name', $row->name),
-		'exam_type' => set_value('exam_type', $row->exam_type)
-	    );
+                'action' => site_url(Backend_URL . 'exam/name/update_action'),
+                'id' => set_value('id', $row->id),
+                'name' => set_value('name', $row->name),
+                'status' => set_value('status', $row->status),
+                'exam_type' => set_value('exam_type', $row->exam_type)
+            );
             $this->viewAdminContent('exam/name/update', $data);
         } else {
             $this->session->set_flashdata('message', '<p class="ajax_error">Name Not Found</p>');
-            redirect(site_url( Backend_URL. 'exam/name'));
+            redirect(site_url(Backend_URL . 'exam/name'));
         }
     }
-    
-    public function update_action(){
+
+    public function update_action()
+    {
         $this->_rules();
 
         $id = $this->input->post('id', TRUE);
         if ($this->form_validation->run() == FALSE) {
-            $this->update( $id );
+            $this->update($id);
         } else {
             $data = array(
-		'name' => $this->input->post('name',TRUE),
-		'exam_type' => $this->input->post('exam_type',TRUE),
-		'updated_at' => date('Y-m-d H:i:s'),
-	    );
+                'name' => $this->input->post('name', TRUE),
+                'exam_type' => $this->input->post('exam_type', TRUE),
+                'status' => $this->input->post('status', TRUE),
+                'updated_at' => date('Y-m-d H:i:s'),
+            );
 
             $this->Name_model->update($id, $data);
             $this->session->set_flashdata('message', '<p class="ajax_success">Name Updated Successlly</p>');
-            redirect(site_url( Backend_URL. 'exam/name/'));
+            redirect(site_url(Backend_URL . 'exam/name/'));
         }
     }
-    
-    public function delete($id){
+
+    public function delete($id)
+    {
         $row = $this->Name_model->get_by_id($id);
 
         if ($row) {
             $this->Name_model->delete($id);
             $this->session->set_flashdata('message', '<p class="ajax_success">Name Deleted Successfully</p>');
-            redirect(site_url( Backend_URL. 'exam/name'));
+            redirect(site_url(Backend_URL . 'exam/name'));
         } else {
             $this->session->set_flashdata('message', '<p class="ajax_error">Name Not Found</p>');
-            redirect(site_url( Backend_URL. 'exam/name'));
+            redirect(site_url(Backend_URL . 'exam/name'));
         }
     }
 
-    public function _rules(){
-	$this->form_validation->set_rules('name', 'name', 'trim|required');
-	$this->form_validation->set_rules('exam_type', 'exam type', 'trim|required|in_list[PLAB Part 2,SCA]');
+    public function _rules()
+    {
+        $this->form_validation->set_rules('name', 'name', 'trim|required');
+        $this->form_validation->set_rules('exam_type', 'exam type', 'trim|required|in_list[PLAB Part 2,SCA]');
 
-	$this->form_validation->set_rules('id', 'id', 'trim');
-	$this->form_validation->set_error_delimiters('<span class="text-danger">', '</span>');
+        $this->form_validation->set_rules('id', 'id', 'trim');
+        $this->form_validation->set_error_delimiters('<span class="text-danger">', '</span>');
     }
-    
+
 
 
 }

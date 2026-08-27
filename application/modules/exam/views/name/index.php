@@ -39,7 +39,10 @@
                                 <?php foreach ($names as $name) {  ?>
                                     <tr>
                                         <td><?php echo ++$start; ?></td>
-                                        <td><?php echo "{$name->name}  <small class='text-light-blue'>({$name->exam_type})</small>"; ?></td>
+                                        <td>
+                                            <?php echo "{$name->name}  <small class='text-light-blue'>({$name->exam_type})</small>"; ?>
+                                            <?php echo "<small class='pull-right text-light-blue'>({$name->status})</small>"; ?>
+                                        </td>
                                         <td class="text-center">
                                             <a href="admin/student?eid=<?= $name->id; ?>">
                                                 <?php echo $name->student_qty; ?>
@@ -120,13 +123,21 @@
                             </div>
                             <div class="form-group">
                                 <label>Exam Type</label>
-                                <div>
-                                    <label class="radio-inline">
-                                        <input type="radio" name="exam_type" value="PLAB Part 2" checked /> PLAB Part 2
-                                    </label>
-                                    <label class="radio-inline">
-                                        <input type="radio" name="exam_type" value="SCA" /> SCA
-                                    </label>
+                                <div style="padding-bottom:8px;">
+                                <?php echo htmlRadio('exam_type', 'PLAB Part 2', [
+                                    'PLAB Part 2' => 'PLAB Part 2',
+                                    'SCA' => 'SCA',
+                                ]); ?>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Status:&nbsp;</label>
+                                <div style="padding-bottom:8px;">
+                                <?php echo htmlRadio('status', 'Active', [
+                                    'Active' => 'Active',
+                                    'Inactive' => 'Inactive',
+                                ])?>
+                                <?php echo form_error('status') ?>
                                 </div>
                             </div>
                             <div class="form-group">

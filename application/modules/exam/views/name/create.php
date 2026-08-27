@@ -30,14 +30,22 @@
 
             <div class="form-group">
                 <label class="col-sm-2 control-label">Exam Type :</label>
-                <div class="col-sm-10">
-                    <label class="radio-inline">
-                        <input type="radio" name="exam_type" value="PLAB Part 2" <?php echo ($exam_type == 'PLAB Part 2') ? 'checked' : ''; ?> /> PLAB Part 2
-                    </label>
-                    <label class="radio-inline">
-                        <input type="radio" name="exam_type" value="SCA" <?php echo ($exam_type == 'SCA') ? 'checked' : ''; ?> /> SCA
-                    </label>
+                <div class="col-sm-10" style="padding-top: 8px;">
+                    <?php echo htmlRadio('exam_type', $exam_type, [
+                        'PLAB Part 2' => 'PLAB Part 2',
+                        'SCA' => 'SCA',
+                    ]); ?>
                     <?php echo form_error('exam_type') ?>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">Status :</label>
+                <div class="col-sm-4" style="padding-top: 8px;">
+                    <?php echo htmlRadio('status', $status, [
+                        'Active' => 'Active',
+                        'Inactive' => 'Inactive',
+                    ])?>
+                    <?php echo form_error('status') ?>
                 </div>
             </div>
 
