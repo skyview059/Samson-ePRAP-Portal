@@ -315,3 +315,105 @@ function sca_build_report($results)
         'cases'      => $cases,
     );
 }
+
+/**
+ * TRUE when the result belongs to an SCA exam (exams.exam_type).
+ */
+function result_is_sca($results)
+{
+    return ( ! empty($results->exam_type) && $results->exam_type == 'SCA');
+}
+
+/**
+ * Builds the common result summary used by the result pages and PDFs on
+ * both the admin side (assess/Result) and the student portal: totals,
+ * stations passed, pass/fail and the passing-criteria text.
+ *
+ * For SCA exams it also applies the manual pass-mark override
+ * (exam_schedules.pass_mark beats the computed sum of per-station pass
+ * marks when > 0), recomputes pass/fail against it, and attaches the
+ * aggregated SCA report (see sca_build_report()).
+ */
+function result_build_data($results, $student_id = null, $es_id = null)
+{
+    $details     = ! empty($results->details) ? $results->details : array();
+    $total_score = $total_pass_mark = $passed_station = 0;
+
+    foreach ($details as $result) {
+        $get_mark         = $result->technical_skills + $result->clinical_skills + $result->interpersonal_skills;
+        $total_score     += $get_mark;
+        $total_pass_mark += $result->pass_mark;
+
+        if ($get_mark >= $result->pass_mark) {
+            $passed_station += 1;
+        }
+    }
+
+    $min_station = (int) $results->pass_station;
+    $param_arr   = array(
+        '%PassStation%'         => $results->pass_station,
+        '%NameOfMockTest%'      => $results->exam_name,
+        '%YourScore%'           => $total_score,
+        '%PassedStations%'      => $passed_station,
+        '%MinPassMarkRequired%' => $total_pass_mark,
+    );
+    $passing_criteria_str = strtr((string) $results->passing_criteria, $param_arr);
+
+    $data = array(
+        'is_sca'               => result_is_sca($results),
+        'total_score'          => $total_score,
+        'req_pass_mark'        => $total_pass_mark,
+        'passed_station'       => $passed_station,
+        'pass_or_fail'         => ($total_score >= $total_pass_mark && $passed_station >= $min_station) ? 'Pass' : 'Fail',
+        'results'              => $results,
+        's_id'                 => $student_id,
+        'es_id'                => $es_id,
+        'passing_criteria_str' => nl2br_fk($passing_criteria_str),
+    );
+
+    if ($data['is_sca']) {
+        $manual_pass_mark = $results->schedule_pass_mark ?? null;
+        $is_manual        = ($manual_pass_mark !== null && $manual_pass_mark !== '' && (float) $manual_pass_mark > 0);
+        $exam_pass_mark   = $is_manual ? (float) $manual_pass_mark : $total_pass_mark;
+
+        $data['exam_pass_mark']      = $exam_pass_mark;
+        $data['pass_mark_is_manual'] = $is_manual;
+        // Result must agree with the pass mark shown; station-count rule kept as before
+        $data['pass_or_fail']        = ($total_score >= $exam_pass_mark && $passed_station >= $min_station) ? 'Pass' : 'Fail';
+        $data['sca']                 = sca_build_report($results);
+    }
+
+    return $data;
+}
+
+/**
+ * View used for the result PDF of this exam type. Both PDF layouts live in
+ * the assess module so admin and student downloads share one file each:
+ *   modules/assess/views/result/result_pdf_sca.php
+ *   modules/assess/views/result/result_pdf_plab.php
+ */
+function result_pdf_view($results)
+{
+    return 'assess/result/result_pdf_' . (result_is_sca($results) ? 'sca' : 'plab');
+}
+
+/**
+ * Renders the SCA / PLAB result PDF for $results and sends it as a download.
+ * $data is the array from result_build_data().
+ */
+function result_pdf_download($results, $data, $filename, $margins = array())
+{
+    $ci = & get_instance();
+    $ci->load->library('m_pdf');
+
+    $html = $ci->load->view(result_pdf_view($results), $data, true);
+
+    $ci->m_pdf->pdf->AddPageByArray(array_merge(array(
+        'margin-left'   => 5,
+        'margin-right'  => 5,
+        'margin-top'    => 15,
+        'margin-bottom' => 15,
+    ), $margins));
+    $ci->m_pdf->pdf->WriteHTML($html);
+    $ci->m_pdf->pdf->Output($filename, 'D');
+}

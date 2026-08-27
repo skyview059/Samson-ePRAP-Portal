@@ -314,55 +314,17 @@ class Result extends Admin_controller {
     }
     
     public function download_pdf( $student_id, $sch_id ){
-        $results = $this->Result_model->get_result($student_id,$sch_id);           
-        $total_score = $total_pass_mark = $passed_station = 0;
-        
-        foreach ($results->details as $result) {
-            $get_mark   = $result->technical_skills + $result->clinical_skills + $result->interpersonal_skills;
-            $total_score += $get_mark;            
-            $total_pass_mark += $result->pass_mark;
-            
-            if($get_mark >= $result->pass_mark ) {
-                $passed_station += 1;
-            }
+        $results = $this->Result_model->get_result($student_id, $sch_id);
+        if (empty($results->id)) {
+            $this->session->set_flashdata('msge', 'Result Not Found!');
+            redirect(site_url(Backend_URL . 'assess/result?id=' . $sch_id));
         }
-        
-        $min_station = $results->pass_station;
-        $param_arr = array(
-            '%PassStation%' => $results->pass_station, 
-            '%NameOfMockTest%' => $results->exam_name, 
-            '%YourScore%' => $total_score, 
-            '%PassedStations%' => $passed_station, 
-            '%MinPassMarkRequired%' => $total_pass_mark
-        );
-        $passing_criteria_str = strtr($results->passing_criteria, $param_arr);
-        $data = array(
-            'total_score'       => $total_score,
-            'req_pass_mark'     => $total_pass_mark,
-            'passed_station'    => $passed_station,
-            'pass_or_fail'      => ($total_score >= $total_pass_mark && $passed_station >= $min_station ) ? 'Pass' : 'Fail',
-            'results'           => $results,
-            's_id'              => $student_id,
-            'es_id'             => $sch_id,
-            'passing_criteria_str'    => nl2br_fk($passing_criteria_str)
-        ); 
-        
-        $this->load->library('m_pdf');
-        // Write some HTML code:
-        $html = $this->load->view('result/result_pdf', $data, true);
-        // Write some HTML code:
-        $this->m_pdf->pdf->AddPageByArray([
-            'margin-left' => 5,
-            'margin-right' => 5,
-            'margin-top' => 15,
-            'margin-bottom' => 15,
-        ]);
-        $this->m_pdf->pdf->WriteHTML($html);
 
-        // Output a PDF file directly to the browser
-//        $this->m_pdf->pdf->Output();
-        //Add 'D' parameter for download
-        $this->m_pdf->pdf->Output($results->gmc_number . '-result.pdf', 'D');
+        // Summary / pass-fail / SCA report are built by the shared helper, and the
+        // PDF layout (result_pdf_sca vs result_pdf_plab) is picked by exam_type inside
+        // result_pdf_download() — the same code path the student portal download uses.
+        $data = result_build_data($results, $student_id, $sch_id);
+        result_pdf_download($results, $data, $results->gmc_number . '-result.pdf');
     }
 
 }
