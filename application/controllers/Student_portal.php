@@ -572,6 +572,10 @@ class Student_portal extends Frontend_controller
         $student_id = $this->student_id;
 
         $results     = $this->Result_model->get_result($student_id, $es_id);
+        if (empty($results->id)) {
+            $this->session->set_flashdata('msgw', 'Result Not Found!');
+            redirect(site_url('results'));
+        }
         $total_score = $total_pass_mark = $passed_station = 0;
 
         foreach ($results->details as $result) {
@@ -597,7 +601,24 @@ class Student_portal extends Frontend_controller
             'passing_criteria_str' => nl2br_fk($passing_criteria_str)
         );
 
-        $this->viewMemberContent('result_view', $data);
+        if ($results->exam_type == 'SCA') {
+            // Same rule as the admin view (assess/Result::details): a manual pass mark set
+            // on the exam schedule (exam_schedules.pass_mark) overrides the computed one
+            // (sum of per-station borderline pass marks). Blank/0 keeps the computed logic.
+            $manual_pass_mark = $results->schedule_pass_mark ?? null;
+            $is_manual        = ($manual_pass_mark !== null && $manual_pass_mark !== '' && (float) $manual_pass_mark > 0);
+            $exam_pass_mark   = $is_manual ? (float) $manual_pass_mark : $total_pass_mark;
+
+            $data['exam_pass_mark']      = $exam_pass_mark;
+            $data['pass_mark_is_manual'] = $is_manual;
+            // Result must agree with the pass mark shown; station-count rule kept as before
+            $data['pass_or_fail']        = ($total_score >= $exam_pass_mark && $passed_station >= $min_station) ? 'Pass' : 'Fail';
+
+            $data['sca'] = sca_build_report($results);
+            $this->viewMemberContent('result_sca', $data);
+        } else {
+            $this->viewMemberContent('result_plab', $data);
+        }
     }
 
     public function understand()
