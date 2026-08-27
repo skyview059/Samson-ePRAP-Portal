@@ -201,7 +201,11 @@ class Student_model extends Fm_model
         $this->db->select(
             "s.id, s.number_type, s.gmc_number AS gmc, s.email,
              TRIM(CONCAT_WS(' ', s.fname, s.mname, s.lname)) AS full_name,
-             (see.id IS NOT NULL) AS booked",
+             (see.id IS NOT NULL) AS booked,
+             (SELECT GROUP_CONCAT(e2.name ORDER BY e2.name SEPARATOR ', ')
+                FROM student_interested_exams sie2
+                JOIN exams e2 ON e2.id = sie2.exam_id
+               WHERE sie2.student_id = s.id) AS exam_names",
             false
         );
         $this->db->join(

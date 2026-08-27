@@ -12,7 +12,7 @@
  *
  * The page then only needs a trigger:  <button type="button" onclick="linkStudent();">…</button>
  *
- * Endpoints: admin/student/search_for_exam, admin/student/book_for_exam
+ * Endpoints: admin/student/search_for_exam, admin/student/book_for_exam, admin/student/unbook_for_exam
  */
 $schedule_id = (int)($schedule_id ?? 0);
 $exam_id     = (int)($exam_id ?? 0);
@@ -34,6 +34,11 @@ $exams       = $exams ?? getBookableExams();
                 <!-- Exam filter -->
                 <div class="form-group">
                     <label class="control-label">Show students interested in:</label>
+                    <small style="margin-left:8px;">
+                        <a href="javascript:void(0)" @click="examIds = exams.map(e => String(e.id)); search(1)">All</a>
+                        &nbsp;|&nbsp;
+                        <a href="javascript:void(0)" @click="examIds = []; search(1)">None</a>
+                    </small>
                     <div>
                         <template x-for="e in exams" :key="e.id">
                             <label class="checkbox-inline" style="margin-left:0; margin-right:15px;">
@@ -72,31 +77,44 @@ $exams       = $exams ?? getBookableExams();
                     <table class="table table-striped table-bordered table-condensed">
                         <thead>
                         <tr>
-                            <th width="60" class="text-center">Mark</th>
-                            <th width="100" class="text-center">StudentID</th>
+                            <th width="110" class="text-center">Mark</th>
+                            <th width="90" class="text-center">StudentID</th>
                             <th>Name</th>
                             <th>Email</th>
+                            <th>Interested Exams</th>
                         </tr>
                         </thead>
                         <tbody>
                         <template x-for="s in rows" :key="s.id">
                             <tr :class="{'success': selected.includes(String(s.id))}">
-                                <td class="text-center">
-                                    <span class="label label-success" x-show="s.booked == 1" title="Already booked for this schedule">
-                                        <i class="fa fa-check"></i> Booked
-                                    </span>
+                                <td class="text-center" style="white-space:nowrap;">
+                                    <template x-if="s.booked == 1">
+                                        <span>
+                                            <span class="label label-success" title="Already booked for this schedule">
+                                                <i class="fa fa-check"></i> Booked
+                                            </span>
+                                            <button type="button" class="btn btn-danger btn-xs" style="margin-left:4px;"
+                                                    title="Unlink this student from this exam"
+                                                    @click="unbook(s)" :disabled="unbooking == s.id">
+                                                <i class="fa" :class="unbooking == s.id ? 'fa-spinner fa-spin' : 'fa-unlink'"></i>
+                                            </button>
+                                        </span>
+                                    </template>
                                     <input type="checkbox" x-show="s.booked != 1" :value="String(s.id)" x-model="selected">
                                 </td>
-                                <td class="text-center" x-text="s.student_id"></td>                                
+                                <td class="text-center" x-text="s.student_id"></td>
                                 <td x-text="s.full_name"></td>
                                 <td x-text="s.email"></td>
+                                <td>
+                                    <small x-text="s.exam_names || '—'" :class="{'text-muted': !s.exam_names}"></small>
+                                </td>
                             </tr>
                         </template>
                         <tr x-show="loading && rows.length === 0">
-                            <td colspan="4" class="text-center"><p class="ajax_processing">Loading...</p></td>
+                            <td colspan="5" class="text-center"><p class="ajax_processing">Loading...</p></td>
                         </tr>
                         <tr x-show="!loading && rows.length === 0 && examIds.length">
-                            <td colspan="4" class="text-center">
+                            <td colspan="5" class="text-center">
                                 <p class="ajax_notice">No student found.</p>
                                 <a :href="'admin/student/create?id=' + examIds[0]" target="_blank" class="btn btn-primary btn-sm">
                                     <i class="fa fa-plus"></i> Click here to add Student
@@ -104,7 +122,7 @@ $exams       = $exams ?? getBookableExams();
                             </td>
                         </tr>
                         <tr x-show="!examIds.length">
-                            <td colspan="4" class="text-center"><p class="ajax_notice">Select at least one exam above.</p></td>
+                            <td colspan="5" class="text-center"><p class="ajax_notice">Select at least one exam above.</p></td>
                         </tr>
                         </tbody>
                     </table>
@@ -151,6 +169,7 @@ $exams       = $exams ?? getBookableExams();
      * Alpine.js component for #student_popup.
      * Server-side search: admin/student/search_for_exam
      * Additive booking:   admin/student/book_for_exam
+     * Unlink one student: admin/student/unbook_for_exam
      */
     function bookingModal(scheduleId, defaultExamId) {
         const ajaxHeaders = {'X-Requested-With': 'XMLHttpRequest'};
@@ -166,6 +185,8 @@ $exams       = $exams ?? getBookableExams();
             selected: [],      // student ids (strings) — persists across searches & pages
             loading : false,
             saving  : false,
+            unbooking: 0,      // student id currently being unbooked (0 = none)
+            dirty   : false,   // an unbook happened → reload the page when the modal closes
             _req    : 0,
 
             open() {
@@ -178,8 +199,13 @@ $exams       = $exams ?? getBookableExams();
                 this.rows     = [];
                 this.total    = 0;
                 this.selected = [];
+                this.dirty    = false;
                 this.examIds  = defaultExamId ? [String(defaultExamId)] : [];
                 $('#student_popup').modal({show: true, backdrop: 'static'});
+                // Bootstrap 3 fires jQuery events (not DOM events), so Alpine can't listen for them directly.
+                $('#student_popup').off('hidden.bs.modal.booking').on('hidden.bs.modal.booking', () => {
+                    if (this.dirty) location.reload();
+                });
                 this.search(1);
                 this.$nextTick(() => this.$refs.keyword && this.$refs.keyword.focus());
             },
@@ -237,6 +263,30 @@ $exams       = $exams ?? getBookableExams();
                 } catch (e) {
                     toastr.error('Save failed. Please try again.');
                     this.saving = false;
+                }
+            },
+
+            async unbook(s) {
+                if (this.unbooking) return;
+                if (!confirm('Unlink ' + s.full_name + ' (' + s.student_id + ') from this exam?')) return;
+                this.unbooking = s.id;
+
+                const body = new URLSearchParams({exam_schedule_id: scheduleId, student_id: s.id});
+
+                try {
+                    const res  = await fetch('admin/student/unbook_for_exam', {method: 'POST', body, headers: ajaxHeaders});
+                    const data = await res.json();
+                    if (data.Status === 'OK') {
+                        toastr.success(data.Msg);
+                        s.booked   = 0;          // row flips back to a bookable checkbox
+                        this.dirty = true;       // underlying page list is stale → reload on close
+                    } else {
+                        toastr.error(data.Msg || 'Something went wrong!');
+                    }
+                } catch (e) {
+                    toastr.error('Unbook failed. Please try again.');
+                } finally {
+                    this.unbooking = 0;
                 }
             },
 

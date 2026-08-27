@@ -24,6 +24,7 @@ $route['admin/student/get']             = 'student/get';
 $route['admin/student/save']            = 'student/save';
 $route['admin/student/search_for_exam'] = 'student/search_for_exam';
 $route['admin/student/book_for_exam']   = 'student/book_for_exam';
+$route['admin/student/unbook_for_exam'] = 'student/unbook_for_exam';
 $route['admin/student/save_assignment'] = 'student/save_assignment';
 $route['admin/student/progress/(:num)'] = 'student/progress/$1';
 $route['admin/student/save_progress']   = 'student/save_progress';

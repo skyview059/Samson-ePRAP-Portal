@@ -878,6 +878,45 @@ class Student extends Admin_controller
         echo ajaxRespond('OK', $msg);
     }
 
+    /**
+     * Unlink (un-book) one already-booked student from a schedule — used by the
+     * "Unbook" button in the booking modal. Removes the enrollment row (same as the
+     * old save() did), but refuses when a result already exists for that
+     * student/schedule so assessment data is never orphaned.
+     * POST: exam_schedule_id, student_id
+     */
+    public function unbook_for_exam()
+    {
+        ajaxAuthorized();
+
+        $exam_schedule_id = (int)$this->input->post('exam_schedule_id');
+        $student_id       = (int)$this->input->post('student_id');
+
+        if (!$exam_schedule_id || !$student_id) {
+            echo ajaxRespond('Fail', 'Invalid request — no student/schedule given.');
+            return;
+        }
+
+        $has_result = $this->db->where('exam_schedule_id', $exam_schedule_id)
+                               ->where('student_id', $student_id)
+                               ->count_all_results('results') > 0;
+        if ($has_result) {
+            echo ajaxRespond('Fail', 'This student already has assessment results for this exam and cannot be unbooked. Use "Cancel" on the Exam/Student page instead.');
+            return;
+        }
+
+        $deleted = $this->db->where('exam_schedule_id', $exam_schedule_id)
+                            ->where('student_id', $student_id)
+                            ->delete('student_exam_enrollments');
+
+        if (!$deleted || $this->db->affected_rows() < 1) {
+            echo ajaxRespond('Fail', 'Student is not booked for this exam.');
+            return;
+        }
+
+        echo ajaxRespond('OK', 'Student unbooked successfully');
+    }
+
     public function save()
     {
         ajaxAuthorized();
