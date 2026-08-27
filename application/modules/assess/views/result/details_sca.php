@@ -31,6 +31,7 @@ $stations  = (int) $sca['stations'];
     .sca-result-fail { color: #c0392b; }
     .sca-criteria { font-size: 14px; line-height: 1.6; color: #444; margin: 0 0 20px; }
 
+
     /* Domain grade charts */
     .sca-domain { display: grid; grid-template-columns: 260px 1fr; background: #eef2f8; margin-bottom: 14px; padding: 24px; }
     .sca-domain-name { font-weight: 600; font-size: 15px; margin-bottom: 8px; }
@@ -82,6 +83,8 @@ $stations  = (int) $sca['stations'];
     .sca-comments strong { display: block; margin-bottom: 6px; color: #333; }
 
     .sca-footer { text-align: center; padding-top: 8px; }
+
+    .examiner_comment { color: #c94a68 !important;}
 
     @media (max-width: 767px) {
         .sca-report { padding: 20px 12px 40px; }
@@ -244,7 +247,7 @@ $stations  = (int) $sca['stations'];
             <?php } ?>
 
             <div class="sca-comments">
-                <strong >Examiner&rsquo;s comments</strong>
+                <strong class="examiner_comment">Examiner&rsquo;s comments</strong>
                 <?php echo ! empty($case->examiner_comments) ? nl2br_fk(html_escape($case->examiner_comments)) : '<span class="sca-empty">No comments.</span>'; ?>
             </div>
         </div>

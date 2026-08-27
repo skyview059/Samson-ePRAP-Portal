@@ -14,6 +14,19 @@
         </div>
         <div class="col-md-12">
             <div class="form-group">
+                <label for="remarks" class="col-sm-2 control-label">
+                    Enroll Status
+                    <sup>*</sup>
+                </label>
+                <div class="col-sm-10">                    
+                    <?php echo htmlRadio('status', $status, [
+                        'Enrolled' => 'Enrolled',
+                        'Cancelled' => 'Cancelled',
+                    ]);?>
+                </div>
+            </div>
+
+            <div class="form-group" style="padding-top: 15px;">
                 <label for="remarks" class="col-sm-2 control-label">Remarks<sup>*</sup></label>
                 <div class="col-sm-10">
                     <input type="hidden" name="id" value="<?php echo $student_exam_id; ?>"/>

@@ -104,13 +104,13 @@
                                         echo anchor(site_url(Backend_URL . 'exam/publish/' . $exam->id), 
                                                 '<i class="fa fa-fw fa-close"></i> Withdrawal', 
                                                 'class="btn btn-xs btn-success confirmation" title="Withdrawal Result" onclick="return confirm(\'Confirm Withdrawal Result\')"');
-                                    }else{
+                                    } else {
                                         echo anchor(site_url(Backend_URL . 'exam/publish/' . $exam->id), 
                                                 '<i class="fa fa-check-square-o"></i> Release ', 
                                                 'class="btn btn-xs btn-warning confirmation" title="Relese Result" onclick="return confirm(\'Confrim Relese Result\')"');
                                     }
                                 } else {
-                                    echo 'N/A';
+                                    echo 'N/A (Exam Not Finished)';
                                 }
                                 ?>                                  
                             </td>

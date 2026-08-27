@@ -57,9 +57,8 @@
                                         <tr>
                                             <th width="40">Sl</th>
                                             <th width="100" class="text-center">Photo</th>
-                                            <th>Name</th>
-                                            <th>Number Type</th>                                            
-                                            <th>Number</th>                                            
+                                            <th>Name</th>                                       
+                                            <th>StudentID</th>                                            
                                             <th>Exam Name</th>
                                             <th>Centre Name</th>
                                             <?php if($admin){ echo '<th class="text-center text-red">Admin Tool</th>'; } ?>
@@ -74,9 +73,8 @@
                                         <tr>
                                             <td><?php echo ++$start; ?></td>
                                             <td class="text-center"><?php echo getPhoto_v2($s->photo, $s->full_name); ?></td>                            
-                                            <td><?php echo $s->full_name; ?></td>
-                                            <td><?php echo $s->number_type; ?></td>
-                                            <td><?php echo $s->gmc_number; ?></td>
+                                            <td><?php echo $s->full_name; ?></td>                                            
+                                            <td><?php echo studentID($s->id); ?></td>
                                             <td><?php echo $s->exam_name; ?></td>
                                             <td><?php echo $s->centre_name; ?></td>
                                             

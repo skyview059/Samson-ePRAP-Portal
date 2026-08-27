@@ -54,19 +54,18 @@
                                 </label>
                             </th>
                             <th width="80">Photo</th>
-                            <th>Name & Email</th>                            
-                            <th>StudentID</th>
-                            <th>Number</th>
-                            <th>Phone</th>
-                            <th>Booked At</th>
-                            <th>Attendance</th>
-                            <th class="text-center hide_on_print" width="170">Action</th>
+                            <th>Name & Email</th>  
+                            <th>Exam Date</th>                          
+                            <th>StudentID</th>                            
+                            <th>Contacts</th>
+                            <th class="text-center">Booked At</th>
+                            <th class="text-center">Attendance</th>
+                            <th class="text-center hide_on_print" width="220">Action</th>
                         </tr>
                         </thead>
                         <tbody>
                         <?php foreach ($students as $student) {
-                            $options    = "<input name='students[]' value='{$student->id}' class='mark' type='checkbox'/>";
-                            $exam_link  = "exam_schedule_id={$id}&number_type={$student->number_type}&gmc={$student->gmc_number}";
+                            $options    = "<input name='students[]' value='{$student->id}' class='mark' type='checkbox'/>";                            
                             ?>
                             <tr>
                                 <td><label><?= $options . ' ' . sprintf('%02d', ++$start); ?></label></td>
@@ -91,29 +90,20 @@
                                         <i class="fa fa-whatsapp"></i> <?php echo "+{$student->whatsapp_code}{$student->whatsapp}"; ?>
                                     </a>
                                 </td>
-                                <td><?php echo globalDateTimeFormat($student->assign_at); ?></td>
-                                <td>
-                                <span class="label <?= ($student->attendance) ? 'label-success' : 'label-warning' ?> btn-xs"> 
-                                <?= ($student->attendance) ? '<i class="fa fa-check-square-o"></i>' : '<i class="fa fa-fw fa-close"></i>'; ?>
-                                <?= ($student->attendance) ? 'Yes' : 'No'; ?>
-                                </span>
+                                <td class="text-center"><?php echo globalDateTimeFormat($student->assign_at); ?></td>
+                                <td class="text-center">
+                                    <span class="label <?= ($student->attendance) ? 'label-success' : 'label-warning' ?> btn-xs"> 
+                                        <?= ($student->attendance) ? '<i class="fa fa-check-square-o"></i>' : '<i class="fa fa-fw fa-close"></i>'; ?>
+                                        <?= ($student->attendance) ? 'Yes' : 'No'; ?>
+                                    </span>
                                 </td>
                                 <td class="text-center hide_on_print">
-                                    <?php
                                     
-                                    if ($student->exam_status == 'Enrolled') {
-                                        ?>
-                                        <span class="btn  btn-xs btn-danger"
-                                              onclick="studentStatusChange(<?php echo "{$student->student_exam_id}"; ?>);">
-                                  <i class="fa fa-times"></i>
-                                  Cancel
-                                </span>
-                                    <?php } else { ?>
-                                        <span class="btn  btn-xs btn-default disabled">
-                                      <i class="fa fa-ban"></i>
-                                      Canceled
+                                    <span class="btn btn-xs btn-warning"
+                                        onclick="studentStatusChange(<?= "{$student->student_exam_id}, {$student->id}"; ?>);">
+                                        <i class="fa fa-times"></i>
+                                        Edit (<?= $student->exam_status; ?>)
                                     </span>
-                                    <?php } ?>
 
                                     <?php 
                                         echo anchor(
@@ -124,7 +114,7 @@
                                     ?>
                 
                                     <p style="margin-top: 5px;">
-                                        <a class="btn btn-primary btn-xs" href="<?= site_url(Backend_URL . 'assess/search_student?' . $exam_link ) ?>" target="_blank">
+                                        <a class="btn btn-primary btn-xs" href="<?= site_url(Backend_URL . "assess/search_student?exam_schedule_id={$id}" ) ?>" target="_blank">
                                             Open Exam View
                                             <i class="fa fa-fw fa-external-link"></i>
                                         </a>
@@ -337,7 +327,7 @@
                     toastr.clear();
                     if(respond.Status === 'OK') {
                         toastr.success('Link loaded successfully!');
-                        editor.setData(`${respond.Msg.title} <br/> ${respond.Msg.link} <br/><br/> Thanks <br/> Team Samson`);
+                        editor.setData(`${respond.Msg.title} <br/> ${respond.Msg.link} <br/><br/> Thanks <br/> Team Genius Class`);
                     } else {
                         toastr.error('Something went wrong!');
                     }
@@ -406,7 +396,7 @@
             backdrop: 'static'
         });
         $.ajax({
-            url       : "admin/exam/get_student_exams/" + student_exam_id,
+            url       : `admin/exam/get_student_exams/${student_exam_id}`,
             type      : "GET",
             dataType  : "html",
             beforeSend: function () {

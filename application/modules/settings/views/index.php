@@ -42,8 +42,10 @@
     $('#submit').on('click', function (e) {
         e.preventDefault();
 
-        for (instance in CKEDITOR.instances) {
-            CKEDITOR.instances[instance].updateElement();
+        // CKEditor 5: copy editor content back into its <textarea> before serializing
+        // (CKEDITOR.instances / updateElement() are CKEditor 4 APIs and do not exist here)
+        if (window.CK5 && window.CK5.updateSourceElements) {
+            window.CK5.updateSourceElements();
         }
 
         const settings = $('#settings').serialize();

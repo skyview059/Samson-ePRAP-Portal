@@ -330,6 +330,7 @@ class Exam extends Admin_controller
             'min'              => set_value('min', date('i', strtotime('+1 month'))),
             'am_pm'            => set_value('am_pm', date('a', strtotime('+1 month'))),
             'pass_station'     => set_value('pass_station', 10),
+            'pass_mark'        => set_value('pass_mark'),
             'student_limit'    => set_value('student_limit', 10),
             'gmc_exam_dates'   => set_value('gmc_exam_dates'),
             'label'            => set_value('label'),
@@ -359,6 +360,7 @@ class Exam extends Admin_controller
                 'exam_centre_id'   => $this->input->post('exam_centre_id', TRUE),
                 'datetime'         => $datetime,
                 'pass_station'     => $this->input->post('pass_station', TRUE),
+                'pass_mark'        => $this->input->post('pass_mark', TRUE),
                 'passing_criteria' => $this->input->post('passing_criteria', TRUE),
                 'zoom_link'        => $this->input->post('zoom_link', TRUE),
 
@@ -404,6 +406,7 @@ class Exam extends Admin_controller
                 'label'          => set_value('label', $row->label),
 
                 'pass_station'     => set_value('pass_station', $row->pass_station),
+                'pass_mark'        => set_value('pass_mark', $row->pass_mark),
                 'passing_criteria' => set_value('passing_criteria', $row->passing_criteria),
                 'zoom_link'        => set_value('zoom_link', $row->zoom_link),
                 'status'           => set_value('status', $row->status),
@@ -436,6 +439,7 @@ class Exam extends Admin_controller
                 'exam_centre_id'   => (int)$this->input->post('exam_centre_id', TRUE),
                 'datetime'         => $datetime,
                 'pass_station'     => $this->input->post('pass_station', TRUE),
+                'pass_mark'        => $this->input->post('pass_mark', TRUE),
                 'passing_criteria' => $this->input->post('passing_criteria', TRUE),
                 'zoom_link'        => $this->input->post('zoom_link', TRUE),
                 'status'           => $this->input->post('status', TRUE),
@@ -580,11 +584,18 @@ class Exam extends Admin_controller
 
     public function get_student_exams($student_exam_id)
     {
+        
+        $enroll = $this->db->select('id,status,remarks')
+                    ->where('id', (int) $student_exam_id)
+                    ->get('student_exam_enrollments')->row();
 
         $data = [
             'student_exam_id'   => $student_exam_id,
-            'student_exam_info' => $this->Exam_model->get_student_exam_by_id($student_exam_id)
+            'student_exam_info' => $this->Exam_model->get_student_exam_by_id($student_exam_id),
+            'status' => $enroll->status,
+            'remark' => $enroll->remarks
         ];
+        
         $this->load->view('exam/exam/student_exam_info', $data);
     }
 

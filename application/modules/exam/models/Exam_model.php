@@ -83,8 +83,9 @@ class Exam_model extends Fm_model
         $this->db->from('student_exam_enrollments as se');
         $this->db->join('students as s', 's.id=se.student_id ', 'LEFT');
         $this->db->join('results as r', 'r.student_id=s.id and r.exam_schedule_id=se.exam_schedule_id', 'LEFT');
-        $this->db->where('se.status', 'Enrolled');
         $this->db->where('se.exam_schedule_id', $exam_schedule_id);
+        $this->db->order_by("FIELD(se.status, 'Enrolled', 'Cancelled')", '', FALSE);
+        $this->db->order_by('se.created_at', 'DESC');
         return $this->db->get()->result();
     }
     

@@ -93,9 +93,10 @@ class Result extends Admin_controller {
     {
 
         $results = $this->Result_model->get_result($student_id,$sch_id);
+        $total_pass_mark = $results->total_pass_mark ?? 0;
     //    dd($results);
         
-        $total_score = $total_pass_mark = $passed_station = 0;
+        $total_score = $passed_station = 0;
         
         foreach ($results->details as $result) {
             $get_mark   = $result->technical_skills + $result->clinical_skills + $result->interpersonal_skills;

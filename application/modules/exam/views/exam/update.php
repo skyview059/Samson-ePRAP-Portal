@@ -134,11 +134,27 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="passing_criteria" class="col-sm-2 control-label">Passing Criteria
-                            <sup>*</sup></label>
+                        <label for="passing_criteria" class="col-sm-2 control-label">
+                            Pass Mark
+                            <sup>*</sup>
+                        </label>
+                        <div class="col-sm-2">
+                            <div class="input-group">                                
+                                <input type="text" name="pass_mark" id="pass_mark" 
+                                        class="form-control" placeholder="12.5" value="<?= $pass_mark; ?>">
+                                <span class="input-group-addon">Eg. 10,12.5 etc</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="passing_criteria" class="col-sm-2 control-label">
+                            Passing Criteria
+                            <sup>*</sup>
+                        </label>
                         <div class="col-sm-8">
                             <textarea name="passing_criteria" id="passing_criteria" rows="10"
-                                      class="form-control"><?= $passing_criteria; ?></textarea>
+                                class="form-control"><?= $passing_criteria; ?></textarea>
                         </div>
                     </div>
 
