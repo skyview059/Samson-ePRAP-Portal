@@ -11,11 +11,12 @@
         "source": "https://github.com/bcit-ci/CodeIgniter"
     },
     "require": {
-        "php": ">=5.2.4",        
-        "mauricesvay/php-facedetection": "^0.1.0",
+        "php": ">=5.2.4",
         "phpmailer/phpmailer": "^6.3",
         "verot/class.upload.php": "dev-master",
-        "mpdf/mpdf": "^8.3"
+        "mpdf/mpdf": "^8.3",
+        "aws/aws-sdk-php": "^3.0",
+        "vlucas/phpdotenv": "^5.6"
     },
     "suggest": {
         "paragonie/random_compat": "Provides better randomness in PHP 5.x"

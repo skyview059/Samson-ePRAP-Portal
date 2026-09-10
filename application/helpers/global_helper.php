@@ -777,6 +777,9 @@ function getMyEncodeKey($string, $salt, $key)
 
 function removeImage($photo = null)
 {
+    if ($photo) {
+        removeFromSpaces($photo);
+    }
     $filename = dirname(APPPATH) . '/' . $photo;
     if ($photo && file_exists($filename)) {
         unlink($filename);
@@ -786,11 +789,24 @@ function removeImage($photo = null)
 
 function removeFile($file = null)
 {
+    if ($file) {
+        removeFromSpaces($file);
+    }
     $filename = dirname(APPPATH) . '/' . $file;
     if ($file && file_exists($filename)) {
         unlink($filename);
     }
     return TRUE;
+}
+
+function removeFromSpaces($relative_path)
+{
+    $ci = &get_instance();
+    $ci->load->library('spaces');
+
+    if ($ci->spaces->isEnabled()) {
+        $ci->spaces->deleteFile($relative_path);
+    }
 }
 
 function getLocationList($selected = 0, $type = 0, $parent_id = 0)
@@ -826,10 +842,58 @@ function uploadPhoto($FILE = array(), $path = '', $name = '')
         $handle->file_new_name_ext    = 'jpg';
         $handle->process($path);
         if ($handle->processed) {
-            return stripslashes($handle->file_dst_pathname);
+            $relative_path = stripslashes($handle->file_dst_pathname);
+            pushToSpaces($relative_path);
+            return $relative_path;
         }
     }
     return '';
+}
+
+/**
+ * Push an already-written local file to DigitalOcean Spaces under the same
+ * relative path, then remove the local copy. No-op (and local file kept)
+ * when Spaces isn't configured, or when the push fails.
+ */
+function pushToSpaces($relative_path)
+{
+    if (!$relative_path) {
+        return false;
+    }
+
+    $ci = &get_instance();
+    $ci->load->library('spaces');
+
+    if (!$ci->spaces->isEnabled()) {
+        return false;
+    }
+
+    $local_path = FCPATH . ltrim($relative_path, '/');
+    if ($ci->spaces->putFile($local_path, $relative_path)) {
+        @unlink($local_path);
+        return true;
+    }
+    return false;
+}
+
+/**
+ * Public URL for a stored relative path/key: the Spaces CDN URL when
+ * enabled, otherwise base_url() over the local path (unchanged legacy
+ * behaviour).
+ */
+function spacesUrl($relative_path)
+{
+    if (!$relative_path) {
+        return '';
+    }
+
+    $ci = &get_instance();
+    $ci->load->library('spaces');
+
+    if ($ci->spaces->isEnabled()) {
+        return $ci->spaces->url($relative_path);
+    }
+    return base_url($relative_path);
 }
 
 function build_pagination_url($link = 'listing', $page = 'page', $ext = false)
@@ -1010,6 +1074,13 @@ function getUserData($user_id = 0, $filde_name = 'id')
 
 function getPhoto($photo, $name = '', $noPhotoWidth = '150', $noPhotoHeight = '150')
 {
+    $ci = &get_instance();
+    $ci->load->library('spaces');
+
+    if ($photo && $ci->spaces->isEnabled()) {
+        return spacesUrl($photo);
+    }
+
     $filename = dirname(BASEPATH) . '/' . $photo;
     if ($photo && file_exists($filename)) {
         return $photo;
@@ -1034,6 +1105,15 @@ function firstLetterOfEachWord($str, $limit = 2)
 
 function getPhotoWithTimThumb($photo, $width = '110', $height = '110', $zc = 2)
 {
+    $ci = &get_instance();
+    $ci->load->library('spaces');
+
+    if ($photo && $ci->spaces->isEnabled()) {
+        // timthumb needs local disk access to resize/cache, which multiple
+        // app servers can't share; photos are already resized on upload.
+        return spacesUrl($photo);
+    }
+
     $filename = dirname(BASEPATH) . "/{$photo}";
     if ($photo && file_exists($filename)) {
         return base_url('timthumb.php?src=' . base_url($photo) . "&h={$height}&w={$width}&zc={$zc}");
@@ -1486,7 +1566,9 @@ function uploadFile($FILE = [], $path = 'uploads/certificate/', $name = 'cert')
         $handle->file_new_name_body = uniqid("{$name}_");
         $handle->process($path);
         if ($handle->processed) {
-            return stripslashes($handle->file_dst_pathname);
+            $relative_path = stripslashes($handle->file_dst_pathname);
+            pushToSpaces($relative_path);
+            return $relative_path;
         }
     }
     return '';
@@ -1540,7 +1622,9 @@ function uploadAttachment($FILE = [], $path = null, $name = 'att', $allowed = []
     $result['path'] = $path . $handle->file_dst_name;
     $result['size'] = (int)filesize($handle->file_dst_pathname);
     $result['type'] = substr_fk($mime, 0, 120);
-    $result['url']  = base_url($result['path']);
+
+    pushToSpaces($result['path']);
+    $result['url'] = $ci->spaces->isEnabled() ? spacesUrl($result['path']) : base_url($result['path']);
 
     $ci->db->insert('attachments', [
         'name'        => $result['name'],
@@ -1560,6 +1644,14 @@ function download_attachment($file)
     if (empty($file)) {
         return 'No File';
     }
+
+    $ci = &get_instance();
+    $ci->load->library('spaces');
+
+    if ($ci->spaces->isEnabled()) {
+        return '<a href="' . spacesUrl($file) . '" title=" Download File"><i class="fa fa-download"></i> Download</a>';
+    }
+
     $filepath = dirname(APPPATH) . "/{$file}";
 
     if (file_exists($filepath)) {
@@ -1572,9 +1664,28 @@ function download_attachment($file)
 
 function filePreviewBtn($file)
 {
-    $btn       = '';
+    $btn = '';
+    if (!$file) {
+        return '<span class="btn btn-xs btn-default" title="No Preview"><i class="fa fa-search" aria-hidden="true"></i> Preview </span>';
+    }
+
+    $ci = &get_instance();
+    $ci->load->library('spaces');
+
+    if ($ci->spaces->isEnabled()) {
+        $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+        $file_url = in_array($ext, ['jpg', 'jpeg', 'png', 'gif'])
+            ? spacesUrl($file)
+            : '//docs.google.com/viewer?url=' . spacesUrl($file);
+
+        $btn .= "<a href=\"{$file_url}\" target=\"_blank\" class=\"btn btn-xs btn-success\" title=\"Preview\">";
+        $btn .= '<i class="fa fa-search-plus"></i> Preview ';
+        $btn .= '</a>';
+        return $btn;
+    }
+
     $file_path = dirname(BASEPATH) . "/{$file}";
-    if (!$file or !file_exists($file_path)) {
+    if (!file_exists($file_path)) {
         return '<span class="btn btn-xs btn-default" title="No Preview"><i class="fa fa-search" aria-hidden="true"></i> Preview </span>';
     }
 

@@ -119,6 +119,14 @@ function multiDateFormat($str)
 
 function getPhoto_v2($photo, $name, $width = 80, $height = 80, $zc = 2)
 {
+    $ci = &get_instance();
+    $ci->load->library('spaces');
+
+    if ($photo && $ci->spaces->isEnabled()) {
+        $img = spacesUrl($photo);
+        return "<img src='{$img}' class='img-cercle' title='{$name}'/>";
+    }
+
     $filename = dirname(BASEPATH) . "/{$photo}";
     if ($photo && file_exists($filename)) {
         $src = base_url($photo);
@@ -138,6 +146,15 @@ function name2imgView($name)
 
 function getPhoto_v3($photo, $gender, $name = 'Student', $width = 80, $height = 80, $zc = 2, $id = false)
 {
+    $ci = &get_instance();
+    $ci->load->library('spaces');
+
+    if ($photo && $ci->spaces->isEnabled()) {
+        $img = spacesUrl($photo);
+        $new_id = ($id == true) ? "id='results'" : '';
+        return "<img {$new_id} src='{$img}' title='{$name}'  style=\"width:{$width}px; height:{$height}px;\" class='img-cercle' />";
+    }
+
     $filename = dirname(BASEPATH) . "/{$photo}";
     if ($photo && file_exists($filename)) {
         $src = base_url($photo);

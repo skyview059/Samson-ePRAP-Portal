@@ -310,11 +310,11 @@ class Mail extends MX_Controller
             // $config['protocol'] = 'sendmail';
             // $config['mailpath'] = '/usr/sbin/sendmail';
             $config['protocol']     = 'smtp';
-            $config['smtp_host']    = 'mail.eprap.com';
-            $config['smtp_port']    = '465';
+            $config['smtp_host']    = env('SMTP_HOST', 'mail.eprap.com');
+            $config['smtp_port']    = env('SMTP_PORT', '465');
             $config['smtp_timeout'] = '5';
-            $config['smtp_user']    = 'smtp@eprap.com';
-            $config['smtp_pass']    = 'Aw953e337';
+            $config['smtp_user']    = env('SMTP_USER', '');
+            $config['smtp_pass']    = env('SMTP_PASS', '');
             $config['smtp_crypto']  = 'ssl';
         }
 
