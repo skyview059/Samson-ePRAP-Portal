@@ -17,6 +17,7 @@
 /db_cache
 /application/config/database.php
 /application/config/config.php
+/.env
 /.htaccess
 /temp/sessions
 /temp
