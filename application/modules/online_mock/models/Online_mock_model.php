@@ -77,11 +77,12 @@ class Online_mock_model extends Fm_model
     }  
 
     public function get_students($exam_schedule_id){
-        $this->db->select('s.*, se.id as student_exam_id, se.created_at as assign_at, se.status as exam_status, se.remarks, r.id as attendance');
+        $this->db->select('s.id,fname,photo,gender,email,photo,mname,lname,exam_date,whatsapp_code,whatsapp,phone_code,phone');
+        $this->db->select('se.status as exam_status, se.id as student_exam_id, se.created_at as assign_at, se.status as exam_status, se.remarks, r.id as attendance');
         $this->db->from('student_exam_enrollments as se');
         $this->db->join('students as s', 's.id=se.student_id ', 'LEFT');
         $this->db->join('results as r', 'r.student_id=s.id and r.exam_schedule_id=se.exam_schedule_id', 'LEFT');
-        $this->db->where('se.status', 'Enrolled');
+        $this->db->order_by("FIELD(se.status, 'Enrolled', 'Cancelled')", '', FALSE);
         $this->db->where('se.exam_schedule_id', $exam_schedule_id);
         return $this->db->get()->result();
     }

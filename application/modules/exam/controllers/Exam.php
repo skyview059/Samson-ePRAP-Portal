@@ -593,7 +593,7 @@ class Exam extends Admin_controller
             'student_exam_id'   => $student_exam_id,
             'student_exam_info' => $this->Exam_model->get_student_exam_by_id($student_exam_id),
             'status' => $enroll->status,
-            'remark' => $enroll->remarks
+            'remarks' => $enroll->remarks
         ];
         
         $this->load->view('exam/exam/student_exam_info', $data);
@@ -604,6 +604,7 @@ class Exam extends Admin_controller
         ajaxAuthorized();
         $id      = (int)$this->input->post('id', TRUE);
         $remarks = $this->input->post('remarks', TRUE);
+        $status = $this->input->post('status', TRUE);
 
         if (empty($id)) {
             echo ajaxRespond('Fail', '<p class="ajax_error">Their is nothing to save... </p>');
@@ -617,7 +618,7 @@ class Exam extends Admin_controller
 
         $this->db->trans_start();
         $updateData = array(
-            'status'  => 'cancelled',
+            'status'  => $status,
             'remarks' => $remarks,
         );
         $this->db->where('id', $id);

@@ -4,6 +4,9 @@
     .table tbody tr td{
         vertical-align: middle;
     }
+    tr.student_cancelled td {
+        background-color: #ffd1d1 !important;
+    }
 </style>
 <section class="content-header">
     <h1>Mock Exam <small>Student List</small></h1>
@@ -21,11 +24,13 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="pull-left">
-                        <button type="button" class="btn btn-primary pull-right hide_on_print"
+                        <button type="button" class="btn btn-primary hide_on_print"
                                 onclick="linkStudent();">
                             <i class="fa fa-hospital-o"></i>
                             Book Student for Exam
                         </button>
+
+                        <?= getExamRoom( $id, $datetime, 'btn-md' ); ?>
                     </div>
                 </div>
                 <div class="col-md-6 text-right">
@@ -52,23 +57,31 @@
                             <th width="80">Photo</th>
                             <th>Name & Email</th>
                             <th>GMC-Exam-Date</th>
-                            <th>Number</th>
+                            <th class="text-center">StudentID</th>
                             <th>Phone</th>
                             <th>Booked At</th>
                             <th>Attendance</th>
-                            <th class="text-center hide_on_print" width="170">Action</th>
+                            <th class="text-center hide_on_print" width="200">Action</th>
                         </tr>
                     </thead>
                     <tbody>
                     <?php foreach($students as $student) { 
                         $options = "<input name='students[]' value='{$student->id}' class='mark' type='checkbox'/>";
                         ?>
-                        <tr>
+                        <tr class="student_<?php echo strtolower($student->exam_status); ?>">
                             <td><label><?= $options .' '. sprintf('%02d', ++$start); ?></label></td>                                                    
                             <td><?php echo getPhoto_v3($student->photo, $student->gender, $student->fname, 60, 60); ?></td>
-                            <td><?php echo "{$student->fname} {$student->mname} {$student->lname}"; ?><br><?php echo $student->email; ?></td>
+                            <td>
+                            <?php                                     
+                                echo anchor(
+                                    site_url(Backend_URL . 'student/read/' . $student->id),
+                                    "{$student->fname} {$student->mname} {$student->lname}" . ' <i class="fa fa-fw fa-external-link"></i>',
+                                    'target="_blank"'
+                                ); ?><br/>
+                            <?= $student->email ?>     
+                            </td>
                             <td><?php echo globalDateFormat($student->exam_date); ?></td>
-                            <td><?php echo "{$student->number_type}-{$student->gmc_number}"; ?></td>
+                            <td class="text-center"><?php echo studentID($student->id); ?></td>
                             <td>
                             &nbsp;&nbsp;<i class="fa fa-mobile-phone"></i> <?php echo "+{$student->phone_code}{$student->phone}"; ?><br/>
                                     <i class="fa fa-whatsapp" ></i> <?php echo "+{$student->whatsapp_code}{$student->whatsapp}"; ?>                            
@@ -81,23 +94,25 @@
                                 </span>
                             </td>
                             <td class="text-center hide_on_print">
-                                <?php
-                                echo anchor(
-                                    site_url(Backend_URL . 'student/read/' . $student->id), 
-                                    '<i class="fa fa-fw fa-external-link"></i> Preview', 
-                                    'class="btn btn-xs btn-primary" target="_blank"'
-                                );
-                                if($student->exam_status=='Enrolled'){
+                                <?php 
+                                    echo anchor(
+                                        site_url(Backend_URL . 'student/login/' . $student->id), 
+                                        '<i class="fa fa-fw fa-gear"></i> Login', 
+                                        'class="btn btn-xs btn-info" target="_blank"'
+                                    ); 
                                 ?>
-                                <span class="btn  btn-xs btn-danger" 
+
+                                <?php if($student->exam_status=='Enrolled'){  ?>
+                                <span class="btn btn-xs btn-danger" 
                                     onclick="studentStatusChange(<?php echo "{$student->student_exam_id}"; ?>);">
                                   <i class="fa fa-times"></i>
                                   Cancel
                                 </span>
                                 <?php } else { ?>
-                                    <span class="btn  btn-xs btn-default disabled">
-                                      <i class="fa fa-ban"></i>
-                                      Canceled
+                                    <span class="btn btn-xs btn-warning"
+                                        onclick="studentStatusChange(<?= $student->student_exam_id; ?>);">
+                                        <i class="fa fa-times"></i>
+                                        Edit (<?= $student->exam_status; ?>)
                                     </span>
                                 <?php } ?>
                             </td>

@@ -292,6 +292,8 @@
                                 </tr>
                             </table>
 
+                            < Prev || Next >
+
                             <!--                        <div class="text-center">-->
                             <!--                            <button type="button" class="btn btn-success" id="start_timer_btn"><i-->
                             <!--                                        class="fa fa-play"></i>-->

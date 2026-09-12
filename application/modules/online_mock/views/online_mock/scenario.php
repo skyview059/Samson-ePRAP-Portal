@@ -27,6 +27,8 @@
                             <i class="fa fa-clock-o"></i>
                             Manage Scenario Default Time
                         </button>
+
+                        <?= getExamRoom( $id, $datetime, 'btn-md' ); ?>
                     </div>
                 </div>
                 <div class="col-md-6 text-right">

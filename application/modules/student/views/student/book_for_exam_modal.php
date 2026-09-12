@@ -89,14 +89,14 @@ $exams       = $exams ?? getBookableExams();
                             <tr :class="{'success': selected.includes(String(s.id))}">
                                 <td class="text-center" style="white-space:nowrap;">
                                     <template x-if="s.booked == 1">
-                                        <span>
-                                            <span class="label label-success" title="Already booked for this schedule">
+                                        <span class="btn-group btn-group-xs">
+                                            <span class="btn btn-success btn-xs" style="cursor:default;pointer-events:none;" title="Already booked for this schedule">
                                                 <i class="fa fa-check"></i> Booked
                                             </span>
-                                            <button type="button" class="btn btn-danger btn-xs" style="margin-left:4px;"
-                                                    title="Unlink this student from this exam"
+                                            <button type="button" class="btn btn-danger btn-xs"
+                                                    title="Cancelled this student from this exam"
                                                     @click="unbook(s)" :disabled="unbooking == s.id">
-                                                <i class="fa" :class="unbooking == s.id ? 'fa-spinner fa-spin' : 'fa-unlink'"></i>
+                                                <i class="fa" :class="unbooking == s.id ? 'fa-spinner fa-spin' : 'fa-ban'"></i>
                                             </button>
                                         </span>
                                     </template>
@@ -169,7 +169,7 @@ $exams       = $exams ?? getBookableExams();
      * Alpine.js component for #student_popup.
      * Server-side search: admin/student/search_for_exam
      * Additive booking:   admin/student/book_for_exam
-     * Unlink one student: admin/student/unbook_for_exam
+     * Cancelled one student: admin/student/unbook_for_exam
      */
     function bookingModal(scheduleId, defaultExamId) {
         const ajaxHeaders = {'X-Requested-With': 'XMLHttpRequest'};
@@ -268,7 +268,7 @@ $exams       = $exams ?? getBookableExams();
 
             async unbook(s) {
                 if (this.unbooking) return;
-                if (!confirm('Unlink ' + s.full_name + ' (' + s.student_id + ') from this exam?')) return;
+                if (!confirm('Cancelled ' + s.full_name + ' (' + s.student_id + ') from this exam?')) return;
                 this.unbooking = s.id;
 
                 const body = new URLSearchParams({exam_schedule_id: scheduleId, student_id: s.id});

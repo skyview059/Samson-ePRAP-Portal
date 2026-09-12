@@ -5,9 +5,12 @@
     .table tbody tr td {
         vertical-align: middle;
     }
-     .ck-editor__editable {
-         min-height: 200px;
-     }
+    .ck-editor__editable {
+        min-height: 200px;
+    }    
+    tr.student_cancelled td {
+        background-color: #ffd1d1 !important;
+    }
 </style>
 <section class="content-header">
     <h1>Mock Exam <small>Student List</small></h1>
@@ -67,7 +70,7 @@
                         <?php foreach ($students as $student) {
                             $options    = "<input name='students[]' value='{$student->id}' class='mark' type='checkbox'/>";                            
                             ?>
-                            <tr>
+                            <tr class="student_<?php echo strtolower($student->exam_status); ?>">
                                 <td><label><?= $options . ' ' . sprintf('%02d', ++$start); ?></label></td>
                                 <td><?php echo getPhoto_v3($student->photo, $student->gender, $student->fname, 60, 60); ?></td>
                                 <td><?php                                     

@@ -76,3 +76,44 @@ SELECT id,fname,lname,email,exam_id FROM `students` WHERE `email` IN ( 'furtado.
 'mau.elendu@gmail.com',
 'rimahfouz@gmail.com',
 'adaobiazom@gmail.com' );
+
+
+
+
+
+
+25th Aug, 2026: 7:00pm
+----------------------------------------
+Re-generate Result:
+    Data gathering  and diagnosis
+    Clinical management and medical complexity
+    Relating to others
+
+Admin Preview: 
+https://www.eprap.com/portal/admin/assess/result/details/17991/1249
+
+Student Result Preview will need to work....
+    -> https://www.eprap.com/portal/results/1249
+
+
+Admin Pass mark setup on Exam
+
+Setting not saving data: for CK editor issue 
+https://www.eprap.com/portal/admin/settings
+
+
+
+New Demand : bring back Cancelled student as well. ---- done 
+
+
+
+==================================
+--- 27 Aug, 2026 - 2:20 pm Start Work
+==================================
+ALTER TABLE `exam_schedules` ADD `pass_mark` DECIMAL(5,2) NULL DEFAULT NULL AFTER `pass_station`;
+
+
+
+==================================
+
+1.  15min Break ( prayer + chat with al-amin )

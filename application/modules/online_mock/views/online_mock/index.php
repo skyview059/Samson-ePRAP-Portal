@@ -127,11 +127,12 @@
                             }
                             ?></td>
                             <td class="text-center">
-                                <a href="<?= site_url('mock/exam-room/' . $exam->id.'/practice?force=1'); ?>"
+                                <?= getExamRoom( $exam->id, $exam->datetime ); ?>
+                                <!-- <a href="<?= site_url('mock/exam-room/' . $exam->id.'/practice?force=1'); ?>"
                                    target="_blank"
                                    class="btn btn-xs btn-success" <?= ($exam->datetime < date('Y-m-d H:i:s')) ? 'disabled' : '' ?>>
                                     <i class="fa fa-play"></i> Enter exam room
-                                </a>
+                                </a> -->
                                 <?php
                                 echo anchor(site_url(Backend_URL . 'online_mock/update/' . $exam->id), '<i class="fa fa-fw fa-edit"></i> Edit', 'class="btn btn-xs btn-warning"');
                                 echo anchor(site_url(Backend_URL . 'online_mock/scenario/' . $exam->id), '<i class="fa fa-exchange"></i> Scenario', 'class="btn btn-xs btn-warning"');

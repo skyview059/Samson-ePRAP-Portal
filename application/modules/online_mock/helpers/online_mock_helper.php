@@ -55,3 +55,18 @@ function onlineMockListTab($active = 'coming', $coming = 0, $past = 0, $cancelle
     $html .= '</ul>';
     return $html;
 }
+
+function getExamRoom( $exam_id, $exam_time, $size = 'btn-xs' ){
+    $_URL = site_url("mock/exam-room/{$exam_id}/practice?force=1");
+    if($exam_time > date('Y-m-d H:i:s')){
+        return '<a href="' . $_URL . '" target="_blank" class="btn '. $size .' btn-success">'
+            . '<i class="fa fa-play"></i>' 
+            . ' Enter exam room'
+            . '</a>';
+    } else {
+        return '<button class="btn '. $size .' btn-danger">'
+            . '<i class="fa fa-lock"></i> ' 
+            . 'Exam Expired'
+            . '</button>';
+    }
+}

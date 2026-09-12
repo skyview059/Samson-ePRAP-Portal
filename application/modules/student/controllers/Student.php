@@ -905,11 +905,12 @@ class Student extends Admin_controller
             return;
         }
 
-        $deleted = $this->db->where('exam_schedule_id', $exam_schedule_id)
+        $cancelled = $this->db->where('exam_schedule_id', $exam_schedule_id)
                             ->where('student_id', $student_id)
-                            ->delete('student_exam_enrollments');
+                            ->set('status', 'Cancelled')
+                            ->update('student_exam_enrollments');
 
-        if (!$deleted || $this->db->affected_rows() < 1) {
+        if (!$cancelled || $this->db->affected_rows() < 1) {
             echo ajaxRespond('Fail', 'Student is not booked for this exam.');
             return;
         }

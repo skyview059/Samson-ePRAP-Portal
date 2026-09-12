@@ -69,6 +69,7 @@ class Online_mock extends Admin_controller
                 'students'       => $this->Online_mock_model->get_students($id),
                 'start'          => 0
             );
+            
             $this->viewAdminContent('online_mock/online_mock/student', $data);
         } else {
             $this->session->set_flashdata('msge', 'Online mock Not Found');

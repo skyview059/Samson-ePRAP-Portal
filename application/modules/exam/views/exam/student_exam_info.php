@@ -30,7 +30,7 @@
                 <label for="remarks" class="col-sm-2 control-label">Remarks<sup>*</sup></label>
                 <div class="col-sm-10">
                     <input type="hidden" name="id" value="<?php echo $student_exam_id; ?>"/>
-                    <textarea class="form-control" name="remarks" id="remarks" rows="3" cols="27"></textarea>
+                    <textarea class="form-control" name="remarks" id="remarks" rows="3" cols="27"><?php echo htmlentities($remarks);?></textarea>
                 </div>
             </div>
         </div>
