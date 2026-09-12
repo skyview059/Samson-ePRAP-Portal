@@ -324,7 +324,7 @@
                         <td><?php echo download_attachment($file->file); ?></td>
                         <td><?php echo globalDateTimeFormat($file->timestamp); ?></td>
                         <td class="text-center">
-                            <a href="//docs.google.com/viewer?url=<?= base_url($file->file); ?>" target="_blank"
+                            <a href="//docs.google.com/viewer?url=<?= spacesUrl($file->file); ?>" target="_blank"
                                class="btn btn-xs btn-success" data-id="<?= $file->id; ?>" title="Preview">
                                 <i class="fa fa-search-plus"></i>
                                 Preview
@@ -359,7 +359,7 @@
                         <td><?php echo download_attachment($p->file); ?></td>
                         <td><?php echo globalDateTimeFormat($p->timestamp); ?></td>
                         <td class="text-center">
-                            <a href="//docs.google.com/viewer?url=<?= base_url($p->file); ?>" target="_blank"
+                            <a href="//docs.google.com/viewer?url=<?= spacesUrl($p->file); ?>" target="_blank"
                                class="btn btn-xs btn-success" data-id="<?= $p->id; ?>" title="Preview">
                                 <i class="fa fa-search-plus"></i>
                                 Preview

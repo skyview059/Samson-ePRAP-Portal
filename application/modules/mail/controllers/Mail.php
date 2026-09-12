@@ -328,15 +328,23 @@ class Mail extends MX_Controller
                 $mail->SMTPAutoTLS = false;
             } else {
                 $mail->SMTPDebug  = SMTP::DEBUG_OFF;
-                $mail->Host       = 'mail.eprap.com';
-                $mail->SMTPAuth   = true;
-                $mail->Username   = $this->send_from;
-                $mail->Password   = 'Aw953e337';
-                $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
-                $mail->Port       = 465;
+                $mail->Host       = env('SMTP_HOST', 'mail.eprap.com');
+                $mail->SMTPAuth   = env('SMTP_USER') ? true : false;
+                $mail->Username   = env('SMTP_USER', $this->send_from);
+                $mail->Password   = env('SMTP_PASS', '');
+                
+                $secure = env('SMTP_SECURE', '');
+                if ($secure) {
+                    $mail->SMTPSecure = $secure;
+                } else {
+                    $mail->SMTPAutoTLS = false;
+                }
+                $mail->Port       = (int) env('SMTP_PORT', 465);
             }
 
 
+            $this->send_from = env('SMTP_FROM', $this->send_from);
+            $this->from_name = env('SMTP_FROM_NAME', $this->from_name);
             $mail->setFrom($this->send_from, $this->from_name);
             $mail->addAddress($this->send_to);
             $mail->addReplyTo($this->send_from, $this->from_name);

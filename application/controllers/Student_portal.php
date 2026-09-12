@@ -299,6 +299,7 @@ class Student_portal extends Frontend_controller
 
                 $file_full_path = $folder_path . $file_name;
                 file_put_contents($file_full_path, $image_base64);
+                pushToSpaces($file_full_path);
                 $data['photo'] = $file_full_path;
             }
 

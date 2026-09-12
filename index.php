@@ -38,6 +38,36 @@
 
 /*
  *---------------------------------------------------------------
+ * .ENV
+ *---------------------------------------------------------------
+ *
+ * Loads a .env file from the project root into $_ENV/$_SERVER, if one
+ * exists, before anything else runs so application/config/*.php files
+ * can read DB credentials, Spaces keys, etc. from it. Safe to omit —
+ * with no .env file present, env() calls elsewhere just fall back to
+ * their defaults, same as before .env support existed.
+ *
+ * NB: phpdotenv populates $_ENV/$_SERVER but not getenv() by default
+ * (putenv() isn't safe across PHP-FPM workers), so config files must
+ * call env() below rather than getenv() directly.
+ */
+	if (is_file(__DIR__ . '/vendor/autoload.php')) {
+		require_once __DIR__ . '/vendor/autoload.php';
+		if (class_exists('Dotenv\\Dotenv')) {
+			Dotenv\Dotenv::createImmutable(__DIR__)->safeLoad();
+		}
+	}
+
+	if (!function_exists('env')) {
+		function env($key, $default = null)
+		{
+			$value = $_ENV[$key] ?? $_SERVER[$key] ?? getenv($key);
+			return ($value === false || $value === null || $value === '') ? $default : $value;
+		}
+	}
+
+/*
+ *---------------------------------------------------------------
  * APPLICATION ENVIRONMENT
  *---------------------------------------------------------------
  *
@@ -53,7 +83,7 @@
  *
  * NOTE: If you change these, also change the error_reporting() code below
  */
-	define('ENVIRONMENT', isset($_SERVER['CI_ENV']) ? $_SERVER['CI_ENV'] : 'development');
+	define('ENVIRONMENT', $_SERVER['CI_ENV'] ?? (getenv('CI_ENV') ?: 'development'));
 
 /*
  *---------------------------------------------------------------

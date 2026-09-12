@@ -42,7 +42,7 @@
                 <?php if($p->id==$p->progression_id){?>
                 
                     <?php if(($p->file)){ ?>
-                        <a href="//docs.google.com/viewer?url=<?= base_url( $p->file ); ?>" target="_blank" class="btn btn-xs btn-success" data-id="<?= $p->id; ?>" title="Preview">
+                        <a href="//docs.google.com/viewer?url=<?= spacesUrl( $p->file ); ?>" target="_blank" class="btn btn-xs btn-success" data-id="<?= $p->id; ?>" title="Preview">
                             <i class="fa fa-search-plus"></i>
                             Preview
                         </a>
