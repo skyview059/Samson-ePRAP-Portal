@@ -8,8 +8,7 @@
 <div class="footer" <?= $display_none; ?>>
     <section class="copyright">
         <div class="container-fluid text-center">
-            &COPY; <?php echo date('Y') . ' ' . getSettingItem('SiteTitle') ?>. All Rights Reserved.
-            Company Registration No: <b>09266951</b>
+            &COPY; <?php echo date('Y') . ' ' . getSettingItem('SiteTitle') ?>. All Rights Reserved.            
         </div>
     </section>
 </div>

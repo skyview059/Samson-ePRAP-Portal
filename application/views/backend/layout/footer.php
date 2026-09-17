@@ -9,7 +9,8 @@
         Loading Time <b>{elapsed_time}</b> seconds. App v0.1 & CiF v<?php echo CI_VERSION; ?>
     </div>
     <b>Copyright &copy; <?php echo date('Y') . ' ' . $this->SiteTitle; ?>.</b>
-    All rights reserved. <?php if($this->CompanyRegNo){ echo "Company Registration No: <b>{$this->CompanyRegNo}</b>"; } ?>
+    All rights reserved. 
+    <?php /* if($this->CompanyRegNo){ echo "Company Registration No: <b>{$this->CompanyRegNo}</b>"; } */ ?>
 </footer>
 
 </div>
