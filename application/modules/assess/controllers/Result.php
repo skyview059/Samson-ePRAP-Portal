@@ -19,7 +19,7 @@ class Result extends Admin_controller {
 
     public function index()
     {
-        $this->output->enable_profiler(true);
+        // $this->output->enable_profiler(true);
         $sch_id = (int) $this->input->get('id');
         $start  = (int) $this->input->get('start');
 
