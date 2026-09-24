@@ -221,12 +221,6 @@ class Exam_model extends Fm_model
                 'count'     => $this->db->where('exam_schedule_id', $id)->count_all_results('scenario_relations'),
             ),
             array(
-                'label'     => 'Student Exams',
-                'table'     => 'student_exams',
-                'condition' => "exam_schedule_id = {$id}",
-                'count'     => $this->db->where('exam_schedule_id', $id)->count_all_results('student_exams'),
-            ),
-            array(
                 'label'     => 'Student Enrollments (all statuses)',
                 'table'     => 'student_exam_enrollments',
                 'condition' => "exam_schedule_id = {$id}",
@@ -300,10 +294,7 @@ class Exam_model extends Fm_model
         $this->db->where('exam_schedule_id', $id)->delete('scenario_relations');
         $deleted['scenario_relations'] = $this->db->affected_rows();
 
-        // 3. students
-        $this->db->where('exam_schedule_id', $id)->delete('student_exams');
-        $deleted['student_exams'] = $this->db->affected_rows();
-
+        // 3. student_exam_enrollments
         $this->db->where('exam_schedule_id', $id)->delete('student_exam_enrollments');
         $deleted['student_exam_enrollments'] = $this->db->affected_rows();
 
