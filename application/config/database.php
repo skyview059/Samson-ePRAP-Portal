@@ -17,7 +17,7 @@ $db['default'] = array(
     'dbdriver' => 'mysqli',
     'dbprefix' => '',
     'pconnect' => FALSE,
-    'db_debug' => (ENVIRONMENT !== 'production'),
+    'db_debug' => APP_DEBUG, // controlled by APP_DEBUG in .env
     'cache_on' => FALSE,
     'cachedir' => FCPATH . 'temp/db_cache/',
     'char_set' => 'utf8',

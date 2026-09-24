@@ -2,7 +2,8 @@
 
 defined( 'BASEPATH' ) or exit( 'No direct script access allowed' );
 date_default_timezone_set( 'UTC' );
-error_reporting(0);
+// Error display is controlled by APP_DEBUG in .env (see index.php); do not hardcode error_reporting() here.
+if (!APP_DEBUG) { error_reporting(0); }
 $config['base_url'] = env('BASE_URL', 'https://eprap.test');
 
 $config['index_page']        = '';

@@ -1,3 +1,37 @@
+-- 23th Sep, 2026
+-------------------------
+ALTER TABLE `scenario_to_assessors` ADD `exam_scheduled_id` INT NULL DEFAULT NULL AFTER `id`;
+UPDATE `scenario_to_assessors` SET `exam_scheduled_id` = (SELECT `exam_schedule_id` FROM `scenario_relations` WHERE id = `scenario_to_assessors`.`scenario_rel_id`) LIMIT 100;
+SELECT * FROM `scenario_to_assessors`;
+-------------------------
+
+
+SELECT * FROM `scenario_to_assessors` WHERE scenario_rel_id IN ( 
+  SELECT id FROM `scenario_relations` WHERE exam_schedule_id = 1249
+);
+
+SELECT * FROM `student_exams` WHERE exam_schedule_id = 1249;
+
+SELECT * FROM `scenario_relations` WHERE exam_schedule_id = 1249;
+
+/*
+Claude, i need to add few more relational data
+1. SELECT COUNT(*) AS `numrows` FROM `scenario_relations` WHERE `exam_schedule_id` = '1249'
+
+2. SELECT COUNT(*) AS `numrows` FROM `student_exam_enrollments` WHERE `status` = 'Enrolled' AND `exam_schedule_id` = '1249'
+
+3. 
+
+
+Next: 
+Great, 
+Create a new branch 
+OPCache is enabled ----- no need to do anything here
+Save session into Redis
+
+*/
+
+
 ALTER TABLE `course_payments` CHANGE `admin_comments` `admin_comments` MEDIUMTEXT CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NULL;
 
 

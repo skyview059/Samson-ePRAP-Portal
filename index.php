@@ -87,36 +87,64 @@
 
 /*
  *---------------------------------------------------------------
+ * APP DEBUG
+ *---------------------------------------------------------------
+ *
+ * APP_DEBUG=true in .env shows PHP errors and DB errors on screen;
+ * APP_DEBUG=false hides them. It is independent of CI_ENV, so you can
+ * temporarily turn error output on for a production server (e.g. via the
+ * Forge .env editor) without switching the whole environment to
+ * development. When APP_DEBUG is not set at all, it defaults to true only
+ * for the development environment.
+ *
+ * Read via $_SERVER/getenv() directly (same as CI_ENV above) so it also
+ * works when the value comes from real server env rather than .env.
+ */
+	$app_debug = $_SERVER['APP_DEBUG'] ?? getenv('APP_DEBUG');
+	if ($app_debug === false || $app_debug === null || $app_debug === '')
+	{
+		$app_debug = (ENVIRONMENT === 'development');
+	}
+	define('APP_DEBUG', filter_var($app_debug, FILTER_VALIDATE_BOOLEAN));
+	unset($app_debug);
+
+/*
+ *---------------------------------------------------------------
  * ERROR REPORTING
  *---------------------------------------------------------------
  *
- * Different environments will require different levels of error reporting.
- * By default development will show errors but testing and live will hide them.
+ * Driven by APP_DEBUG (see above) rather than by the environment name.
+ * ENVIRONMENT is still validated so a typo in CI_ENV fails loudly.
  */
 switch (ENVIRONMENT)
 {
 	case 'development':
-		error_reporting(-1);
-		ini_set('display_errors', 1);
-	break;
-
 	case 'testing':
 	case 'production':
-		ini_set('display_errors', 0);
-		if (version_compare(PHP_VERSION, '5.3', '>='))
-		{
-			error_reporting(E_ALL & ~E_NOTICE & ~E_DEPRECATED & ~E_STRICT & ~E_USER_NOTICE & ~E_USER_DEPRECATED);
-		}
-		else
-		{
-			error_reporting(E_ALL & ~E_NOTICE & ~E_STRICT & ~E_USER_NOTICE);
-		}
 	break;
 
 	default:
 		header('HTTP/1.1 503 Service Unavailable.', TRUE, 503);
 		echo 'The application environment is not set correctly.';
 		exit(1); // EXIT_ERROR
+}
+
+if (APP_DEBUG)
+{
+	error_reporting(-1);
+	ini_set('display_errors', 1);
+}
+else
+{
+	ini_set('display_errors', 0);
+	if (version_compare(PHP_VERSION, '5.3', '>='))
+	{
+		error_reporting(E_ALL & ~E_NOTICE & ~E_DEPRECATED & ~E_USER_NOTICE & ~E_USER_DEPRECATED);
+	}
+	else
+	{
+		error_reporting(E_ALL & ~E_NOTICE & ~E_USER_NOTICE);
+	}
 }
 
 /*
