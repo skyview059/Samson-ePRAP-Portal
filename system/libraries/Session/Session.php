@@ -419,7 +419,11 @@ class CI_Session {
 		{
 			$bits_per_character = (int) ini_get('session.sid_bits_per_character');
 			$sid_length         = (int) ini_get('session.sid_length');
-			if (($bits = $sid_length * $bits_per_character) < 160)
+			// PHP 8.4 deprecated session.sid_length / session.sid_bits_per_character
+			// (both will be hard-coded to 32 / 4 in PHP 9), so ini_set() on them
+			// emits E_DEPRECATED. Keep the current values as-is on 8.4+ and only
+			// lengthen the SID on older versions where the setting is still honoured.
+			if (PHP_VERSION_ID < 80400 && ($bits = $sid_length * $bits_per_character) < 160)
 			{
 				// Add as many more characters as necessary to reach at least 160 bits
 				$sid_length += (int) ceil((160 % $bits) / $bits_per_character);
