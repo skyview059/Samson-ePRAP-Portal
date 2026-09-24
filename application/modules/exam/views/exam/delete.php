@@ -37,18 +37,73 @@
                     <td>:</td>
                     <td><?php echo $centre_address; ?></td>
                 </tr>
-                
+
             </table>
+
+            <?php
+            $total_related = 0;
+            foreach ($relations as $rel) {
+                $total_related += $rel['count'];
+            }
+            ?>
+            <h4 class="text-bold" style="margin-top:25px;">
+                <i class="fa fa-sitemap"></i> Relational Data (exam_schedule_id = <?php echo $id; ?>)
+                <small class="text-muted">— rows that will be removed together with this exam</small>
+            </h4>
+            <table class="table table-bordered table-condensed">
+                <thead>
+                    <tr class="active">
+                        <th width="30">#</th>
+                        <th>Data</th>
+                        <th>Table</th>
+                        <th>Condition</th>
+                        <th width="90" class="text-right">Rows</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <?php foreach ($relations as $i => $rel) { ?>
+                    <tr class="<?php echo ($rel['count'] > 0) ? 'text-danger' : 'text-muted'; ?>">
+                        <td><?php echo $i + 1; ?></td>
+                        <td><?php echo $rel['label']; ?></td>
+                        <td><code><?php echo $rel['table']; ?></code></td>
+                        <td><small><code><?php echo $rel['condition']; ?></code></small></td>
+                        <td class="text-right text-bold"><?php echo $rel['count']; ?></td>
+                    </tr>
+                <?php } ?>
+                </tbody>
+                <tfoot>
+                    <tr class="active">
+                        <th colspan="4" class="text-right">Total related rows</th>
+                        <th class="text-right"><?php echo $total_related; ?></th>
+                    </tr>
+                </tfoot>
+            </table>
+
+            <?php if (!empty($enrollments)) { ?>
+            <p class="text-muted" style="margin-top:-10px;">
+                <i class="fa fa-info-circle"></i> Enrollment breakdown by status:
+                <?php
+                $parts = array();
+                foreach ($enrollments as $status => $qty) {
+                    $parts[] = "<strong>{$status}</strong> {$qty}";
+                }
+                echo implode(', ', $parts);
+                ?>
+            </p>
+            <?php } ?>
         </div>
         <div class="box-footer">
             
             <?php 
+
             
             if($warning == false ){ 
-                 
+
+                echo "<p class='text-danger text-bold'>{$students} Student &  {$scenarios} Scenario(s) associated with this exam.</p>";
+
                 echo anchor(
                         site_url(Backend_URL . 'exam/delete_action/' . $id), 
-                        '<i class="fa fa-fw fa-trash"></i> Confrim Delete ', 
+                        '<i class="fa fa-fw fa-trash"></i> Confirm Delete ', 
                         'class="btn btn-danger" onclick="javasciprt: return confirm(\'Are You Sure ?\')"'
                     );
                 

@@ -472,9 +472,12 @@ class Exam extends Admin_controller
                 'datetime'       => $row->datetime,
                 'created_at'     => $row->created_at,
                 'updated_at'     => $row->updated_at,
-                'students'       => countExamStudent($id),
+                'students'       => $students,
+                'scenarios'      => $scenarios,
+                'relations'      => $this->Exam_model->get_relational_data($id),
+                'enrollments'    => $this->Exam_model->get_enrollment_status_counts($id),
             );
-            $data['warning'] = ($links) ? true : false;
+            $data['warning'] = ($students) ? true : false;
 
             $this->viewAdminContent('exam/exam/delete', $data);
         } else {
@@ -488,8 +491,31 @@ class Exam extends Admin_controller
         $row = $this->Exam_model->get_by_id($id);
         if ($row) {
             $red_id = $row->exam_id;
-            $this->Exam_model->delete($id);
-            $this->session->set_flashdata('msgs', 'Exam Deleted Successfully');
+
+            // Same guard as the delete preview page: enrolled students block the delete.
+            $students = countExamStudent($id);
+            if ($students) {
+                $this->session->set_flashdata('msge', "{$students} Student(s) enrolled for this exam. Delete is not allowed.");
+                redirect(site_url(Backend_URL . 'exam/delete/' . $id));
+            }
+
+            $deleted = $this->Exam_model->delete_with_relations($id);
+            if ($deleted === FALSE) {
+                $this->session->set_flashdata('msge', 'Exam delete failed and was rolled back. Nothing was removed.');
+                redirect(site_url(Backend_URL . 'exam/delete/' . $id));
+            }
+
+            $parts = array();
+            foreach ($deleted as $table => $qty) {
+                if ($qty > 0 && $table != 'exam_schedules') {
+                    $parts[] = "{$table}: {$qty}";
+                }
+            }
+            $msg = 'Exam Deleted Successfully';
+            if ($parts) {
+                $msg .= ' (related rows removed &mdash; ' . implode(', ', $parts) . ')';
+            }
+            $this->session->set_flashdata('msgs', $msg);
             redirect(site_url(Backend_URL . "exam?id={$red_id}"));
         } else {
             $this->session->set_flashdata('msge', 'Exam Not Found');

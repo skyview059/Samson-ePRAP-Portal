@@ -182,4 +182,142 @@ class Exam_model extends Fm_model
         $this->db->where('exam_id', $exam_id );
         return $this->db->count_all_results('exam_schedules');        
     }
+
+    /**
+     * Count every row, in every table, that is linked to an exam schedule.
+     * Used by the delete preview so the admin can see what a delete would touch.
+     * Order matters: the list is also the intended delete order (children first).
+     */
+    public function get_relational_data($exam_schedule_id)
+    {
+        $id = (int) $exam_schedule_id;
+
+        $scenario_rel_ids = "SELECT id FROM scenario_relations WHERE exam_schedule_id = {$id}";
+        $result_ids       = "SELECT id FROM results WHERE exam_schedule_id = {$id}";
+
+        $relations = array(
+            array(
+                'label'     => 'Result Details',
+                'table'     => 'result_details',
+                'condition' => "result_id IN (results WHERE exam_schedule_id = {$id})",
+                'count'     => $this->db->where("result_id IN ({$result_ids})", NULL, FALSE)->count_all_results('result_details'),
+            ),
+            array(
+                'label'     => 'Results',
+                'table'     => 'results',
+                'condition' => "exam_schedule_id = {$id}",
+                'count'     => $this->db->where('exam_schedule_id', $id)->count_all_results('results'),
+            ),
+            array(
+                'label'     => 'Scenario Assessors',
+                'table'     => 'scenario_to_assessors',
+                'condition' => "scenario_rel_id IN (scenario_relations WHERE exam_schedule_id = {$id}) OR exam_scheduled_id = {$id}",
+                'count'     => $this->db->where("(scenario_rel_id IN ({$scenario_rel_ids}) OR exam_scheduled_id = {$id})", NULL, FALSE)->count_all_results('scenario_to_assessors'),
+            ),
+            array(
+                'label'     => 'Scenarios',
+                'table'     => 'scenario_relations',
+                'condition' => "exam_schedule_id = {$id}",
+                'count'     => $this->db->where('exam_schedule_id', $id)->count_all_results('scenario_relations'),
+            ),
+            array(
+                'label'     => 'Student Exams',
+                'table'     => 'student_exams',
+                'condition' => "exam_schedule_id = {$id}",
+                'count'     => $this->db->where('exam_schedule_id', $id)->count_all_results('student_exams'),
+            ),
+            array(
+                'label'     => 'Student Enrollments (all statuses)',
+                'table'     => 'student_exam_enrollments',
+                'condition' => "exam_schedule_id = {$id}",
+                'count'     => $this->db->where('exam_schedule_id', $id)->count_all_results('student_exam_enrollments'),
+            ),
+        );
+
+        return $relations;
+    }
+
+    /**
+     * Enrollment breakdown by status, e.g. ['Enrolled' => 3, 'Cancelled' => 1]
+     */
+    public function get_enrollment_status_counts($exam_schedule_id)
+    {
+        $rows = $this->db->select('status, COUNT(*) as total')
+            ->where('exam_schedule_id', (int) $exam_schedule_id)
+            ->group_by('status')
+            ->get('student_exam_enrollments')
+            ->result();
+
+        $counts = array();
+        foreach ($rows as $r) {
+            $counts[$r->status] = (int) $r->total;
+        }
+        return $counts;
+    }
+
+    /**
+     * Delete an exam schedule together with every related row (children first),
+     * inside a single transaction. Same tables and order as get_relational_data().
+     *
+     * @return array|false  ['table' => rows deleted, ...] on success, FALSE on rollback
+     */
+    public function delete_with_relations($exam_schedule_id)
+    {
+        $id = (int) $exam_schedule_id;
+
+        $scenario_rel_ids = "SELECT id FROM scenario_relations WHERE exam_schedule_id = {$id}";
+        $result_ids       = "SELECT id FROM results WHERE exam_schedule_id = {$id}";
+
+        $deleted = array();
+
+        $this->db->trans_start();
+
+        // 1. result_details -> results
+        // MySQL forbids deleting from a table that the same statement selects from,
+        // so materialise the parent ids first.
+        $ids = array_column($this->db->query($result_ids)->result_array(), 'id');
+        if ($ids) {
+            $this->db->where_in('result_id', $ids)->delete('result_details');
+        }
+        $deleted['result_details'] = $ids ? $this->db->affected_rows() : 0;
+
+        $this->db->where('exam_schedule_id', $id)->delete('results');
+        $deleted['results'] = $this->db->affected_rows();
+
+        // 2. scenario_to_assessors -> scenario_relations
+        $ids = array_column($this->db->query($scenario_rel_ids)->result_array(), 'id');
+        $this->db->group_start();
+        if ($ids) {
+            $this->db->where_in('scenario_rel_id', $ids);
+            $this->db->or_where('exam_scheduled_id', $id);
+        } else {
+            $this->db->where('exam_scheduled_id', $id);
+        }
+        $this->db->group_end();
+        $this->db->delete('scenario_to_assessors');
+        $deleted['scenario_to_assessors'] = $this->db->affected_rows();
+
+        $this->db->where('exam_schedule_id', $id)->delete('scenario_relations');
+        $deleted['scenario_relations'] = $this->db->affected_rows();
+
+        // 3. students
+        $this->db->where('exam_schedule_id', $id)->delete('student_exams');
+        $deleted['student_exams'] = $this->db->affected_rows();
+
+        $this->db->where('exam_schedule_id', $id)->delete('student_exam_enrollments');
+        $deleted['student_exam_enrollments'] = $this->db->affected_rows();
+
+        // 4. the exam schedule itself
+        $this->db->where($this->id, $id)->delete($this->table);
+        $deleted['exam_schedules'] = $this->db->affected_rows();
+
+        $this->db->trans_complete();
+
+        if ($this->db->trans_status() === FALSE) {
+            log_message('error', "Exam schedule {$id} delete rolled back: " . json_encode($this->db->error()));
+            return FALSE;
+        }
+
+        return $deleted;
+    }
 }
