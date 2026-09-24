@@ -211,8 +211,8 @@ class Exam_model extends Fm_model
             array(
                 'label'     => 'Scenario Assessors',
                 'table'     => 'scenario_to_assessors',
-                'condition' => "scenario_rel_id IN (scenario_relations WHERE exam_schedule_id = {$id}) OR exam_scheduled_id = {$id}",
-                'count'     => $this->db->where("(scenario_rel_id IN ({$scenario_rel_ids}) OR exam_scheduled_id = {$id})", NULL, FALSE)->count_all_results('scenario_to_assessors'),
+                'condition' => "scenario_rel_id IN (scenario_relations WHERE exam_schedule_id = {$id})",
+                'count'     => $this->db->where("scenario_rel_id IN ({$scenario_rel_ids})", NULL, FALSE)->count_all_results('scenario_to_assessors'),
             ),
             array(
                 'label'     => 'Scenarios',
@@ -280,16 +280,10 @@ class Exam_model extends Fm_model
 
         // 2. scenario_to_assessors -> scenario_relations
         $ids = array_column($this->db->query($scenario_rel_ids)->result_array(), 'id');
-        $this->db->group_start();
         if ($ids) {
-            $this->db->where_in('scenario_rel_id', $ids);
-            $this->db->or_where('exam_scheduled_id', $id);
-        } else {
-            $this->db->where('exam_scheduled_id', $id);
+            $this->db->where_in('scenario_rel_id', $ids)->delete('scenario_to_assessors');
         }
-        $this->db->group_end();
-        $this->db->delete('scenario_to_assessors');
-        $deleted['scenario_to_assessors'] = $this->db->affected_rows();
+        $deleted['scenario_to_assessors'] = $ids ? $this->db->affected_rows() : 0;
 
         $this->db->where('exam_schedule_id', $id)->delete('scenario_relations');
         $deleted['scenario_relations'] = $this->db->affected_rows();

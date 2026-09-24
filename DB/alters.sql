@@ -3,6 +3,8 @@
 ALTER TABLE `scenario_to_assessors` ADD `exam_scheduled_id` INT NULL DEFAULT NULL AFTER `id`;
 UPDATE `scenario_to_assessors` SET `exam_scheduled_id` = (SELECT `exam_schedule_id` FROM `scenario_relations` WHERE id = `scenario_to_assessors`.`scenario_rel_id`) LIMIT 100;
 SELECT * FROM `scenario_to_assessors`;
+
+ALTER TABLE `scenario_to_assessors` DROP `exam_scheduled_id`;
 -------------------------
 
 
