@@ -276,68 +276,43 @@
 
                 <div class="card courses">
                     <div class="card-header">
-                        Live Courses
+                        Subscription
                     </div>
-
                     <div class="card-body">
-                        <table class="table table-borderless table-condensed course_table">
+                        <table class="table table-bordered table-striped table-condensed course_table">
                             <thead>
-                            <tr style="background: #20278B; color: white">
-                                <th class="text-center"> Select</th>
-                                <th> Name</th>
-                                <th> Price</th>
-                                <th class="text-center"> Dates & Available Seat</th>
+                            <tr>
+                                <th width="40"> Select</th>
+                                <th width="450"> Name</th>                                
+                                <th width="100" class="text-center"> Price</th>
+                                <th class="text-center"> Duration</th>
                             </tr>
                             </thead>
                             <tbody>
-                            <?php foreach ($course_plans as $plan) { ?>
-                                <?php foreach ($plan['courses'] as $course) { ?>
+                            <?php foreach ($practices as $practice) { ?>
+                                <tr class="active">
+                                    <td colspan="4">&nbsp;&nbsp;<strong><?= $practice['exam']; ?></strong></td>
+                                </tr>
+                                <?php foreach ($practice['packages'] as $p) { ?>
                                     <tr>
-                                        <td class="text-center">
-                                            <div class="icheck-primary icheck-inline">
-                                                <input name="id[<?= $course['id']; ?>]"
-                                                       id="id_<?= $course['id']; ?>"
-                                                       class=""
-                                                       type="checkbox"
-                                                       value="<?= $course['id']; ?>"
-                                                       data-price="<?= $course['price']; ?>"
-
-                                                       onclick="buyCourse(<?= $course['id']; ?>)"
-
-                                                    <?php echo count(json_decode($course['dates'])) === 0 ? 'disabled' : ''?>
-                                                    <?php echo $course['isSelected'] ? 'checked="checked"' : ''; ?> />
-
-                                                <label for="id_<?= $course['id']; ?>"></label>
-                                            </div>
+                                        <td>
+                                            <input name="practice_package_id[<?= $p['id']; ?>]"
+                                                    class="practice2buy form-control"
+                                                    type="checkbox"
+                                                    value="<?= $p['id']; ?>"
+                                                    data-price="<?= $p['price']; ?>" />
                                         </td>
-
-                                        <td id="course_name_<?= $course['id']; ?>"><?= $course['name']; ?></td>
-
-                                        <td class="text-center" style="color: #4387CA; font-weight: bold"><?= GBP($course['price']); ?></td>
-                                        <td class="text-center" id="course_<?= $course['id']; ?>">
-                                            <?php
-                                            if (count(json_decode($course['dates'])) > 0){ ?>
-                                                <select name="slot_id[<?php echo $course['id']; ?>]"
-                                                        id="<?php echo $course['id']; ?>"
-
-                                                        class="form-control date_slot" aria-label="">
-
-                                                    <option disabled selected style="color: #eee;">--Select Your Seat--</option>
-
-                                                    <?php
-                                                    foreach (json_decode($course['dates']) as $date) {
-                                                        echo '<option value="' . $date->id . '">' . date('d M y H:i A', strtotime($date->start_date)) . " ($date->AvailableSeat)" . '</option>';
-                                                    }
-                                                    ?>
-                                                </select>
-                                                <?php
-                                            }else {
-                                                echo "No Date Found to Enroll";
-                                            }
-                                            ?>
-                                        </td>
+                                        <td>
+                                            <?= $p['name']; ?>
+                                            <?php if (!empty($p['description'])) { ?>
+                                                <br><small class="text-muted"><?= $p['description']; ?></small>
+                                            <?php } ?>
+                                        </td>                                        
+                                        <td class="text-center"><?= GBP($p['price']); ?></td>
+                                        <td class="text-center"><?= $p['duration']; ?></td>
                                     </tr>
-                                <?php } }?>
+                                <?php } ?>
+                            <?php } ?>
                             </tbody>
                         </table>
                     </div>
@@ -509,96 +484,6 @@
         })
     }
 
-    function buyCourse(course_id) {
-        const cart = JSON.parse(localStorage.getItem('guest_course')) || [];
-
-        cart.push({
-            course_id: course_id,
-            course_name: $('#' + 'course_name_' + course_id).text(),
-            course_price: $('#' + 'id_' + course_id).data('price') ,
-            date_slot: 0,
-        });
-
-        if (!isDuplicate(course_id) && $('#id_' + course_id).is(':checked')) {
-            localStorage.setItem('guest_course', JSON.stringify(cart));
-        }else {
-            removeFromCart(course_id);
-            // clean date slot option
-            let selectElement = $('#' + course_id);
-            selectElement.val('--Select Your Seat--').trigger('clear');
-        }
-
-
-        // check selected course id & coupon course id same or not
-        const coupon = JSON.parse(localStorage.getItem('coupon'));
-        if (coupon){
-            if (course_id == coupon.course_id) {
-                localStorage.removeItem('coupon');
-                window.location.reload();
-            }
-        }
-
-        checkDateSlotSelectOrNot();
-        isSelected();
-        showCart();
-    }
-
-    // select date slot
-    $('.date_slot').change(function() {
-        let optionLabel = $(this).find('option:selected').text();
-
-        let course_id = $(this).attr('id');
-        let slot_id = parseInt($(this).val());
-
-        const cart = JSON.parse(localStorage.getItem('guest_course')) || [];
-
-        cart.forEach(function(item) {
-            if (item.course_id == course_id) {
-                item.date_slot = slot_id;
-                item.option_label = optionLabel;
-            }
-        });
-
-        localStorage.setItem('guest_course', JSON.stringify(cart));
-
-        isSelected();
-        showCart();
-    });
-
-    function isDuplicate(course_id) {
-        let isDuplicate = false;
-
-        const cart = JSON.parse(localStorage.getItem('guest_course')) || [];
-
-        for (let i = 0; i < cart.length; i++) {
-            if (cart[i].course_id == course_id) {
-                isDuplicate = true;
-                break;
-            }
-        }
-        return isDuplicate;
-    }
-
-    function isSelected() {
-        const cart = JSON.parse(localStorage.getItem('guest_course')) || [];
-
-        cart.forEach(function(item) {
-            $('#' + 'id_' + item.course_id).attr('checked', true);
-        });
-    }
-    isSelected();
-
-    function removeFromCart(course_id) {
-        const cart = JSON.parse(localStorage.getItem('guest_course')) || [];
-
-        const index = cart.findIndex(item => item.course_id == course_id);
-
-        if (index !== -1) {
-            cart.splice(index, 1);
-            localStorage.setItem('guest_course', JSON.stringify(cart));
-        }
-    }
-
     function showCart() {
         const cart = JSON.parse(localStorage.getItem('guest_course')) || [];
         let total_amount = 0;
@@ -647,25 +532,6 @@
        $('#cart_details').html(cart_footer);
     }
     showCart();
-
-    function checkDateSlotSelectOrNot() {
-        const cart = JSON.parse(localStorage.getItem('guest_course')) || [];
-        $('.slot_msg').remove();
-
-        cart.forEach(function(item) {
-            if (item.date_slot  < 1){
-                $('#' + 'course_' + item.course_id).append('<small class="text-danger slot_msg"><i>The seat must be required.</i></small>');
-            }
-
-            if (item.date_slot > 0) {
-                let selectElement = $('#' + item.course_id);
-                if (selectElement.val() != item.date_slot) {
-                    selectElement.val(item.date_slot).trigger('change');
-                }
-            }
-        });
-    }
-    checkDateSlotSelectOrNot();
 
     $('#coupon_apply').on('click', function () {
         let value = $('#coupon').val();

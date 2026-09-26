@@ -132,6 +132,10 @@
                         <a href="<?=base_url('book-course');?>" target="_self"> Book Course </a>
                     </li>
 
+                    <li class="<?=$this->uri->segment( 1 ) == 'book-subscription' ? 'active' : '';?>">
+                        <a href="<?=base_url('book-subscription');?>" target="_self"> Subscription </a>
+                    </li>
+
                     <?php
                     if ( !getLoginStudentData( 'student_id' ) ): ?>
                         <li class="<?=$this->uri->segment( 1 ) == 'login' ? 'active' : '';?>">

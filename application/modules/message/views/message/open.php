@@ -32,7 +32,7 @@
             <div class="box-body">
                 <div class="form-group">
                     <select id="To" name="student_id" class="form-control select2">                                
-                        <?php echo getDropDownStudentList( $id ); ?>
+                        <?php //echo getDropDownStudentList( $id ); ?>
                     </select>                             
                 </div>
 

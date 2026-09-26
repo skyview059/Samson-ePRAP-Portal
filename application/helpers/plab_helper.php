@@ -44,7 +44,7 @@ function sidebar_links($tab = '')
         $html .= ($link == $tab) ? ' class="active"' : '';
         $html .= "><a href=\"{$link}\">{$menu}</a></li>";
     }
-    $html .= '<li><a href="'.site_url('book-course').'" target="_blank"> <i class="fa fa-user-md"></i> Subscription <i class="fa fa-external-link"></i></a></li>';
+    $html .= '<li><a href="'.site_url('book-subscription').'" target="_blank"> <i class="fa fa-user-md"></i> Subscription <i class="fa fa-external-link"></i></a></li>';
     $html .= '<li><a href="https://www.geniusclass.co.uk/" target="_blank"> <i class="fa fa-globe"></i> Genius Class <i class="fa fa-external-link"></i></a></li>';
     $html .= '<li><a href="' . site_url("logout") . '"> <i class="fa fa-power-off"></i> Logout</a></li>';
     $html .= '</ul></div></nav>';
@@ -532,7 +532,7 @@ function getWhatsAppChatLink($code, $number)
          . '<i class="fa fa-whatsapp"></i> ' . $display . '</a>';
 }
 
-function getDropDownStudentList($id = 0)
+function getDropDownStudentList_x($id = 0)
 {
     $ci = &get_instance();
     $ci->db->select('id, title, fname, mname, lname, gmc_number, email');
