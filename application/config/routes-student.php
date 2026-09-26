@@ -42,6 +42,7 @@ $route['practices'] = 'practices/index';
 
 /*  Promo Codes */
 $route['book-course']              = 'frontend/book_course';
+$route['book-subscription']        = 'frontend/book_subscription';
 $route['course-booking-action']    = 'booking_with_registration/index';
 $route['purchase-practice-action'] = 'booking_with_registration/purchase_practice_action';
 $route['course-booking-validate']  = 'booking_with_registration/process';

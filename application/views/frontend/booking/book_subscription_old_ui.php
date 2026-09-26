@@ -71,38 +71,41 @@
                     <?php endif;?>
 
                     <fieldset>
-                        <legend><h4> Live Courses </h4></legend>
+                        <legend><h4>Subscription</h4></legend>
                         <table class="table table-bordered table-striped table-condensed course_table">
                             <thead>
                             <tr>
                                 <th width="40"> Select</th>
-                                <th width="300"> Name</th>
+                                <th width="450"> Name</th>                                
                                 <th width="100" class="text-center"> Price</th>
-                                <th> Dates & Available Seat</th>
+                                <th class="text-center"> Duration</th>
                             </tr>
                             </thead>
                             <tbody>
-                            <?php foreach ($course_plans as $plan) { ?>
-                                <?php foreach ($plan['courses'] as $c) {
-                                       $date_slot = showBookingDates($c, $course_payment_id) !== '<p><small><em>No Date Found to Enroll</em><small></p>';
-                                  ?>
+                            <?php foreach ($practices as $practice) { ?>
+                                <tr class="active">
+                                    <td colspan="4">&nbsp;&nbsp;<strong><?= $practice['exam']; ?></strong></td>
+                                </tr>
+                                <?php foreach ($practice['packages'] as $p) { ?>
                                     <tr>
                                         <td>
-                                            <input name="id[<?= $c['id']; ?>]"
-                                                   class="want2buy form-control"
+                                            <input name="practice_package_id[<?= $p['id']; ?>]"
+                                                   class="practice2buy form-control"
                                                    type="checkbox"
-                                                   value="<?= $c['id']; ?>"
-                                                   data-price="<?= $c['price']; ?>"
-                                                   <?= !$date_slot ? 'disabled' : ''?>
-                                                <?php echo $c['isSelected'] ? 'checked="checked"' : ''; ?> />
+                                                   value="<?= $p['id']; ?>"
+                                                   data-price="<?= $p['price']; ?>" />
                                         </td>
-                                        <td><?= $c['name']; ?></td>
-                                        <td class="text-center"><?= GBP($c['price']); ?></td>
-                                        <td style="padding: 0 10px;">
-                                            <?= showBookingDates($c, $course_payment_id); ?>
-                                        </td>
+                                        <td>
+                                            <?= $p['name']; ?>
+                                            <?php if (!empty($p['description'])) { ?>
+                                                <br><small class="text-muted"><?= $p['description']; ?></small>
+                                            <?php } ?>
+                                        </td>                                        
+                                        <td class="text-center"><?= GBP($p['price']); ?></td>
+                                        <td class="text-center"><?= $p['duration']; ?></td>
                                     </tr>
-                           <?php } } ?>
+                                <?php } ?>
+                           <?php } ?>
                             </tbody>
                         </table>
                     </fieldset>

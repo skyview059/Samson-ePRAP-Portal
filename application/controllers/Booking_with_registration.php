@@ -86,8 +86,9 @@ class Booking_with_registration extends MX_Controller
             $this->form_validation->set_rules('first_name', 'first name', 'required');
             $this->form_validation->set_rules('last_name', 'last name', 'required');
             $this->form_validation->set_rules('email', 'email', 'required');
+            $this->form_validation->set_rules('phone_code', 'phone code', 'required|numeric');
             $this->form_validation->set_rules('phone', 'phone', 'required|numeric');
-            $this->form_validation->set_rules('country_id', 'country', 'required|numeric');
+            // $this->form_validation->set_rules('country_id', 'country', 'required|numeric');
         }
         // End::This validation is not required if the user is authenticated
 
@@ -104,7 +105,7 @@ class Booking_with_registration extends MX_Controller
             $this->form_validation->set_rules('slot_id[]', 'course slot', 'required');
         }
 
-        $this->form_validation->set_rules('personal_data', 'Personal Data Collect', 'required');
+        // $this->form_validation->set_rules('personal_data', 'Personal Data Collect', 'required');
         $this->form_validation->set_rules('terms_and_conditions', 'Terms and Conditions', 'required');
 
         if ($this->form_validation->run() == FALSE) {

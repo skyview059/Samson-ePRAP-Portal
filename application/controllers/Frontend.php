@@ -61,6 +61,9 @@ class Frontend extends Frontend_controller
         $this->output->set_content_type('application/json')->set_output(json_encode($response));
     }
 
+    /**
+     * Live course booking page (guest or logged-in student).
+     */
     public function book_course()
     {
         $course_payment_id = ((int)$this->input->get('id')) ?? null;
@@ -77,6 +80,33 @@ class Frontend extends Frontend_controller
             }
         }
 
+        $view_data = [
+            'course_plans'      => $this->getCoursePlans($course_payment_id),
+            'course_payment_id' => $course_payment_id,
+            'payment_info'      => $paymentInfo
+        ];
+
+        $this->viewFrontContent('frontend/booking/book_course_as_guest', $view_data);
+    }
+
+    /**
+     * Subscription (practice package) booking page (guest or logged-in student).
+     */
+    public function book_subscription()
+    {
+        $view_data = [
+            'practices' => $this->getPracticePackages(),
+        ];
+
+        $this->viewFrontContent('frontend/booking/book_subscription_as_guest', $view_data);
+    }
+
+    /**
+     * Active courses grouped by category, with their upcoming dates.
+     * Courses already in the given (unpaid) payment are flagged as selected.
+     */
+    private function getCoursePlans($course_payment_id = null)
+    {
         $this->db->select('cb.course_id');
         $this->db->from('course_booked as cb');
         $this->db->join('course_payments as cp', 'cp.id=cb.course_payment_id', 'LEFT');
@@ -111,7 +141,14 @@ class Frontend extends Frontend_controller
             ];
         }
 
+        return $data;
+    }
 
+    /**
+     * Active practice packages grouped by exam.
+     */
+    private function getPracticePackages()
+    {
         $this->db->select('e.id as exam_id, e.name as exam');
         $this->db->select('pp.id as package_id, pp.title, pp.description, pp.price, pp.duration');
         $this->db->from('exams as e');
@@ -134,14 +171,7 @@ class Frontend extends Frontend_controller
             ];
         }
 
-        $view_data = [
-            'course_plans'      => $data,
-            'practices'         => $practices,
-            'course_payment_id' => $course_payment_id,
-            'payment_info'      => $paymentInfo
-        ];
-
-        $this->viewFrontContent('frontend/booking/book_course_as_guest', $view_data);
+        return $practices;
     }
 
     private function getDates($course_id, $limit, $payment_id = 0)
