@@ -44,7 +44,7 @@
                                 <label for="student_id" class="col-sm-2 control-label">Student <sup>*</sup></label>
                                 <div class="col-sm-10">
                                     <select class="form-control select2" name="student_id" id="student_id" required>
-                                        <?php echo getDropDownStudentList($student_id); ?>
+                                        <?php echo getDropDownStudentList(); ?>
                                     </select>
                                     <?php echo form_error('student_id') ?>
                                 </div>
