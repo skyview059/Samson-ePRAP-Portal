@@ -532,7 +532,7 @@ function getWhatsAppChatLink($code, $number)
          . '<i class="fa fa-whatsapp"></i> ' . $display . '</a>';
 }
 
-function getDropDownStudentList_x($id = 0)
+function getDropDownStudentList($id = 0)
 {
     $ci = &get_instance();
     $ci->db->select('id, title, fname, mname, lname, gmc_number, email');
@@ -548,7 +548,9 @@ function getDropDownStudentList_x($id = 0)
 
         $options .= '<option value="' . $stu->id . '" ';
         $options .= ($stu->id == $id) ? 'selected="selected"' : '';
-        $options .= ">{$full_name}, {$stu->email}, {$stu->gmc_number}, Ph: {$stu->phone_no}, Wa: {$stu->whatsapp_no}</option>";
+        // $options .= ">{$full_name}, {$stu->email}, {$stu->gmc_number}, Ph: {$stu->phone_no}, Wa: {$stu->whatsapp_no}</option>";
+        // $options .= ">{$stu->full_name}, {$stu->email}, {$stu->gmc_number}, Ph: {$stu->phone_no}, Wa: {$stu->whatsapp_no}</option>";
+        $options .= ">{$full_name}</option>";
     }
     return $options;
 }

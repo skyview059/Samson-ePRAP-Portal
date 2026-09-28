@@ -2,7 +2,7 @@
 
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-function getDropDownStudentList($id=0) {
+function getDropDownStudentList__x($id=0) {
     $ci = & get_instance();
     $ci->db->select('id, title, fname, mname, lname, gmc_number, email');
     $ci->db->select('CONCAT("+", phone_code,phone) as phone_no');
