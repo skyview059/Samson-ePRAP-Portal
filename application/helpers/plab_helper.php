@@ -549,7 +549,7 @@ function getDropDownStudentList($id = 0)
         $options .= '<option value="' . $stu->id . '" ';
         $options .= ($stu->id == $id) ? 'selected="selected"' : '';
         // $options .= ">{$full_name}, {$stu->email}, {$stu->gmc_number}, Ph: {$stu->phone_no}, Wa: {$stu->whatsapp_no}</option>";
-        $options .= ">{$stu->full_name}, {$stu->email}, Ph: {$stu->phone_no}, Wa: {$stu->whatsapp_no}</option>";
+        $options .= ">{$full_name}, {$stu->email}, Ph: {$stu->phone_no}, Wa: {$stu->whatsapp_no}</option>";
         // $options .= ">{$full_name}</option>";
     }
     return $options;
