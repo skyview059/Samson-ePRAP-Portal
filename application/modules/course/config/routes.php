@@ -10,6 +10,7 @@ $route['admin/course/create_action']        = 'course/create_action';
 $route['admin/course/update_action']        = 'course/update_action';
 $route['admin/course/delete_action/(:num)'] = 'course/delete_action/$1';
 $route['admin/course/delete_row']           = 'course/delete_row/';
+$route['admin/course/update_package_type']  = 'course/update_package_type';
 
 $route['admin/course/payment']                      = 'course/payment';
 $route['admin/course/payment/create']               = 'course/payment/create';

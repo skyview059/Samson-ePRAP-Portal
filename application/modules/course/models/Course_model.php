@@ -14,15 +14,15 @@ class Course_model extends Fm_model {
     }
 
     // get total rows
-    function total_rows($category_id=0,$q = NULL)
-    {
-        $this->__sql($category_id,$q);
+    function total_rows($category_id=0,$package_type = NULL,$status = NULL,$q = NULL)
+    {        
         $this->db->from($this->table);
+        $this->__sql($category_id,$package_type,$status,$q);
         return $this->db->count_all_results();
     }
 
     // get data with limit and search
-    function get_limit_data($limit, $start = 0, $category_id =0, $q = NULL)
+    function get_limit_data($limit, $start = 0, $category_id =0, $package_type = NULL, $status = NULL, $q = NULL)
     {
         $this->db->select('count(*)');        
         $this->db->where('course_id', "{$this->table}.id", false );        
@@ -36,21 +36,23 @@ class Course_model extends Fm_model {
         $this->db->select("{$this->table}.*, c.name as category");
         $this->db->select("({$schedule}) as schedule, ({$booked}) as booked");
         $this->db->join('course_categories as c', "c.id={$this->table}.category_id", 'LEFT');
-        $this->__sql($category_id,$q);
-        $this->db->order_by('category_id', 'ASC');        
+        $this->__sql($category_id,$package_type,$status,$q);
+        $this->db->order_by('category_id', 'ASC');
         $this->db->order_by($this->id, 'ASC');        
         $this->db->limit($limit, $start);
         return $this->db->get($this->table)->result();
     }
     
-    function __sql($category_id,$q){
+    function __sql($category_id,$package_type = NULL, $status = NULL,$q = NULL){
         if($category_id) { $this->db->where('category_id', $category_id ); }
-        if ($q) {
-            $this->db->group_start();
-            $this->db->like('courses.name', $q);
-            $this->db->or_like('courses.description', $q);
-            $this->db->group_end();
-        }
+        if($package_type) { $this->db->where("{$this->table}.package_type", $package_type ); }
+        if($status) { $this->db->where("{$this->table}.status", $status ); }
+        // if ($q) {
+        //     $this->db->group_start();
+        //     $this->db->like('courses.name', $q);
+        //     $this->db->or_like('courses.description', $q);
+        //     $this->db->group_end();
+        // }
     }
     
     function getDates($course_id){

@@ -85,6 +85,32 @@ function getDropDownCategory($selected = 0)
     return $options;
 }
 
+function getPackageTypes()
+{
+    return ['Mock', 'Live Course', 'Question Bank'];
+}
+
+function getPackageTypeBtnClass($type = '')
+{
+    $classes = [
+        'Mock'          => 'btn-warning',
+        'Live Course'   => 'btn-success',
+        'Question Bank' => 'btn-info',
+    ];
+    return isset($classes[$type]) ? $classes[$type] : 'btn-default';
+}
+
+function getDropDownPackageType($selected = '', $label = '--Select--')
+{
+    $options = '<option value="">' . $label . '</option>';
+    foreach (getPackageTypes() as $type) {
+        $options .= '<option value="' . $type . '" ';
+        $options .= ($type == $selected) ? 'selected="selected"' : '';
+        $options .= ">{$type}</option>";
+    }
+    return $options;
+}
+
 function getDropDownCourse($selected = 0)
 {
     $ci =& get_instance();

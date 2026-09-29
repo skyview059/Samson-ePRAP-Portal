@@ -28,6 +28,15 @@
                 </div>
             </div>
             <div class="form-group">
+                <label for="package_type" class="col-sm-2 control-label">Package Type :</label>
+                <div class="col-sm-10">
+                    <select class="form-control" name="package_type" id="package_type">
+                        <?php echo getDropDownPackageType($package_type); ?>
+                    </select>
+                    <?php echo form_error('package_type') ?>
+                </div>
+            </div>
+            <div class="form-group">
                 <label for="name" class="col-sm-2 control-label">Name :</label>
                 <div class="col-sm-10">                    
                     <input type="text" class="form-control" name="name" id="name" placeholder="Name" value="<?php echo $name; ?>" />

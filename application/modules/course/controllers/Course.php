@@ -24,22 +24,33 @@ class Course extends Admin_controller
         $q           = urldecode_fk($this->input->get('q', TRUE));
         $start       = intval($this->input->get('start'));
         $category_id = intval($this->input->get('category_id'));
+        $status      = $this->input->get('status', TRUE);
+        if (!in_array($status, ['Active', 'Inactive'], true)) {
+            $status = '';
+        }
+
+        $package_type = $this->input->get('package_type', TRUE);
+        if (!in_array($package_type, getPackageTypes(), true)) {
+            $package_type = '';
+        }
 
         $config['base_url']  = build_pagination_url(Backend_URL . 'course', 'start');
         $config['first_url'] = build_pagination_url(Backend_URL . 'course', 'start');
 
         $config['per_page']          = 50;
         $config['page_query_string'] = TRUE;
-        $config['total_rows']        = $this->Course_model->total_rows($category_id, $q);
-        $courses                     = $this->Course_model->get_limit_data($config['per_page'], $start, $category_id, $q);
+        $config['total_rows']        = $this->Course_model->total_rows($category_id, $package_type, $status, $q);
+        $courses                     = $this->Course_model->get_limit_data($config['per_page'], $start, $category_id, $package_type, $status, $q);
 
         $this->load->library('pagination');
         $this->pagination->initialize($config);
 
         $data = array(
+            'q'           => $q,
             'courses'     => $courses,
             'category_id' => $category_id,
-            'q'           => $q,
+            'package_type'=> $package_type,
+            'status'      => $status,            
             'pagination'  => $this->pagination->create_links(),
             'total_rows'  => $config['total_rows'],
             'start'       => $start,
@@ -54,6 +65,7 @@ class Course extends Admin_controller
             $data = array(
                 'id'            => $row->id,
                 'category_id'   => $row->category_id,
+                'package_type'  => $row->package_type,
                 'name'          => $row->name,
                 'description'   => $row->description,
                 'price'         => $row->price,
@@ -78,6 +90,7 @@ class Course extends Admin_controller
             'action'        => site_url(Backend_URL . 'course/create_action'),
             'id'            => set_value('id'),
             'category_id'   => set_value('category_id'),
+            'package_type'  => set_value('package_type'),
             'name'          => set_value('name'),
             'description'   => set_value('description'),
             'price'         => set_value('price'),
@@ -127,6 +140,7 @@ class Course extends Admin_controller
         } else {
             $data = array(
                 'category_id'   => $this->input->post('category_id', TRUE),
+                'package_type'  => $this->input->post('package_type', TRUE) ?: NULL,
                 'name'          => $this->input->post('name', TRUE),
                 'description'   => $this->input->post('description', TRUE),
                 'price'         => $this->input->post('price', TRUE),
@@ -178,6 +192,7 @@ class Course extends Admin_controller
                 'action'        => site_url(Backend_URL . 'course/update_action'),
                 'id'            => set_value('id', $row->id),
                 'category_id'   => set_value('category_id', $row->category_id),
+                'package_type'  => set_value('package_type', $row->package_type),
                 'name'          => set_value('name', $row->name),
                 'description'   => set_value('description', $row->description),
                 'price'         => set_value('price', $row->price),
@@ -203,6 +218,25 @@ class Course extends Admin_controller
         echo ajaxRespond('OK', "Course Date id {$id} Delete");
     }
 
+    public function update_package_type()
+    {
+        ajaxAuthorized();
+        $id           = (int)$this->input->post('id');
+        $package_type = $this->input->post('package_type', TRUE);
+
+        if (!in_array($package_type, getPackageTypes(), true)) {
+            echo ajaxRespond('FAIL', 'Invalid Package Type');
+            return;
+        }
+        if (!$this->Course_model->get_by_id($id)) {
+            echo ajaxRespond('FAIL', 'Course Not Found');
+            return;
+        }
+
+        $this->Course_model->update($id, ['package_type' => $package_type]);
+        echo ajaxRespond('OK', "Package Type changed to {$package_type}");
+    }
+
     public function update_action()
     {
         $this->_rules();
@@ -213,6 +247,7 @@ class Course extends Admin_controller
         } else {
             $data = array(
                 'category_id'   => $this->input->post('category_id', TRUE),
+                'package_type'  => $this->input->post('package_type', TRUE) ?: NULL,
                 'name'          => $this->input->post('name', TRUE),
                 'description'   => $this->input->post('description', TRUE),
                 'price'         => $this->input->post('price', TRUE),
@@ -356,6 +391,7 @@ class Course extends Admin_controller
     public function _rules()
     {
         $this->form_validation->set_rules('category_id', 'category id', 'trim|required|numeric');
+        $this->form_validation->set_rules('package_type', 'package type', 'trim|in_list[' . implode(',', getPackageTypes()) . ']');
         $this->form_validation->set_rules('name', 'name', 'trim|required');
         $this->form_validation->set_rules('description', 'description', 'trim|required');
         $this->form_validation->set_rules('price', 'price', 'trim|required');

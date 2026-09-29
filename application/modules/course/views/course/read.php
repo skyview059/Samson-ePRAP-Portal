@@ -22,6 +22,7 @@
                 <div class="col-md-6">
                     <table class="table table-striped">
                         <tr><td width="150">Category</td><td width="5">:</td><td><?php echo getCategoryName($category_id); ?></td></tr>
+                        <tr><td>Package Type</td><td>:</td><td><?php echo $package_type ?: '--'; ?></td></tr>
                         <tr><td>Name</td><td>:</td><td><?php echo $name; ?></td></tr>
                         <tr><td>Description</td><td>:</td><td><?php echo $description; ?></td></tr>
                         <tr><td>Price</td><td>:</td><td><?php echo $price; ?></td></tr>
