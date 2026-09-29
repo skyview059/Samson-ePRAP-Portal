@@ -23,6 +23,8 @@ use PHPMailer\PHPMailer\SMTP;
 class Error_reporter
 {
     const MAX_PER_REQUEST = 20;
+    const LOG_FILE        = 'logs/error_report.log'; // relative to APPPATH; viewable at admin/module/error_log
+    const LOG_SEPARATOR   = '--------------------------------------------------------------------------------';
 
     private static $busy       = false;
     private static $seen       = [];
@@ -150,7 +152,7 @@ class Error_reporter
 
     private static function saveToFile(array $row)
     {
-        $entry = str_repeat('-', 80) . "\n"
+        $entry = self::LOG_SEPARATOR . "\n"
             . "[{$row['created_at']}] " . strtoupper($row['type']) . ($row['severity'] ? " ({$row['severity']})" : '') . "\n"
             . ($row['heading'] ? "Heading : {$row['heading']}\n" : '')
             . "Message : {$row['message']}\n"
@@ -162,7 +164,7 @@ class Error_reporter
             . "Agent   : {$row['user_agent']}\n"
             . ($row['backtrace'] ? "Trace   :\n{$row['backtrace']}\n" : '');
 
-        @file_put_contents(APPPATH . 'logs/error_report-' . date('Y-m-d') . '.log', $entry, FILE_APPEND | LOCK_EX);
+        @file_put_contents(APPPATH . self::LOG_FILE, $entry, FILE_APPEND | LOCK_EX);
     }
 
     private static function saveToDb(array $row)
@@ -238,7 +240,7 @@ class Error_reporter
             'User ID'  => $row['user_id'],
             'Student'  => $row['student_id'],
             'Agent'    => $row['user_agent'],
-            'Log ID'   => $id ?: 'not saved in DB (see logs/error_report-' . date('Y-m-d') . '.log)',
+            'Log ID'   => $id ?: 'not saved in DB (see ' . self::LOG_FILE . ')',
             'Time'     => $row['created_at'],
         ];
         $body = '<table cellpadding="6" cellspacing="0" border="1" style="border-collapse:collapse;font:13px Arial,sans-serif">';
@@ -297,7 +299,7 @@ class Error_reporter
             $mail->send();
             return true;
         } catch (\Throwable $ex) {
-            @file_put_contents(APPPATH . 'logs/error_report-' . date('Y-m-d') . '.log', 'Email to dev failed: ' . $mail->ErrorInfo . "\n", FILE_APPEND | LOCK_EX);
+            @file_put_contents(APPPATH . self::LOG_FILE, 'Email to dev failed: ' . $mail->ErrorInfo . "\n", FILE_APPEND | LOCK_EX);
             return false;
         }
     }

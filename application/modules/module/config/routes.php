@@ -16,3 +16,6 @@ $route['admin/module/acl/delete/(:num)']      = 'module/acl/delete/$1';
 $route['admin/module/acl/update/(:num)']      = 'module/acl/update/$1';
 $route['admin/module/acl/create_action']      = 'module/acl/create_action';
 $route['admin/module/acl/update_action']      = 'module/acl/update_action';
+
+$route['admin/module/error_log']              = 'module/error_log';
+$route['admin/module/error_log/clear']        = 'module/error_log/clear';
