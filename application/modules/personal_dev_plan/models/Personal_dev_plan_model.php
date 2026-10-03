@@ -1,7 +1,6 @@
 <?php
 
 defined('BASEPATH') OR exit('No direct script access allowed');
-
 class Personal_dev_plan_model extends Fm_model {
 
     public $table = 'personal_dev_plans';
@@ -32,6 +31,8 @@ class Personal_dev_plan_model extends Fm_model {
     // get total rows
     function total_rows($q = NULL)
     {
+        $this->db->select('pdp.id');
+        $this->db->from("{$this->table} as pdp");
         $this->__search($q);
         $this->db->group_by('pdp.student_id');
         return $this->db->get()->num_rows();
@@ -40,13 +41,16 @@ class Personal_dev_plan_model extends Fm_model {
     // get data with limit and search
     function get_limit_data($limit, $start = 0, $q = NULL)
     {
-//        $this->db->select("pdp.*");
+        
+        $this->db->select('pdp.id, CONCAT(s.fname," ", s.mname," ", s.lname) as "student_name"');
         $this->db->select('pdp.created_at');
-        $this->db->select('s.id, CONCAT(s.fname," ", s.mname," ", s.lname) as "student_name"');
-        $this->db->order_by($this->id, $this->order);
+        
+        $this->db->from("{$this->table} as pdp");
+        $this->db->join('students as s', "s.id = pdp.student_id", 'LEFT');
         $this->__search($q);
 
         $this->db->group_by('pdp.student_id');
+        $this->db->order_by($this->id, $this->order);
         $this->db->limit($limit, $start);
         return $this->db->get()->result();
     }
@@ -59,8 +63,6 @@ class Personal_dev_plan_model extends Fm_model {
             $this->db->or_where("CONCAT(s.fname,' ', s.mname,' ', s.lname) LIKE '%{$q}%'", false, false);
             $this->db->group_end();
         }
-        $this->db->from("{$this->table} as pdp");
-        $this->db->join('students as s', "s.id = pdp.student_id", 'LEFT');
     }
     
     function getStudentName($id) {        

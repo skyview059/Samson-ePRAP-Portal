@@ -6,7 +6,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
  * Public JSON API consumed by external applications (e.g. the Laravel project).
  *
  * Endpoints:
- *   GET /api/packages              -> active courses (flat list) + active subscriptions (grouped by exam)
+ *   GET /api/packages              -> active courses (grouped by package type) + active subscriptions (grouped by exam)
  *   GET /api/packages?exam_id=3    -> limit the subscriptions to a single exam
  */
 class Api extends MX_Controller
@@ -27,7 +27,7 @@ class Api extends MX_Controller
     }
 
     /**
-     * Active courses and active subscription packages (grouped by exam), with name & pricing.
+     * Active courses (grouped by package type) and active subscription packages (grouped by exam), with name & pricing.
      */
     public function packages()
     {
@@ -42,33 +42,44 @@ class Api extends MX_Controller
             'status'        => true,
             'currency'      => $currency,
             'courses'       => $this->activeCourses(),
-            'subscriptions' => $this->activeSubscriptions($exam_id),
+            // 'subscriptions' => $this->activeSubscriptions($exam_id),
         ]);
     }
 
     /**
-     * Active courses as a flat list.
+     * Active courses grouped by package type (Mock, Live Course, Question Bank).
      */
     private function activeCourses()
     {
-        $this->db->select('id, name, price, duration');
+        $this->db->select('id, package_type, name, description, price, duration, booking_limit');
         $this->db->from('courses');
         $this->db->where('status', 'Active');
+        // ENUM column sorts by its definition order: Mock, Live Course, Question Bank.
+        $this->db->order_by('package_type', 'ASC');
         $this->db->order_by('id', 'ASC');
         $rows = $this->db->get()->result();
 
-        $courses = [];
+        $groups = [];
         foreach ($rows as $row) {
-            $days      = (int) $row->duration;
-            $courses[] = [
-                'id'       => (int) $row->id,
-                'name'     => $row->name,
-                'price'    => $this->money($row->price),
-                'duration' => $days . ($days === 1 ? ' day' : ' days'),
+            $key = $row->package_type;
+            if (!isset($groups[$key])) {
+                $groups[$key] = [
+                    'package_type' => $key,
+                    'courses'      => [],
+                ];
+            }
+            $days                      = (int) $row->duration;
+            $groups[$key]['courses'][] = [
+                'id'            => (int) $row->id,
+                'name'          => $row->name,
+                'description'   => $row->description,
+                'price'         => $this->money($row->price),
+                'duration'      => $days . ($days === 1 ? ' day' : ' days'),
+                'booking_limit' => (int) $row->booking_limit,
             ];
         }
 
-        return $courses;
+        return array_values($groups);
     }
 
     /**
