@@ -31,11 +31,11 @@ class Personal_dev_plan_model extends Fm_model {
     // get total rows
     function total_rows($q = NULL)
     {
-        $this->db->select('pdp.student_id');
-        $this->db->from("{$this->table} as pdp");
-        $this->db->join('students as s', "s.id = pdp.student_id", 'LEFT');
+        $this->db->select('personal_dev_plans.student_id');
+        $this->db->from("{$this->table}");
+        $this->db->join('students as s', "s.id = personal_dev_plans.student_id", 'LEFT');
         $this->__search($q);
-        $this->db->group_by('pdp.student_id');
+        $this->db->group_by('personal_dev_plans.student_id');
         return $this->db->get()->num_rows();
     }
 
@@ -43,15 +43,15 @@ class Personal_dev_plan_model extends Fm_model {
     function get_limit_data($limit, $start = 0, $q = NULL)
     {
         
-        $this->db->select('pdp.id, pdp.student_id, CONCAT(s.fname," ", s.mname," ", s.lname) as "student_name"');
-        $this->db->select('pdp.created_at');
+        $this->db->select('personal_dev_plans.id, personal_dev_plans.student_id, CONCAT(s.fname," ", s.mname," ", s.lname) as "student_name"');
+        $this->db->select('personal_dev_plans.created_at');
         
-        $this->db->from("{$this->table} as pdp");
-        $this->db->join('students as s', "s.id = pdp.student_id", 'LEFT');
+        $this->db->from("{$this->table}");
+        $this->db->join('students as s', "s.id = personal_dev_plans.student_id", 'LEFT');
         $this->__search($q);
 
-        $this->db->group_by('pdp.student_id');
-        $this->db->order_by($this->id, $this->order);
+        $this->db->group_by('personal_dev_plans.student_id');
+        $this->db->order_by('personal_dev_plans.id', $this->order);
         $this->db->limit($limit, $start);
         return $this->db->get()->result();
     }
