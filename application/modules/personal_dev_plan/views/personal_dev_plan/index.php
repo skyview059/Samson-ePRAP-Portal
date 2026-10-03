@@ -42,7 +42,7 @@
                         <?php foreach ($p_dev_plans as $plan) { ?>
                             <tr>
                                 <td><?php echo ++$start; ?></td> 
-                                <td><a href="<?php echo site_url(Backend_URL.'student/read/'.$plan->id); ?>">
+                                <td><a href="<?php echo site_url(Backend_URL.'student/read/'.$plan->student_id); ?>">
                                     <?php echo $plan->student_name; ?>
                                         <i class="fa fa-external-link"></i>
                                     </a>
@@ -51,8 +51,8 @@
                                 <td><?php echo globalDateTimeFormat($plan->created_at); ?></td>
                                 <td class="text-center">
                                     <?php
-                                    echo anchor(site_url(Backend_URL . 'personal_dev_plan/details/' . $plan->id), '<i class="fa fa-fw fa-external-link"></i> View', 'class="btn btn-xs btn-primary"');
-                                    echo anchor(site_url(Backend_URL . 'personal_dev_plan/update/' . $plan->id), '<i class="fa fa-fw fa-edit"></i> Edit', 'class="btn btn-xs btn-warning"');                                    
+                                    echo anchor(site_url(Backend_URL . 'personal_dev_plan/details/' . $plan->student_id), '<i class="fa fa-fw fa-external-link"></i> View', 'class="btn btn-xs btn-primary"');
+                                    echo anchor(site_url(Backend_URL . 'personal_dev_plan/update/' . $plan->student_id), '<i class="fa fa-fw fa-edit"></i> Edit', 'class="btn btn-xs btn-warning"');                                    
                                     ?>
                                 </td>
                             </tr>

@@ -43,15 +43,16 @@ class Personal_dev_plan_model extends Fm_model {
     function get_limit_data($limit, $start = 0, $q = NULL)
     {
         
-        $this->db->select('personal_dev_plans.id, personal_dev_plans.student_id, CONCAT(s.fname," ", s.mname," ", s.lname) as "student_name"');
-        $this->db->select('personal_dev_plans.created_at');
-        
+        // Aggregates keep the query valid under sql_mode=only_full_group_by
+        $this->db->select('MAX(personal_dev_plans.id) as id, personal_dev_plans.student_id, CONCAT(s.fname," ", s.mname," ", s.lname) as "student_name"', false);
+        $this->db->select('MAX(personal_dev_plans.created_at) as created_at', false);
+
         $this->db->from("{$this->table}");
         $this->db->join('students as s', "s.id = personal_dev_plans.student_id", 'LEFT');
         $this->__search($q);
 
-        $this->db->group_by('personal_dev_plans.student_id');
-        $this->db->order_by('personal_dev_plans.id', $this->order);
+        $this->db->group_by(array('personal_dev_plans.student_id', 's.fname', 's.mname', 's.lname'));
+        $this->db->order_by('id', $this->order);
         $this->db->limit($limit, $start);
         return $this->db->get()->result();
     }
