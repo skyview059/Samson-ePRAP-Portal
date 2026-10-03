@@ -43,7 +43,7 @@ class Personal_dev_plan_model extends Fm_model {
     function get_limit_data($limit, $start = 0, $q = NULL)
     {
         
-        $this->db->select('pdp.id, CONCAT(s.fname," ", s.mname," ", s.lname) as "student_name"');
+        $this->db->select('pdp.id, pdp.student_id, CONCAT(s.fname," ", s.mname," ", s.lname) as "student_name"');
         $this->db->select('pdp.created_at');
         
         $this->db->from("{$this->table} as pdp");
