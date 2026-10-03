@@ -31,8 +31,9 @@ class Personal_dev_plan_model extends Fm_model {
     // get total rows
     function total_rows($q = NULL)
     {
-        $this->db->select('pdp.id');
+        $this->db->select('pdp.student_id');
         $this->db->from("{$this->table} as pdp");
+        $this->db->join('students as s', "s.id = pdp.student_id", 'LEFT');
         $this->__search($q);
         $this->db->group_by('pdp.student_id');
         return $this->db->get()->num_rows();
