@@ -35,13 +35,12 @@ class Api extends MX_Controller
             return $this->respond(['status' => false, 'message' => 'Method not allowed'], 405);
         }
 
-        $exam_id  = (int) $this->input->get('exam_id');
-        $currency = $this->config->item('stripe_currency') ?: 'GBP';
+        // $exam_id  = (int) $this->input->get('exam_id');
+        // $currency = $this->config->item('stripe_currency') ?: 'GBP';
 
         return $this->respond([
-            'status'        => true,
-            'currency'      => $currency,
-            'courses'       => $this->activeCourses(),
+            'status'    => true,
+            'packages'  => $this->activeCourses(),
             // 'subscriptions' => $this->activeSubscriptions($exam_id),
         ]);
     }
@@ -64,18 +63,18 @@ class Api extends MX_Controller
             $key = $row->package_type;
             if (!isset($groups[$key])) {
                 $groups[$key] = [
-                    'package_type' => $key,
-                    'courses'      => [],
+                    'type'  => $key,
+                    'names' => [],
                 ];
             }
             $days                      = (int) $row->duration;
-            $groups[$key]['courses'][] = [
+            $groups[$key]['names'][] = [
                 'id'            => (int) $row->id,
                 'name'          => $row->name,
                 'description'   => $row->description,
                 'price'         => $this->money($row->price),
                 'duration'      => $days . ($days === 1 ? ' day' : ' days'),
-                'booking_limit' => (int) $row->booking_limit,
+                'seat'          => (int) $row->booking_limit,
             ];
         }
 
