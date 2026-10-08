@@ -188,7 +188,8 @@
     <form id="bookingForm" method="post" action="<?php echo site_url('course-booking-action'); ?>" target="_parent"
           name="bookingForm" class="form-horizontal mt-70">
 
-        <input type="hidden" name="first_promoter" value="<?php echo $this->input->get('ref'); ?>">
+        <input type="hidden" name="first_promoter" value="<?php echo html_escape($this->input->get('ref')); ?>">
+        <?php echo form_guard_fields('booking'); ?>
 
         <div class="row">
             <div class="col-md-8 mb-15">

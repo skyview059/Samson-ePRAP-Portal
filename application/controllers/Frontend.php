@@ -254,6 +254,17 @@ class Frontend extends Frontend_controller
     public function sign_up_action()
     {
         $this->isPost();
+
+        // bot protection: honeypot + signed time token + per IP registration limit
+        $guardError = form_guard_check('sign_up');
+        if (!$guardError && form_guard_ip_limited()) {
+            $guardError = 'Too many registrations from your network. Please try again later.';
+        }
+        if ($guardError) {
+            $this->session->set_flashdata('msge', $guardError);
+            redirect(site_url('sign-up'));
+        }
+
         $this->_rules_sign_up();
 
         if ($this->form_validation->run() == FALSE) {
@@ -326,9 +337,10 @@ class Frontend extends Frontend_controller
         // $this->form_validation->set_rules('gmc_number', 'GMC number', 'trim|min_length[7]|max_length[7]|callback_unique_student_number');
 
         $this->form_validation->set_rules('email', 'email', 'trim|required|max_length[100]|valid_email|callback_unique_email');
-        $this->form_validation->set_rules('fname', 'first name', 'trim|required|max_length[50]');
+        $this->form_validation->set_rules('fname', 'first name', 'trim|required|max_length[50]|valid_person_name');
         // $this->form_validation->set_rules('mname', 'middle name', 'trim|max_length[50]');
-        $this->form_validation->set_rules('lname', 'last name', 'trim|required|max_length[50]');
+        $this->form_validation->set_rules('lname', 'last name', 'trim|required|max_length[50]|valid_person_name');
+        $this->form_validation->set_message('valid_person_name', FORM_GUARD_NAME_MESSAGE);
         // $this->form_validation->set_rules('phone[number]', 'phone', 'trim|required|max_length[20]');
         // $this->form_validation->set_rules('occupation', 'Occupation', 'trim|required');
         // $this->form_validation->set_rules('gender', 'gender', 'trim|required');
