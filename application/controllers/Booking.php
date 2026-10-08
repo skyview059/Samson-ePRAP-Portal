@@ -147,12 +147,28 @@ class Booking extends Frontend_controller
             $this->db->select('id, price, name');        
             $this->db->where('id', $courseId ); 
             $couseInfo = $this->db->get('courses')->row();
-            
-            if(empty($course)){
+
+            if(empty($couseInfo)){
+                echo ajaxRespond("FAIL", "Selected course not found!");
+                exit;
+            }
+
+            $slotId = isset($postData['slot_id'][$courseId]) ? (int) $postData['slot_id'][$courseId] : 0;
+            if(empty($course) || empty($slotId)){
                 echo ajaxRespond("FAIL", "At least a date must be selected for ".$couseInfo->name);
                 exit;
             }
-            
+
+            // date must belong to this course and still be upcoming
+            $validSlot = $this->db->where('id', $slotId)
+                ->where('course_id', $courseId)
+                ->where('start_date >=', 'now()', FALSE)
+                ->count_all_results('course_dates');
+            if(!$validSlot){
+                echo ajaxRespond("FAIL", "The selected date is no longer available for ".$couseInfo->name.". Please choose another date.");
+                exit;
+            }
+
             $totalPay += $couseInfo->price;
             $totalItems++;            
         }
@@ -194,7 +210,7 @@ class Booking extends Frontend_controller
             $courseBookedData[] = [
                 'course_payment_id' => $coursePaymentId,
                 'course_id'         => $courseId,
-                'course_date_id'    => $postData['slot_id'][$courseId],
+                'course_date_id'    => (int) $postData['slot_id'][$courseId],
                 'status'            => 'Pending'                
             ];
         }
