@@ -501,7 +501,8 @@
 
                 if (response.Status === 'OK'){
                     $('#login').html(response.Msg)
-                    setInterval(function (){
+                    // reload once (setInterval kept reloading while a slow page was still loading)
+                    setTimeout(function (){
                         localStorage.removeItem('coupon');
                         window.location.reload();
                     }, 1000)
