@@ -160,14 +160,6 @@
             update: function (e, ui) {
                 var tbody = $(this);
                 var row   = ui.item;
-                var cat   = row.data('category');
-
-                // list is ordered by category first, so only allow moves inside the same category
-                if (row.prev('tr').data('category') !== cat && row.next('tr').data('category') !== cat) {
-                    tbody.sortable('cancel');
-                    alert('Courses can only be reordered within the same category.');
-                    return;
-                }
 
                 $.ajax({
                     type: 'POST',
