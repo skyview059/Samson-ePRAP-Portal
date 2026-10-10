@@ -24,6 +24,7 @@
         <div class="col-md-10 col-md-offset-1" style="margin-top: 50px">
             <form action="<?= site_url('sign_up_action'); ?>" method="post" id="sign_up" class="form-horizontal"
                   enctype="multipart/form-data">
+                <?php echo form_guard_fields('sign_up'); ?>
                 <div class="panel panel-default">
                     <div class="panel-heading">Basic Information</div>
                     <div class="panel-body">

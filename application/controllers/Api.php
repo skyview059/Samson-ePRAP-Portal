@@ -50,12 +50,12 @@ class Api extends MX_Controller
      */
     private function activeCourses()
     {
-        $this->db->select('id, package_type, name, description, price, duration, booking_limit');
+        $this->db->select('id,serial_no, package_type, name, description, price, duration, booking_limit');
         $this->db->from('courses');
         $this->db->where('status', 'Active');
         // ENUM column sorts by its definition order: Mock, Live Course, Question Bank.
         $this->db->order_by('package_type', 'ASC');
-        $this->db->order_by('id', 'ASC');
+        $this->db->order_by('serial_no', 'ASC');
         $rows = $this->db->get()->result();
 
         $groups = [];
@@ -70,6 +70,7 @@ class Api extends MX_Controller
             $days                      = (int) $row->duration;
             $groups[$key]['names'][] = [
                 'id'            => (int) $row->id,
+                'serial_no'     => (int) $row->serial_no,
                 'name'          => $row->name,
                 'description'   => $row->description,
                 'price'         => $this->money($row->price),

@@ -5,10 +5,25 @@ class Booking_with_registration extends MX_Controller
 
     public function index()
     {
+        if ($this->input->method() !== 'post') {
+            redirect(site_url('book-course'));
+        }
+
+        // The form is validated over ajax first, but bots post here directly -> validate again on the server
+        $hasError = $this->validate();
+        if ($hasError) {
+            $this->session->set_flashdata('msge', 'Your booking could not be processed. Please check your details and try again.');
+            redirect(site_url('book-course'));
+        }
+
         $post         = $this->input->post();
         $post['pass'] = randDomPasswordGenerator(6);
         // if user is authenticated, set auth id otherwise register new user
         $student_id = getLoginStudentData('student_id') ? getLoginStudentData('student_id') : $this->register($post);
+        if (!$student_id) {
+            $this->session->set_flashdata('msge', 'This email is already registered. Please log in to continue with your booking.');
+            redirect(site_url('login'));
+        }
 
         // if user is authenticated, don't need to set user data in cookie
         if (!getLoginStudentData('student_id')) {
@@ -20,7 +35,7 @@ class Booking_with_registration extends MX_Controller
             $this->SendWelcomeEmail($post, $student_id);
         }        
 
-        redirect(site_url("booking/checkout/{$course_payment_id}" . ($post['first_promoter'] ? "?ref={$post['first_promoter']}" : '')));
+        redirect(site_url("booking/checkout/{$course_payment_id}" . (!empty($post['first_promoter']) ? '?ref=' . urlencode($post['first_promoter']) : '')));
     }
 
     public function purchase_practice_action()
@@ -81,13 +96,25 @@ class Booking_with_registration extends MX_Controller
     {
         $this->load->library('form_validation');
 
+        $isGuest = !getLoginStudentData('student_id');
+
         // Start::This validation is not required if the user is authenticated
-        if (!getLoginStudentData('student_id')) {
-            $this->form_validation->set_rules('first_name', 'first name', 'required');
-            $this->form_validation->set_rules('last_name', 'last name', 'required');
-            $this->form_validation->set_rules('email', 'email', 'required');
-            $this->form_validation->set_rules('phone_code', 'phone code', 'required|numeric');
-            $this->form_validation->set_rules('phone', 'phone', 'required|numeric');
+        if ($isGuest) {
+            // bot protection: honeypot + signed time token + per IP registration limit
+            $guardError = form_guard_check('booking');
+            if (!$guardError && form_guard_ip_limited()) {
+                $guardError = 'Too many registrations from your network. Please try again later.';
+            }
+            if ($guardError) {
+                return json_encode([['email' => $guardError]]);
+            }
+
+            $this->form_validation->set_rules('first_name', 'first name', 'trim|required|max_length[50]|valid_person_name');
+            $this->form_validation->set_rules('last_name', 'last name', 'trim|required|max_length[50]|valid_person_name');
+            $this->form_validation->set_rules('email', 'email', 'trim|required|max_length[100]|valid_email');
+            $this->form_validation->set_rules('phone_code', 'phone code', 'trim|required|numeric|max_length[6]');
+            $this->form_validation->set_rules('phone', 'phone', 'trim|required|numeric|max_length[20]');
+            $this->form_validation->set_message('valid_person_name', FORM_GUARD_NAME_MESSAGE);
             // $this->form_validation->set_rules('country_id', 'country', 'required|numeric');
         }
         // End::This validation is not required if the user is authenticated
@@ -108,46 +135,50 @@ class Booking_with_registration extends MX_Controller
         // $this->form_validation->set_rules('personal_data', 'Personal Data Collect', 'required');
         $this->form_validation->set_rules('terms_and_conditions', 'Terms and Conditions', 'required');
 
-        if ($this->form_validation->run() == FALSE) {
-            $errors = $this->form_validation->error_array();
-            return json_encode([$errors]);
-        } else {
-            return false;
+        $errors = ($this->form_validation->run() == FALSE) ? $this->form_validation->error_array() : [];
+
+        // A guest must never take over an existing account by booking with its email -> ask them to log in
+        if ($isGuest && empty($errors['email']) && $this->emailExists($this->input->post('email'))) {
+            $errors['email'] = 'This email is already registered. Please log in to continue with your booking.';
         }
+
+        return $errors ? json_encode([$errors]) : false;
     }
 
+    private function emailExists($email)
+    {
+        return (bool)$this->db->from('students')
+            ->where('email', $email)
+            ->count_all_results();
+    }
+
+    /**
+     * Create a new student for a guest booking.
+     *
+     * @return int|false new student id, or false when the email is already registered
+     */
     private function register($post)
     {
-        $user = $this->db->from('students')
-            ->where('email', $post['email'])
-            ->get()->row();
-
-        //  If the user already exists, update his profile
-        if ($user) {
-            $this->db->where('id', $user->id)
-                ->set('fname', $post['first_name'])
-                ->set('lname', $post['last_name'])
-                ->set('password', password_encription($post['pass']))
-                ->set('phone_Code', $post['phone_code'])
-                ->set('phone', $post['phone'])
-                // ->set('country_id', $post['country_id'])
-                ->update('students');
-
-            return $user->id;
-        } else {
-            $data = array(
-                'fname'      => $post['first_name'],
-                'lname'      => $post['last_name'],
-                'email'      => $post['email'],
-                'password'   => password_encription($post['pass']),
-                'phone_Code' => $post['phone_code'],
-                'phone'      => $post['phone'],
-                // 'country_id' => $post['country_id'],
-            );
-            $this->db->insert('students', $data);
-
-            return $this->db->insert_id();
+        // Existing accounts are never updated or logged in from here (account takeover)
+        if ($this->emailExists($post['email'])) {
+            return false;
         }
+
+        $data = array(
+            'fname'       => $post['first_name'],
+            'lname'       => $post['last_name'],
+            'email'       => $post['email'],
+            'password'    => password_encription($post['pass']),
+            'phone_Code'  => $post['phone_code'],
+            'phone'       => $post['phone'],
+            // 'country_id' => $post['country_id'],
+            'tmp_ip_addr' => $this->input->ip_address(),
+            'created_at'  => date('Y-m-d H:i:s'),
+            'updated_at'  => date('Y-m-d H:i:s'),
+        );
+        $this->db->insert('students', $data);
+
+        return $this->db->insert_id();
     }
 
     private function SendWelcomeEmail($post, $student_id)

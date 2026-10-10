@@ -155,7 +155,7 @@ class Wa {
         $ci->db->from('whatsapp_links as wl');
         $ci->db->join('whatsapp_link_relations as wlr', 'wl.id=wlr.wa_link_id', 'LEFT');
         $ci->db->where('wl.link_for', $link_for );
-        $ci->db->where('wlr.rel_id',  $RelID );
+        $ci->db->where('wlr.rel_id',  (int) $RelID );
         $data =  $ci->db->get()->row();        
         if($data){
             return "<b><a href='{$data->link}' target=\"_blank\"><i class='fa fa-whatsapp text-green text-bold'></i> Open</a></b>";

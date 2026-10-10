@@ -40,3 +40,4 @@
 /plans
 /application/logs/error_report.log
 /application/cache/error_reports
+/tests

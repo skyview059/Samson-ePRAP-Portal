@@ -33,6 +33,8 @@ $config['error_views_path']     = '';
 $config['cache_path']           = '';
 $config['cache_query_string']   = false;
 $config['encryption_key']       = '';
+// Secret used to sign the anti-spam token on public registration forms (see form_guard_helper.php)
+$config['form_guard_key']       = '09b15a21f07cbaa1d2c3df906c19cb2727591bc5c805093c7eca22e41f7f5524';
 
 $config['sess_driver']              = 'database';
 $config['sess_save_path']           = 'ci_sessions';
