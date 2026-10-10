@@ -38,7 +38,7 @@ class Course_model extends Fm_model {
         $this->db->join('course_categories as c', "c.id={$this->table}.category_id", 'LEFT');
         $this->__sql($category_id,$package_type,$status,$q);
         $this->db->order_by('category_id', 'ASC');
-        $this->db->order_by($this->id, 'ASC');        
+        $this->db->order_by('serial_no', 'ASC');        
         $this->db->limit($limit, $start);
         return $this->db->get($this->table)->result();
     }

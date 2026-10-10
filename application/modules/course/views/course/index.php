@@ -56,9 +56,10 @@
 
         <div class="box-body">            
             <div class="table-responsive">
-                <table class="table table-bordered table-striped table-condensed">
+                <table class="table table-bordered table-striped table-condensed" id="course-ordering">
                     <thead>
                         <tr>
+                            <th width="30"></th>
                             <th width="40">S/L</th>
                             <th>Category</th>
                             <th>Package Type</th>
@@ -75,9 +76,11 @@
                     </thead>
 
                     <tbody>
+                        <?php $first_sl = $start; ?>
                         <?php foreach ($courses as $course) { ?>
-                            <tr>
-                                <td><?php echo ++$start; ?></td>
+                            <tr id="item-<?php echo $course->id; ?>" data-category="<?php echo $course->category_id; ?>">
+                                <td class="text-center sort-handle" title="Drag to reorder"><i class="fa fa-arrows-v"></i></td>
+                                <td class="sl-no"><?php echo ++$start; ?></td>
                                 <td><?php echo $course->category; ?></td>
                                 <td>
                                     <?php $btn_class = getPackageTypeBtnClass($course->package_type); ?>
@@ -132,9 +135,71 @@
 
 <style type="text/css">
     .package-type-inline { display: flex; }
+    #course-ordering .sort-handle { cursor: move; color: #999; vertical-align: middle; }
+    #course-ordering tr.ui-sortable-helper { display: table; background: #fff; box-shadow: 0 2px 6px rgba(0,0,0,.2); }
+    #course-ordering tr.sort-placeholder td { background: #fcf8e3; height: 30px; }
 </style>
 <script type="text/javascript">
     $(function () {
+        var firstSl = <?php echo (int)$first_sl; ?>;
+
+        $('#course-ordering tbody').sortable({
+            axis: 'y',
+            handle: '.sort-handle',
+            placeholder: 'sort-placeholder',
+            helper: function (e, tr) {
+                // keep column widths while dragging
+                var cells = tr.children();
+                return tr.clone().children().each(function (i) {
+                    $(this).width(cells.eq(i).width());
+                }).end();
+            },
+            start: function (e, ui) {
+                ui.placeholder.html('<td colspan="' + ui.item.children().length + '">&nbsp;</td>');
+            },
+            update: function (e, ui) {
+                var tbody = $(this);
+                var row   = ui.item;
+                var cat   = row.data('category');
+
+                // list is ordered by category first, so only allow moves inside the same category
+                if (row.prev('tr').data('category') !== cat && row.next('tr').data('category') !== cat) {
+                    tbody.sortable('cancel');
+                    alert('Courses can only be reordered within the same category.');
+                    return;
+                }
+
+                $.ajax({
+                    type: 'POST',
+                    url: 'admin/course/save_serial',
+                    data: tbody.sortable('serialize') + '&start=' + firstSl,
+                    dataType: 'json',
+                    beforeSend: function () {
+                        tbody.sortable('disable');
+                        row.find('.sort-handle i').attr('class', 'fa fa-refresh fa-spin');
+                    },
+                    success: function (respond) {
+                        if (respond.Status === 'OK') {
+                            tbody.children('tr').each(function (i) {
+                                $(this).find('.sl-no').text(firstSl + i + 1);
+                            });
+                        } else {
+                            alert(respond.Msg);
+                            location.reload();
+                        }
+                    },
+                    error: function () {
+                        alert('Serial could not be saved. Please try again.');
+                        location.reload();
+                    },
+                    complete: function () {
+                        row.find('.sort-handle i').attr('class', 'fa fa-arrows-v');
+                        tbody.sortable('enable');
+                    }
+                });
+            }
+        });
+
         // .table-responsive clips the dropdown menu, so let it overflow while open
         $('.package-type-inline').on('show.bs.dropdown', function () {
             $(this).closest('.table-responsive').css('overflow', 'visible');

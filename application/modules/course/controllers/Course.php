@@ -146,7 +146,8 @@ class Course extends Admin_controller
                 'price'         => $this->input->post('price', TRUE),
                 'duration'      => $this->input->post('duration', TRUE),
                 'booking_limit' => $this->input->post('booking_limit', TRUE),
-                'status'        => $this->input->post('status', TRUE)
+                'status'        => $this->input->post('status', TRUE),
+                'serial_no'     => (int)$this->db->select_max('serial_no')->get('courses')->row()->serial_no + 1,
             );
 
             $course_id = $this->Course_model->insert($data);
@@ -235,6 +236,35 @@ class Course extends Admin_controller
 
         $this->Course_model->update($id, ['package_type' => $package_type]);
         echo ajaxRespond('OK', "Package Type changed to {$package_type}");
+    }
+
+    public function save_serial()
+    {
+        ajaxAuthorized();
+        $ids   = array_values(array_filter(array_map('intval', (array)$this->input->post('item'))));
+        $start = max(0, (int)$this->input->post('start'));
+        if (empty($ids)) {
+            echo ajaxRespond('FAIL', 'Nothing to reorder');
+            return;
+        }
+
+        // Reuse the serial slots these rows already hold, so rows on other
+        // pages / outside the current filter keep their position.
+        $slots = array_map('intval', array_column(
+            $this->db->select('serial_no')->where_in('id', $ids)->get('courses')->result_array(),
+            'serial_no'
+        ));
+        sort($slots);
+        if (count($slots) !== count($ids) || count(array_unique($slots)) !== count($slots) || $slots[0] < 1) {
+            $slots = range($start + 1, $start + count($ids));
+        }
+
+        $batch = [];
+        foreach ($ids as $i => $id) {
+            $batch[] = ['id' => $id, 'serial_no' => $slots[$i]];
+        }
+        $this->db->update_batch('courses', $batch, 'id');
+        echo ajaxRespond('OK', 'Serial Saved Successfully');
     }
 
     public function update_action()
