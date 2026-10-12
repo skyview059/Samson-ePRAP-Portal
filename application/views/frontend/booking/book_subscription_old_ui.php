@@ -118,7 +118,7 @@
                         <table class="table table-striped cart">
                             <tbody>
                             <tr>
-                                <td width="145">Course Qty</td>
+                                <td width="225">Course Qty</td>
                                 <td width="5">:</td>
                                 <td>
                                     <span id="crs_quantity">0</span>

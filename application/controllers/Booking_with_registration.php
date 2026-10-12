@@ -313,10 +313,11 @@ class Booking_with_registration extends MX_Controller
             // increment uses limit
             $this->db->where('id', $coupon->id)->set('uses', 'uses + 1', FALSE)->update('promocodes');
 
+            // a discount bigger than the price makes the course free, never negative
             if ($coupon->discount_type === 'Fixed') {
-                $total_amount += $course->price - $coupon->amount;
+                $total_amount += max(0, $course->price - $coupon->amount);
             } elseif ($coupon->discount_type === 'Percentage') {
-                $total_amount += $course->price - ($course->price * $coupon->amount / 100);
+                $total_amount += max(0, $course->price - ($course->price * $coupon->amount / 100));
             }
         }
 
@@ -343,9 +344,9 @@ class Booking_with_registration extends MX_Controller
             $price = $package->price;
             if ($couponUsableForPractice) {
                 if ($coupon->discount_type === 'Fixed') {
-                    $price = $package->price - $coupon->amount;
+                    $price = max(0, $package->price - $coupon->amount);
                 } elseif ($coupon->discount_type === 'Percentage') {
-                    $price = $package->price - ($package->price * $coupon->amount / 100);
+                    $price = max(0, $package->price - ($package->price * $coupon->amount / 100));
                 }
                 $coupon_name = $coupon->code;
 
@@ -418,45 +419,58 @@ class Booking_with_registration extends MX_Controller
             ->where('status', 'Public')
             ->get()->row();
 
-        if ($coupon) {
-            // get courses
-            $courses = $this->db->select('course_id')
-                ->from('promocode_course')
-                ->where('promocode_id', $coupon->id)
-                ->get()->result();
-
-
-            $courseIds = [];
-            foreach ($courses as $course) {
-                $courseIds[] = intval($course->course_id);
-            }
-
-            $coupon->courses = $courseIds;
-
-            // get students
-            $students = $this->db->select('student_id')
-                ->from('promocode_student')
-                ->where('promocode_id', $coupon->id)
-                ->get()->result();
-
-            $studentIDs = [];
-            foreach ($students as $student) {
-                $studentIDs[] = intval($student->student_id);
-            }
-
-            $coupon->students = $studentIDs;
-
-            // check:: already use or not
-            $payment = $this->db->from('course_payments')
-                ->where('student_id', getLoginStudentData('student_id'))
-                ->where('promo_code', $coupon->code)
-                ->get()->row();
-
-            // Check if $coupon is an object before accessing its properties
-            $coupon->already_used = (bool)$payment;
+        if (!$coupon) {
+            echo json_encode(['promocode' => null]);
+            return;
         }
 
-        echo json_encode(['promocode' => $coupon]);
+        // get courses
+        $courses = $this->db->select('course_id')
+            ->from('promocode_course')
+            ->where('promocode_id', $coupon->id)
+            ->get()->result();
+
+        $courseIds = [];
+        foreach ($courses as $course) {
+            $courseIds[] = intval($course->course_id);
+        }
+
+        // special coupon: only send the logged-in student's own id (if allowed), never the whole list
+        $studentId  = intval(getLoginStudentData('student_id'));
+        $studentIDs = [];
+        if ($coupon->is_special && $studentId) {
+            $allowed = $this->db->from('promocode_student')
+                ->where('promocode_id', $coupon->id)
+                ->where('student_id', $studentId)
+                ->count_all_results();
+
+            if ($allowed) {
+                $studentIDs[] = $studentId;
+            }
+        }
+
+        // check:: already use or not
+        $payment = false;
+        if($studentId){
+            $payment = $this->db->where('student_id', $studentId )
+                ->where('promo_code', $coupon->code)
+                ->count_all_results('course_payments');
+        }
+
+        // only the fields the booking pages use
+        echo json_encode(['promocode' => [
+            'code'          => $coupon->code,
+            'amount'        => $coupon->amount,
+            'discount_type' => $coupon->discount_type,
+            'start_date'    => $coupon->start_date,
+            'end_date'      => $coupon->end_date,
+            'use_multiple'  => $coupon->use_multiple,
+            'is_special'    => $coupon->is_special,
+            'course_id'     => $coupon->course_id, // still read by the subscription pages
+            'courses'       => $courseIds,
+            'students'      => $studentIDs,
+            'already_used'  => (bool)$payment,
+        ]]);
     }
 
     public function guestLogin()

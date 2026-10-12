@@ -17,6 +17,13 @@
         .d-none {
             display: none;
         }
+
+        /* old price when a promo code discount is applied */
+        .old_price {
+            text-decoration: line-through;
+            color: #999 !important;
+            font-weight: normal !important;
+        }
     </style>
 
     <div class="container">
@@ -85,7 +92,8 @@
                             <tbody>
                             <?php foreach ($course_plans as $plan) { ?>
                                 <?php foreach ($plan['courses'] as $c) {
-                                       $date_slot = showBookingDates($c, $course_payment_id) !== '<p><small><em>No Date Found to Enroll</em><small></p>';
+                                       // no dates -> course can't be booked (same check as book_course_new_ui.php)
+                                       $date_slot = !empty(json_decode($c['dates']));
                                   ?>
                                     <tr>
                                         <td>
@@ -115,7 +123,7 @@
                         <table class="table table-striped cart">
                             <tbody>
                             <tr>
-                                <td width="145">Course Qty</td>
+                                <td width="225">Course Qty</td>
                                 <td width="5">:</td>
                                 <td>
                                     <span id="crs_quantity">0</span>
@@ -194,6 +202,24 @@
     <script>
         $('.select2').select2();
 
+        let appliedCoupon = null;
+
+        function couponError(msg) {
+            $('.coupon_error_msg').removeClass('d-none').html('<b>' + msg + '</b>');
+        }
+
+        // the server discounts one course: the last promo code course that is selected
+        function findCouponCourse(courseIDs) {
+            let matched = null;
+            (courseIDs || []).forEach(function (courseID) {
+                const elem = $('.want2buy[value="' + parseInt(courseID) + '"]:checked');
+                if (elem.length) {
+                    matched = elem;
+                }
+            });
+            return matched;
+        }
+
         $('#coupon_apply').on('click', function () {
 
             let value = $('#coupon').val();
@@ -206,17 +232,32 @@
 
                 beforeSend() {
                     $('.coupon_error_msg').addClass('d-none');
+                    $('#coupon_apply').prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Checking...');
+                },
+                complete() {
+                    $('#coupon_apply').prop('disabled', false).html(' Apply ');
+                },
+                error() {
+                    couponError('Could not check the promo code. Please try again.');
                 },
                 success: function (response) {
-                    if (response.promocode === null){
-                        $('.coupon_error_msg').removeClass('d-none');
-                        $('.coupon_error_msg').html('<b>Promo code is invalid.</b>');
+                    const promo = response.promocode;
+
+                    if (promo === null){
+                        couponError('Promo code is invalid.');
                         return;
                     }
 
-                    if (response.promocode.already_used && 'yes' !== response.promocode.use_multiple){
-                        $('.coupon_error_msg').removeClass('d-none');
-                        $('.coupon_error_msg').html('<b>You have already use this coupon.</b>');
+                    if (promo.already_used && 'yes' !== promo.use_multiple){
+                        couponError('You have already use this coupon.');
+                        return;
+                    }
+
+                    const isLoggedIn = <?= json_encode(auth('student')); ?>;
+
+                    // check:: this coupon for this auth user or not
+                    if (parseInt(promo.is_special) === 1 && (!isLoggedIn || !promo.students.includes(parseInt(isLoggedIn.id)))){
+                        couponError('This coupon for special user.');
                         return;
                     }
 
@@ -227,78 +268,105 @@
 
                     const now = `${year}-${month}-${day}`;
 
-                    if (response.promocode && (response.promocode.start_date <= now && now <= response.promocode.end_date)) {
-                        $('.coupon_applied').val(response.promocode.code);
-
-                        let course_id = response.promocode.course_id;
-                        let total_amount = 0;
-                        let match_course = false;
-
-                        $(".want2buy").each(function (key, elem) {
-                            if ($(elem).is(':checkbox:checked')) {
-                                let id = $(this).val();
-                                let price = parseInt($(elem).attr('data-price'));
-
-                                if (course_id === id) {
-                                    match_course = true;
-
-                                    $('.coupon').addClass('d-none')
-                                    $('.note').addClass('d-none');
-
-                                    if (response.promocode.discount_type === 'Fixed') {
-                                        total_amount += price - response.promocode.amount;
-                                    }
-
-                                    if (response.promocode.discount_type === 'Percentage') {
-                                        let discountAmount = (price * response.promocode.amount) / 100;
-                                        total_amount += price - discountAmount;
-                                    }
-                                } else {
-                                    total_amount += price;
-                                }
-
-                                $('.coupon_error_msg').removeClass('d-none');
-                            }
-                        });
-
-                        let html = `<tr>
-                                        <td> Discount (${response.promocode.code}) <span style="color:red" onclick="cancel_coupon()"> <i class="fa fa-times-circle" aria-hidden="true"></i> </span></td>
-                                        <td>:</td>
-                                        <td>
-                                            ${response.promocode.amount} ${response.promocode.discount_type === 'Percentage' ? '%' : ''}
-                                        </td>
-                                    </tr>
-
-                                    <tr>
-                                        <td> Total </td>
-                                        <td>:</td>
-                                        <td id="car_total_amount">
-                                            ${total_amount}
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td colspan="3">
-                                            <span style="display: block"><strong>Coupon applied for:</strong></span>
-                                            ${response.promocode.name}
-                                        </td>
-                                    </tr>`
-
-                        if (match_course){
-                            $('.cart').append(html);
-                        }
-
-                    } else {
-                        $('.coupon_error_msg').removeClass('d-none')
-                        $('.coupon_error_msg').html('<b>ddf.</b>');
+                    if (!(promo.start_date <= now && now <= promo.end_date)) {
+                        couponError('Promo code expired.');
+                        return;
                     }
+
+                    if ($('.want2buy:checked').length === 0) {
+                        couponError('Please select a course before applying a promo code.');
+                        return;
+                    }
+
+                    if (!findCouponCourse(promo.courses)) {
+                        couponError('The promo code is not for this course.');
+                        return;
+                    }
+
+                    appliedCoupon = {
+                        code: promo.code,
+                        amount: parseFloat(promo.amount),
+                        discount_type: promo.discount_type,
+                        courses: promo.courses || [],
+                    };
+
+                    $('.coupon_applied').val(promo.code);
+                    $('.coupon').addClass('d-none');
+                    $('.note').addClass('d-none');
+                    showCoupon();
                 }
             })
         });
 
+        // draw the discount rows from the cart total calculated by cartDetails()
+        function showCoupon() {
+            $('.cart .coupon_row').remove();
+            $('#total_amount').removeClass('old_price');
+            if (!appliedCoupon) {
+                return;
+            }
+
+            const matched = findCouponCourse(appliedCoupon.courses);
+            const base = parseFloat($('#input_total_amount').val()) || 0;
+            let total = base;
+            const discounted = matched && $('#slot_' + matched.val()).find('.ckbx:checked').length > 0;
+
+            // discount only when the matched course is in the total (a date is selected)
+            if (discounted) {
+                $('#total_amount').addClass('old_price');
+                const price = parseFloat(matched.attr('data-price'));
+
+                let discount = 0;
+
+                if (appliedCoupon.discount_type === 'Fixed') {
+                    discount = appliedCoupon.amount;
+                }
+
+                if (appliedCoupon.discount_type === 'Percentage') {
+                    discount = price * appliedCoupon.amount / 100;
+                }
+
+                // never discount more than the course price (same as the server)
+                total = base - Math.min(discount, price);
+            }
+
+            total = Math.round(total * 100) / 100;
+            const courseName = matched ? matched.closest('tr').find('td').eq(1).text() : '<em>Select a matching course</em>';
+
+            const html = `<tr class="coupon_row">
+                                <td> Discount (${appliedCoupon.code}) <span style="color:red; cursor: pointer" onclick="cancel_coupon()"> <i class="fa fa-times-circle" aria-hidden="true"></i> </span></td>
+                                <td>:</td>
+                                <td>
+                                    ${appliedCoupon.discount_type === 'Fixed' ? '£' + appliedCoupon.amount : appliedCoupon.amount + '%'}
+                                </td>
+                            </tr>
+                            <tr class="coupon_row">
+                                <td> Total After Discount (£) </td>
+                                <td>:</td>
+                                <td id="coupon_total_amount" style="color:green; font-weight: bold;">
+                                    ${Number.isInteger(total) ? total : total.toFixed(2)}
+                                </td>
+                            </tr>
+                            <tr class="coupon_row">
+                                <td colspan="3">
+                                    <span style="display: block"><strong>Coupon applied for:</strong></span>
+                                    ${courseName}
+                                </td>
+                            </tr>`;
+
+            $('.cart tbody').append(html);
+        }
+
+        // cartDetails() (script.common.js.php) recalculates the cart on these clicks -> redraw the discount after it
+        $(function () {
+            $('body').on('click', '.want2buy, .ckbx, .practice2buy', showCoupon);
+        });
+
         function cancel_coupon() {
-            $('.cart tr:last-child').remove();
-            $('.cart tr:last-child').remove();
-            $('.cart tr:last-child').remove();
+            appliedCoupon = null;
+            $('.cart .coupon_row').remove();
+            $('#total_amount').removeClass('old_price');
+            $('.coupon_applied').val('');
             $('.coupon').removeClass('d-none');
             $('.note').removeClass('d-none');
             $('.coupon_error_msg').addClass('d-none');

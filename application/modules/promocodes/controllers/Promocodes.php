@@ -210,6 +210,12 @@ class Promocodes extends Admin_controller{
     
     public function update_action(){
         $id = $this->input->post('id', TRUE);
+
+        $this->_rules();
+        if ($this->form_validation->run() == FALSE) {
+            return $this->update($id);
+        }
+
         $courseIDs = $this->input->post('courseIds',TRUE);
         $studentIds = $this->input->post('studentIds',TRUE);
         $is_special = $this->input->post('is_special',TRUE);
@@ -317,7 +323,15 @@ class Promocodes extends Admin_controller{
         $this->form_validation->set_rules('code', 'code', 'trim|required');
         $this->form_validation->set_rules('discount_type', 'discount type', 'trim|required');
         $this->form_validation->set_rules('amount', 'amount', 'trim|required');
-        $this->form_validation->set_rules('end_date', 'end date', 'trim|required');
+        $this->form_validation->set_rules('end_date', 'end date', [
+            'trim', 'required',
+            // end date must not be before start date (otherwise the code is never valid on the booking page)
+            ['end_after_start', function ($end) {
+                $start = $this->input->post('start_date', TRUE);
+                return !$start || !$end || strtotime($end) >= strtotime($start);
+            }],
+        ]);
+        $this->form_validation->set_message('end_after_start', 'The end date must be on or after the start date.');
         $this->form_validation->set_rules('start_date', 'start date', 'trim|required');
         $this->form_validation->set_rules('uses_limit', 'uses limit', 'trim|required');
         $this->form_validation->set_rules('status', 'Status', 'required');

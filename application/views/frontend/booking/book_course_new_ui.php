@@ -152,6 +152,13 @@
         color: #eee;
     }
 
+    /* old price when a promo code discount is applied */
+    .old_price {
+        text-decoration: line-through;
+        opacity: .6;
+        margin-right: 5px;
+    }
+
     #cart_ballance {
         background: #3C4D9D;
     }
@@ -601,13 +608,43 @@
         }
     }
 
+    function formatGBP(amount) {
+        amount = Math.round(amount * 100) / 100;
+        return '£' + (Number.isInteger(amount) ? amount : amount.toFixed(2));
+    }
+
     function showCart() {
         const cart = JSON.parse(localStorage.getItem('guest_course')) || [];
         let total_amount = 0;
 
+        // discount only the matched course (same rule as createCartAndCheckout on the server)
+        const coupon = JSON.parse(localStorage.getItem('coupon'));
+        const matchedItem = coupon ? findCouponCourse(coupon.courses, cart) : null;
+        let discount = 0;
+
+        if (matchedItem){
+            const price = parseFloat(matchedItem.course_price);
+
+            if (coupon.discount_type === 'Fixed') {
+                discount = coupon.amount;
+            }
+
+            if (coupon.discount_type === 'Percentage') {
+                discount = price * coupon.amount / 100;
+            }
+
+            // never discount more than the course price (same as the server)
+            discount = Math.min(discount, price);
+        }
+
         $('#cart_item').empty();
 
         cart.forEach(function(item) {
+            // matched course: old price crossed out + discounted price
+            const price_html = (item === matchedItem && discount)
+                ? `<span class="old_price">${formatGBP(item.course_price)}</span> ${formatGBP(item.course_price - discount)}`
+                : formatGBP(item.course_price);
+
             let cart_table_row = `
                     <tr style="vertical-align: middle">
                         <td>
@@ -615,7 +652,7 @@
                             <small> ${item.option_label ? item.option_label : ''} </small>
                         </td>
                         <td class="text-right">
-                            <span id="crs_quantity"> £${item.course_price} </span>
+                            <span id="crs_quantity"> ${price_html} </span>
                         </td>
                     </tr>
                 `;
@@ -624,24 +661,16 @@
             $('#cart_item').append(cart_table_row);
         });
 
-        const coupon = JSON.parse(localStorage.getItem('coupon'));
-
-        if (coupon){
-            if (coupon.discount_type === 'Fixed') {
-                total_amount = total_amount - coupon.amount;
-            }
-
-            if (coupon.discount_type === 'Percentage') {
-                total_amount = total_amount - (total_amount * coupon.amount / 100);
-            }
-        }
+        const old_total = Math.round(total_amount * 100) / 100;
+        total_amount = Math.round((total_amount - discount) * 100) / 100;
 
         let cart_footer = `
-                    <div class="col-md-8 col-xs-8 footer-label">
+                    <div class="col-md-7 col-xs-7 footer-label">
                         Total Amount (£)
                     </div>
-                    <div class="col-md-4 col-xs-4 footer-amount">
-                        £${total_amount}
+                    <div class="col-md-5 col-xs-5 footer-amount">
+                        ${discount ? `<span class="old_price">${formatGBP(old_total)}</span>` : ''}
+                        ${formatGBP(total_amount)}
                     </div>
                  `;
 
@@ -669,6 +698,18 @@
     }
     checkDateSlotSelectOrNot();
 
+    // the server discounts one course: the last promo code course that is in the cart
+    function findCouponCourse(courseIDs, cartItems) {
+        let matched = null;
+        (courseIDs || []).forEach(function (courseID) {
+            const item = cartItems.find(item => parseInt(item.course_id) === parseInt(courseID));
+            if (item) {
+                matched = item;
+            }
+        });
+        return matched;
+    }
+
     $('#coupon_apply').on('click', function () {
         let value = $('#coupon').val();
         getCoupon(value);
@@ -683,12 +724,19 @@
 
             beforeSend() {
                 $('.coupon_error_msg').addClass('d-none');
+                $('#coupon_apply').prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Checking...');
+            },
+            complete() {
+                $('#coupon_apply').prop('disabled', false).html(' Apply ');
+            },
+            error() {
+                $('.coupon_error_msg').removeClass('d-none').html('<b>Could not check the promo code. Please try again.</b>');
             },
             success: function (response) {
                 // console.log(response.promocode);
 
                 if (response.promocode === null){
-                    $('.coupon_error_msg').removeClass('d-none').html('<b>Promo code is invalid.</b>');
+                    $('.coupon_error_msg').removeClass('d-none').html('<b>Invalid Promo Code.</b>');
                     return;
                 }
 
@@ -721,23 +769,26 @@
 
                 if (response.promocode && (response.promocode.start_date <= now && now <= response.promocode.end_date)) {
                     // Start::selected course id & coupon course id same or not
-                    const cartItems = JSON.parse(localStorage.getItem('guest_course'));
-                    const courseIDs = response.promocode.courses;
+                    const cartItems = JSON.parse(localStorage.getItem('guest_course')) || [];
+                    const courseIDs = response.promocode.courses || [];
 
-                    const matchedCourses = cartItems.filter(item => courseIDs.includes(item.course_id))
-                        .map(item => (item.course_name)).join(', ');
+                    if (cartItems.length === 0) {
+                        $('.coupon_error_msg').removeClass('d-none').html('<b>Please select a course before applying a promo code.</b>');
+                        return;
+                    }
+
+                    const matchedItem = findCouponCourse(courseIDs, cartItems);
 
                     const couponData = {
-                        amount: response.promocode.amount,
+                        amount: parseFloat(response.promocode.amount),
                         code: response.promocode.code,
                         discount_type: response.promocode.discount_type,
-                        course_id: response.promocode.course_id,
-                        name: matchedCourses,
+                        course_id: matchedItem ? matchedItem.course_id : null,
+                        courses: courseIDs,
+                        name: matchedItem ? matchedItem.course_name : '',
                     };
 
-                    const courseExists = courseIDs.some(courseID => cartItems.some(item => item.course_id === courseID));
-
-                    if (courseExists) {
+                    if (matchedItem) {
                         localStorage.setItem('coupon', JSON.stringify(couponData));
                     } else {
                         $('.coupon_error_msg').removeClass('d-none').html('<b> The promo code is not for this course.</b>');
