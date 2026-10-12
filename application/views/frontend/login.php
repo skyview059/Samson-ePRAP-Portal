@@ -102,7 +102,7 @@
                                         <button type="button" class="btn btn-dark disabled resendBTN d-none">Resend</button>
                                     </div>
                                     <div class="col-md-8 col-md-offset-3">
-                                        <button id="otp_resend" style="font-size: 11pt; cursor: pointer; margin-top: 15px;" class="btn btn-success resendBTN">
+                                        <button id="otp_resend" style="font-size: 11pt; cursor: pointer; margin-top: 15px;" class="btn btn-success resendBTN hidden d-none">
                                             Didn't receive SMS? Get code via Phone
                                         </button>
 
