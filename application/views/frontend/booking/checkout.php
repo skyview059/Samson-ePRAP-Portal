@@ -162,11 +162,16 @@
                 </div>
 
                 <br clear="all"/>
-                <p>If you are not able to Pay by Card,<br/>
-                    please contact <?= $SiteName; ?> <br/>
-                    Phone: <?= $PhoneNumber; ?> <br/>
+                <p>If you are not able to pay,<br/>
+                    please contact us <br/>
                     Email <?= $IncomingEmail; ?> <br/>
                     to arrange your booking.</p>
+
+                <!-- <p>If you are not able to Pay by Card,<br/>
+                    please contact <?php // $SiteName; ?> <br/>
+                    Phone: <?php // $PhoneNumber; ?> <br/>
+                    Email <?php // $IncomingEmail; ?> <br/>
+                    to arrange your booking.</p> -->
 
                 <!-- <p>If you are not able to pay by PayPal or Stripe,<br/>
                 please contact <?php // $SiteName; ?> <br/>

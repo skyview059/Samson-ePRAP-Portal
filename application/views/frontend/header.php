@@ -71,7 +71,7 @@
                 <div class="header-right clearfix">
                     <div class="header-btn-top hidden-xs">
                         <i class="fa fa-phone phone-align"> </i>
-                        <a href="tel: +4408000096888"> +44(0) 8000 096 888</a> <br>
+                        <!-- <a href="tel: +4408000096888"> +44(0) 8000 096 888</a> <br> -->
 
                         <i class="fa fa-circle phone-align" style="color: #FFC107"></i>
                         <a href="" style="text-transform:none"> Students: <?php echo totalStudentCount(); ?></a>&nbsp;&nbsp;&nbsp;
