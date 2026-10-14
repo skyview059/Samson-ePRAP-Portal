@@ -72,7 +72,7 @@
 
         <center>
             <h3>Your Total Unpaid Amount : <?= GBP($item_price); ?></h3>
-            <h3 style="color:red;">You have <span id="time">--:--</span> min to complete your payment. </h3>
+            <h3 style="color:red;">You have <span id="time">00:00</span> min to complete your payment. </h3>
         </center>
 
         <div class="row">
@@ -82,7 +82,7 @@
                     <?php
                     if ( $this->config->item('paypal_enable')){ ?>
                     <!--Start::paypal payment-->
-                        <div class="col-md-offset-2 col-md-3 text-center">
+                        <div class="col-md-offset-3 col-md-3 text-center">
 
                         <form name="PPForm" id="PPForm" action="<?= $paypal_url; ?>" method="post">
                             <input type="hidden" name="custom" value="<?= $cart_id; ?>"/>
@@ -148,15 +148,14 @@
                     <!--End::flutterWave payment-->
 
                     <!--Start::Sorting button-->
-                    <div class="col-md-3 text-left">
-                        <?php //if ($worldpay_active) { ?>
+                    <div class="col-md-3 text-center ">
+                        <?php if ($worldpay_active) { ?>
                         <form name="worldpay" id="worldpay" action="<?php echo site_url('worldpay/request.php'); ?>"
                               method="post" style="width: 180px; margin: auto;">
                             <input type="hidden" name="invoice" value="<?= $invoice_id; ?>"/>
-                            <a class="btn btn-warning" href="<?= site_url('booking/course?id=' . $cart_id); ?>">Change
-                                Order Items</a>
+                            
                         </form>
-                        <?php // } ?>
+                        <?php } ?>
                     </div>
                     <!--End::Sorting button-->
                 </div>
@@ -178,6 +177,18 @@
                 Phone: <?php // $PhoneNumber; ?> <br/>
                 Email <?php // $IncomingEmail; ?> <br/>
                 to arrange your booking.</p> -->
+
+
+                <div class="text-center">
+                    <a class="btn btn-warning" href="<?= site_url('booking/course?id=' . $cart_id ); ?>">
+                        <i class="fa fa-random"></i> Change Items
+                    </a>
+                    <form action="<?= site_url('booking/cancel_order'); ?>" method="post" style="display: inline;"
+                            onsubmit="return confirm('Are you sure you want to cancel this order?');">
+                        <input type="hidden" name="cart_id" value="<?= $cart_id; ?>"/>
+                        <button type="submit" class="btn btn-danger"><i class="fa fa-times"></i> Cancel Order</button>
+                    </form>
+                </div>
             </div>
         </div>
 

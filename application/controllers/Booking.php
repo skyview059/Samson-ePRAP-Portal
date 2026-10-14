@@ -249,8 +249,8 @@ class Booking extends Frontend_controller
         
         $payout_limit = findOutPayoutTime($paymentInfo->purchased_at);
         
-//        $IsPaypalLive = getSettingItem("IsPaypalLive");
-        $IsPaypalLive = "No";
+        $IsPaypalLive = getSettingItem("IsPaypalLive");
+        // $IsPaypalLive = "No";
         $data = [
             'SiteName'          => getSettingItem('SiteTitle'),
             'PhoneNumber'       => getSettingItem('PhoneNumber'),
@@ -346,6 +346,37 @@ class Booking extends Frontend_controller
         }
     }
     
+    public function cancel_order()
+    {
+        $coursePaymentId = (int) $this->input->post('cart_id');
+
+        // only the student's own unpaid order can be cancelled
+        $paymentInfo = $this->db->where('id', $coursePaymentId)
+            ->where('student_id', $this->student_id)
+            ->where('status', 'Due')
+            ->get('course_payments')->row();
+
+        if (empty($paymentInfo)) {
+            $this->session->set_flashdata('msge', "Order not found or already processed.");
+            redirect(site_url('booking/course'));
+        }
+
+        /*=====  trans_start  ======*/
+        $this->db->trans_begin();
+        $this->db->where('course_payment_id', $coursePaymentId)->delete('course_booked');
+        $this->db->where('id', $coursePaymentId)->delete('course_payments');
+
+        if ($this->db->trans_status() === FALSE) {
+            $this->db->trans_rollback();
+            $this->session->set_flashdata('msge', "Couldn't cancel the order.");
+            redirect(site_url('booking/checkout/' . $coursePaymentId));
+        }
+
+        $this->db->trans_commit();
+        $this->session->set_flashdata('msgs', 'Your order has been cancelled.');
+        redirect(site_url('booking/course'));
+    }
+
     private function cancel_mail( $id ){
         $this->load->model('course/Booked_model', 'Booked_model');
         $cancel = $this->Booked_model->getBookingCancelationMail($id);
