@@ -612,7 +612,7 @@ function ajaxAuthorized()
         $html .= '<center>';
         $html .= '<h1 style="color:red;">Access Denied !</h1>';
         $html .= '<hr>';
-        $html .= '<p>It seems that you might come here via an unauthorised way</p>';
+        $html .= '<p>It seems that you might come here via an unauthorized way</p>';
         $html .= '<p style="color:red;">It may happen for incomplete page loading. Please go back, refresh and try again.</p>';
         $html .= "<p><a href=\"{$url}\">Go Back</a></p>";
         $html .= '</center>';

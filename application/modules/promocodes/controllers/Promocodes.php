@@ -15,43 +15,46 @@ class Promocodes extends Admin_controller{
     public function index(){
         $q = urldecode_fk($this->input->get('q', TRUE));
         $start = intval($this->input->get('start'));
-        
+        $status = ($this->input->get('status') === 'expired') ? 'expired' : 'active';
+
         $config['base_url'] = build_pagination_url( Backend_URL . 'promocodes/', 'start');
         $config['first_url'] = build_pagination_url( Backend_URL . 'promocodes/', 'start');
 
         $config['per_page'] = 25;
         $config['page_query_string'] = TRUE;
-        $config['total_rows'] = $this->Promocodes_model->total_rows($q);
-        $promocodess = $this->Promocodes_model->get_limit_data($config['per_page'], $start, $q);
+        $config['total_rows'] = $this->Promocodes_model->total_rows($q, $status);
+        $promo_codes = $this->Promocodes_model->get_limit_data($config['per_page'], $start, $q, $status);
 
         $this->load->library('pagination');
         $this->pagination->initialize($config);
 
         $data = array(
-            'promocodess' => $promocodess,
+            'promo_codes' => $promo_codes,
             'q' => $q,
+            'status' => $status,
             'pagination' => $this->pagination->create_links(),
             'total_rows' => $config['total_rows'],
             'start' => $start,
         );
 
-        foreach ($promocodess as $key => $promocode){
+        foreach ($promo_codes as $key => $pcode){
             $courses = array_column($this->db->from('promocode_course as pc')
                 ->select('c.name')
-                ->where('promocode_id', $promocode->id )
+                ->where('promocode_id', $pcode->id )
                 ->join('courses as c', 'c.id = pc.course_id')
                 ->get()->result_array(), 'name');
 
-
-            $promocodess[$key]->courses = implode(', ' , $courses);
+            $promo_codes[$key]->courses = implode(', ' , $courses);
         }
 
         $this->viewAdminContent('promocodes/promocodes/index', $data);
     }
 
     public function read($id){
+        echo ajaxAuthorized();
+
         $row = $this->Promocodes_model->get_by_id($id);
-        if ($row) {
+        // if ($row) {
             $data = array(
                 'id'            => $row->id,
                 'amount'        => $row->amount,
@@ -74,11 +77,17 @@ class Promocodes extends Admin_controller{
                 ->row_array();
 
             $data['full_name'] = $user_info['full_name'];
-            $this->viewAdminContent('promocodes/promocodes/read', $data);
-        } else {
-            $this->session->set_flashdata('message', '<p class="ajax_error">Promocodes Not Found</p>');
-            redirect(site_url( Backend_URL. 'promocodes'));
-        }
+
+            // index page loads the details into a modal
+            
+            $data['courses'] = implode(', ', array_column($this->db->from('promocode_course as pc')
+                ->select('c.name')
+                ->where('promocode_id', $row->id)
+                ->join('courses as c', 'c.id = pc.course_id')
+                ->get()->result_array(), 'name'));
+            echo $this->load->view('promocodes/promocodes/read_modal', $data, true);
+            
+        
     }
 
     public function create(){

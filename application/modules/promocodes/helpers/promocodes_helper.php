@@ -1,5 +1,21 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
 
+function promocodesTabAsStatus($status = 'active') {
+	$statuses = [
+		'active'  => 'Active',
+		'expired' => 'Expired',
+	];
+
+	$html = '<ul class="nav nav-tabs admintab">';
+	foreach ($statuses as $key => $label) {
+		$html .= '<li><a href="' . Backend_URL . "promocodes?status={$key}\"";
+		$html .= ($key == $status) ? ' class="active"' : '';
+		$html .= '>' . $label . '</a></li>';
+	}
+	$html .= '</ul>';
+	return $html;
+}
+
 function promocodesTabs($id, $active_tab) {
 	$html = '<ul class="tabsmenu">';
 	$tabs = [
@@ -15,4 +31,15 @@ function promocodesTabs($id, $active_tab) {
 	}
 	$html .= '</ul>';
 	return $html;
+}
+
+
+function promoAmount($amount, $discount_type) {
+
+	if ($discount_type == 'Percentage') {
+		return $amount . '%';
+	} else {
+		return GBP($amount);
+	}
+	
 }
