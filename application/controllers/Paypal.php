@@ -35,7 +35,11 @@ class Paypal extends MX_Controller
         $this->db->where('course_payment_id', $payment_id);
         $this->db->update('course_booked', ['status' => 'Confirmed']);
 
-        $course_booked = $this->db->get_where('course_booked', ['id' => $payment_id])->row();
+        $course_booked = $this->db->get_where('course_booked', ['course_payment_id' => $payment_id])->row();
+        if (!$course_booked) {
+            return true;
+        }
+
         if ($course_booked->type == 'course') {
             $this->bookingConfirmationMail($payment_id);
         } else {
@@ -85,7 +89,7 @@ class Paypal extends MX_Controller
     private function invoicePractice($id, $payment)
     {
         $this->db->select('cb.course_payment_id, cb.course_id as practice_id, cb.course_payment_id,');
-        $this->db->select("c.name, cp.total_pay as amount");
+        $this->db->select("e.name, cp.total_pay as amount");
         $this->db->from('course_booked as cb');
         $this->db->join('exams as e', 'e.id = cb.course_id', 'LEFT');
         $this->db->join('course_payments as cp', 'cp.id = cb.course_payment_id', 'LEFT');
