@@ -2,11 +2,11 @@
     <div style="width: 90%; border: 1px solid #EEE; background: #fff; margin: 0 auto;">
         <div style="background-color:#009adf; height:80px; padding:15px;">
             <div style="float:left">
-                <img src="<?php echo site_url('portal/assets/theme/images/logo.png');?>" />              
+                <img src="<?php echo site_url('assets/theme/images/logo.png');?>" />              
             </div>
 
             <div style="float:right; text-align:right; color:#FFF;  font-size:12pt;">
-                Cell: <?php echo getSettingItem('PhoneNumber'); ?><br />
+                
                 <?php echo getSettingItem('OutgoingEmail'); ?>
             </div>
         </div>
