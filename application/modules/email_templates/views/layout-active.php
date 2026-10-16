@@ -2,11 +2,11 @@
     <div style="width: 90%; border: 1px solid #EEE; background: #fff; margin: 0 auto;">
         <div style="background-color:#009adf; height:80px; padding:15px;">
             <div style="float:left">
-                <img src="https://www.eprap.com/portal/assets/theme/images/logo.png" />
+                <img src="https://portal.eprap.com/assets/theme/images/logo.png" />
             </div>
 
             <div style="float:right; text-align:right; color:#FFF;  font-size:12pt;">
-                Cell: +44(0) 8000 096 888<br />                
+                info@eprap.com<br />                
             </div>
         </div>
 

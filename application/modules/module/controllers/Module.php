@@ -240,13 +240,17 @@ class Module extends Admin_controller{
             'href'      => 'module',
             'children'  => [
                 [
-                    'title' => 'Module List',
+                    'title' => 'Modules',
                     'icon'  => 'fa fa-puzzle-piece',
                     'href'  => 'module'
                 ],[
                     'title' => 'Access Control List',
                     'icon'  => 'fa fa-check-square-o',
                     'href'  => 'module/acl'
+                ],[
+                    'title' => 'Error Logs',
+                    'icon'  => 'fa fa-check-square-o',
+                    'href'  => 'module/error_log'
                 ]
             ]        
         ]);
