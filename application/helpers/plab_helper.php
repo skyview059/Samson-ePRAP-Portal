@@ -42,7 +42,7 @@ function sidebar_links($tab = '')
     $html .= '<ul class="nav navbar-nav">';
     foreach ($menus as $link => $menu) {
         if($link == 'sca') {
-            $html .= '<li><a href="https://geniusclass.co.uk/candidate/courses/12/classrooms" target="_blank"><i class="fa fa-book"></i> SCA <span class="label label-success">NEW</span> </a></li>';           
+            $html .= '<li><a href="https://geniusclass.co.uk/candidate/courses/12/classrooms" target="_blank"><i class="fa fa-fa-video-camera"></i> SCA Recorded Lectures </a></li>';           
         } else {
             $html .= '<li';
             $html .= ($link == $tab) ? ' class="active"' : '';
