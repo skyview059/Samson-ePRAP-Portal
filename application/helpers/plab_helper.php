@@ -8,7 +8,7 @@ function sidebar_links($tab = '')
         ''                          => '<i class="fa fa-dashboard"></i> Dashboard',
         'booking'                   => '<i class="fa fa-check-square-o"></i> Booking',
 //        'whatsapp-group'          => '<i class="fa fa-whatsapp"></i> Whatsapp Group',
-        'scenario-practice'         => '<i class="fa fa-users"></i> Clinical Scenarios',
+        'scenario-practice'         => '<i class="fa fa-users"></i> Clinical Case Bank',
         'sca'                       => 'SCA',
         'study-plan'                => '<i class="fa fa-bookmark"></i> Study Plan',
         'mock'                      => '<i class="fa fa-list"></i> Online Mock',
