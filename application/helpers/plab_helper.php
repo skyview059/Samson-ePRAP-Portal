@@ -9,6 +9,7 @@ function sidebar_links($tab = '')
         'booking'                   => '<i class="fa fa-check-square-o"></i> Booking',
 //        'whatsapp-group'          => '<i class="fa fa-whatsapp"></i> Whatsapp Group',
         'scenario-practice'         => '<i class="fa fa-users"></i> Course Materials <span class="label label-success">NEW</span>',
+        'sca'                       => 'SCA',
         'study-plan'                => '<i class="fa fa-bookmark"></i> Study Plan <span class="label label-success">NEW</span>',
         'mock'                      => '<i class="fa fa-list"></i> Online Mock <span class="label label-success">NEW</span>',
         'practices'                 => '<i class="fa fa-book"></i> Practice Booking',
@@ -40,9 +41,13 @@ function sidebar_links($tab = '')
     $html .= '<div class="sidebar collapse navbar-collapse" id="myNavbar">';
     $html .= '<ul class="nav navbar-nav">';
     foreach ($menus as $link => $menu) {
-        $html .= '<li';
-        $html .= ($link == $tab) ? ' class="active"' : '';
-        $html .= "><a href=\"{$link}\">{$menu}</a></li>";
+        if($link == 'sca') {
+            $html .= '<li><a href="https://geniusclass.co.uk/candidate/courses/12/classrooms" target="_blank"><i class="fa fa-book"></i> SCA <span class="label label-success">NEW</span> </a></li>';           
+        } else {
+            $html .= '<li';
+            $html .= ($link == $tab) ? ' class="active"' : '';
+            $html .= "><a href=\"{$link}\">{$menu}</a></li>";
+        }
     }
     $html .= '<li><a href="'.site_url('book-subscription').'" target="_blank"> <i class="fa fa-user-md"></i> Subscription <i class="fa fa-external-link"></i></a></li>';
     $html .= '<li><a href="https://www.geniusclass.co.uk/" target="_blank"> <i class="fa fa-globe"></i> Genius Class <i class="fa fa-external-link"></i></a></li>';
