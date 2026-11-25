@@ -8,10 +8,10 @@ function sidebar_links($tab = '')
         ''                          => '<i class="fa fa-dashboard"></i> Dashboard',
         'booking'                   => '<i class="fa fa-check-square-o"></i> Booking',
 //        'whatsapp-group'          => '<i class="fa fa-whatsapp"></i> Whatsapp Group',
-        'scenario-practice'         => '<i class="fa fa-users"></i> Course Materials <span class="label label-success">NEW</span>',
+        'scenario-practice'         => '<i class="fa fa-users"></i> Clinical Scenarios',
         'sca'                       => 'SCA',
-        'study-plan'                => '<i class="fa fa-bookmark"></i> Study Plan <span class="label label-success">NEW</span>',
-        'mock'                      => '<i class="fa fa-list"></i> Online Mock <span class="label label-success">NEW</span>',
+        'study-plan'                => '<i class="fa fa-bookmark"></i> Study Plan',
+        'mock'                      => '<i class="fa fa-list"></i> Online Mock',
         'practices'                 => '<i class="fa fa-book"></i> Practice Booking',
         'profile'                   => '<i class="fa fa-user"></i> Profile',
         'jobs'                      => '<i class="fa fa-list"></i> Job Board',
@@ -24,7 +24,7 @@ function sidebar_links($tab = '')
         'exams'                     => '<i class="fa fa-book"></i> Mock Exam <i class="fa fa-clock-o"></i>',
         'results'                   => '<i class="fa fa-wpforms"></i> Results',
         'understand'                => '<i class="fa fa-graduation-cap"></i> Understanding Your Results',
-//        'messages'                => '<i class="fa fa-comments-o"></i> Admin Messages',
+//      'messages'                => '<i class="fa fa-comments-o"></i> Admin Messages',
         'student-messages'          => '<i class="fa fa-comments-o"></i> Student Messages',
         'change-password'           => '<i class="fa fa-lock"></i> Change Password',
         'contact-us'                => '<i class="fa fa-envelope"></i> Contact us'
@@ -42,7 +42,7 @@ function sidebar_links($tab = '')
     $html .= '<ul class="nav navbar-nav">';
     foreach ($menus as $link => $menu) {
         if($link == 'sca') {
-            $html .= '<li><a href="https://geniusclass.co.uk/candidate/courses/12/classrooms" target="_blank"><i class="fa fa-video-camera"></i> SCA Recorded Lectures </a></li>';           
+            $html .= '<li><a href="https://geniusclass.co.uk/candidate/courses/12/classrooms" target="_blank"><i class="fa fa-video-camera"></i> Recorded Lectures </a></li>';           
         } else {
             $html .= '<li';
             $html .= ($link == $tab) ? ' class="active"' : '';
